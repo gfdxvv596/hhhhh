@@ -625,37 +625,7 @@ body.bordered-mode #status-bar {
     border: 1px solid var(--border-color); /* 添加一个细微的边框 */
 }
 
-/* b. AI (左侧) 气泡的默认样式 */
-#chat-messages:not([data-theme]) .message-bubble.ai .content {
-    background-color: var(--secondary-bg); /* 使用浅灰色背景 */
-    border-bottom-left-radius: 4px; /* 左下角变尖，形成“尾巴” */
-}
-
-/* c. 用户 (右侧) 气泡的默认样式 */
-#chat-messages:not([data-theme]) .message-bubble.user .content {
-    background-color: var(--accent-color); /* 使用主题强调色背景 */
-    color: white; /* 文字为白色 */
-    border: none; /* 用户气泡通常不需要边框 */
-    border-bottom-right-radius: 4px; /* 右下角变尖，形成“尾巴” */
-}
-
-/* d. 确保夜间模式下，默认AI气泡的背景和边框也能正确切换 */
-#phone-screen.dark-mode #chat-messages:not([data-theme]) .message-bubble.ai .content {
-    background-color: #2c2c2e; /* 夜间模式下的深灰色 */
-    border-color: #38383a;
-}
-
 /* ▲▲▲ 新增样式结束 ▲▲▲ */
-
-/* a. 默认主题 */
-#chat-messages[data-theme="default"] .message-bubble.user .content {
-    background: linear-gradient(to bottom right, var(--fresh-gray), #ffffff);
-    color: #333;
-}
-#chat-messages[data-theme="default"] .message-bubble.ai .content {
-    background: linear-gradient(to bottom left, var(--fresh-gray), #ffffff);
-    color: #333;
-}
 
 /* b. 粉蓝主题 */
 #chat-messages[data-theme="pink_blue"] .message-bubble.user .content {
