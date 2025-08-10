@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="https://i.postimg.cc/CMZqNMRh/IMG-6497.jpg">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <title>EPhone</title>
+    <title>🐇Phone</title>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
@@ -839,6 +839,46 @@ body:not(.bordered-mode) .comment-input {
 }
 
 /* ▲▲▲ 粘贴到此结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】已保存的气泡主题列表样式 ▼▼▼ */
+.saved-bubble-theme-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+#phone-screen.dark-mode .saved-bubble-theme-item {
+    background-color: #2c2c2e;
+}
+.saved-bubble-theme-item .theme-name {
+    font-weight: 500;
+}
+.saved-bubble-theme-item .theme-actions button {
+    margin-left: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+}
+#phone-screen.dark-mode .saved-bubble-theme-item .theme-actions button {
+    background-color: #3e3e42;
+    border-color: #555;
+    color: #fff;
+}
+.saved-bubble-theme-item .theme-actions .apply-btn {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+.saved-bubble-theme-item .theme-actions .delete-btn {
+    border-color: #ff3b30;
+    color: #ff3b30;
+}
+/* ▲▲▲ 新增样式结束 ▲▲▲ */
 
 /* === 聊天列表界面新增样式 (这是新添加的) === */
 #chat-list-screen {
@@ -5599,6 +5639,21 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
 
+<!-- ▼▼▼ Paste this new block right after the custom CSS textarea's form-group ▼▼▼ -->
+<div class="form-group">
+    <button class="form-button form-button-secondary" id="save-custom-css-theme-btn">将当前CSS存为新主题</button>
+</div>
+
+<hr style="opacity: 0.2; margin: 20px 0;">
+
+<div class="form-group">
+    <label>我保存的气泡主题</label>
+    <div id="saved-bubble-themes-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto; padding-top: 10px;">
+        <!-- Saved themes will be dynamically inserted here by JS -->
+    </div>
+</div>
+<!-- ▲▲▲ Pasting Ends ▲▲▲ -->
+
 <!-- ▼▼▼ 请将这段新代码粘贴到自定义CSS输入框的 form-group 之后 ▼▼▼ -->
 <div class="form-group">
     <label>实时预览</label>
@@ -6485,7 +6540,8 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // 2. 数据库结构定义
         // ===================================================================
 
-db.version(23).stores({ 
+// ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
+db.version(24).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
     globalSettings: '&id', 
@@ -6502,8 +6558,10 @@ db.version(23).stores({
     qzoneGroups: '++id, name',
     memories: '++id, chatId, timestamp, type, targetDate' ,
     callRecords: '++id, chatId, timestamp, customName',
-    customThemes: '&id, name' // <-- 【全新添加】这张表用来存储自定义主题
+    customThemes: '&id, name',
+    customBubbleThemes: '&id, name' // <-- 【全新添加】这张表用来存储自定义气泡主题
 });
+// ▲▲▲ Modification Ends ▲▲▲
 
         // ===================================================================
         // 3. 所有功能函数定义
@@ -7354,6 +7412,102 @@ async function renderChatList() {
     });
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】将这【一整块】新函数粘贴到JS功能函数定义区 ▼▼▼
+
+/**
+ * 渲染已保存的自定义气泡主题列表
+ */
+async function renderSavedBubbleThemes() {
+    const listEl = document.getElementById('saved-bubble-themes-list');
+    if (!listEl) return;
+
+    const savedThemes = await db.customBubbleThemes.toArray();
+    listEl.innerHTML = '';
+
+    if (savedThemes.length === 0) {
+        listEl.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">还没有保存的主题</p>';
+        return;
+    }
+
+    savedThemes.forEach(theme => {
+        const item = document.createElement('div');
+        item.className = 'saved-bubble-theme-item';
+        item.innerHTML = `
+            <span class="theme-name">${theme.name}</span>
+            <div class="theme-actions">
+                <button class="apply-btn" data-id="${theme.id}">应用</button>
+                <button class="delete-btn" data-id="${theme.id}">删除</button>
+            </div>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+/**
+ * 将当前CSS编辑器的内容保存为一个新主题
+ */
+async function saveCurrentCssTheme() {
+    const customCss = document.getElementById('custom-css-input').value.trim();
+    if (!customCss) {
+        alert("自定义CSS内容不能为空！");
+        return;
+    }
+
+    const themeName = await showCustomPrompt("保存主题", "为这个气泡主题起个名字吧！");
+    if (!themeName || !themeName.trim()) return;
+
+    const newTheme = {
+        id: 'bubble_' + Date.now(),
+        name: themeName.trim(),
+        css: customCss
+    };
+    
+    await db.customBubbleThemes.add(newTheme);
+    await renderSavedBubbleThemes(); // 刷新列表
+    alert('气泡主题保存成功！');
+}
+
+/**
+ * 应用一个已保存的自定义气泡主题
+ * @param {string} themeId - 要应用的主题ID
+ */
+async function applyCustomBubbleTheme(themeId) {
+    const theme = await db.customBubbleThemes.get(themeId);
+    if (!theme) return;
+
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+
+    // 1. 将保存的CSS应用到设置中
+    chat.settings.customCss = theme.css;
+
+    // 2. 重置预设主题为"默认"，避免冲突
+    chat.settings.theme = 'default';
+    document.getElementById('theme-default').checked = true;
+
+    // 3. 更新UI显示
+    document.getElementById('custom-css-input').value = theme.css;
+    updateSettingsPreview(); // 实时更新预览
+    alert(`主题“${theme.name}”已应用。点击“保存”以生效。`);
+}
+
+/**
+ * 删除一个已保存的自定义气泡主题
+ * @param {string} themeId - 要删除的主题ID
+ */
+async function deleteCustomBubbleTheme(themeId) {
+    const theme = await db.customBubbleThemes.get(themeId);
+    if (!theme) return;
+    
+    const confirmed = await showCustomConfirm('删除主题', `确定要删除气泡主题“${theme.name}”吗？`);
+    if (confirmed) {
+        await db.customBubbleThemes.delete(themeId);
+        await renderSavedBubbleThemes(); // 刷新列表
+    }
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 function createChatListItem(chat) {
     const lastMsgObj = chat.history.filter(msg => !msg.isHidden).slice(-1)[0] || {};
@@ -13945,7 +14099,7 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     document.getElementById('group-members-group').style.display = isGroup ? 'block' : 'none';
     document.getElementById('ai-persona-group').style.display = isGroup ? 'none' : 'block';
     document.getElementById('ai-avatar-group').style.display = isGroup ? 'none' : 'block';
-    
+    document.getElementById('chat-settings-modal').classList.add('visible');
     // 【核心修改1】根据是否为群聊，显示或隐藏“好友分组”区域
     document.getElementById('assign-group-section').style.display = isGroup ? 'none' : 'block';
     
@@ -15126,7 +15280,11 @@ if (state.globalSettings.enableBackgroundActivity) {
 
 // 1. 监听主题选择
 document.querySelectorAll('input[name="theme-select"]').forEach(radio => {
-    radio.addEventListener('change', updateSettingsPreview);
+    radio.addEventListener('change', () => {
+        // 【增强】当用户选择一个预设主题时，自动清空自定义CSS输入框
+        document.getElementById('custom-css-input').value = '';
+        updateSettingsPreview();
+    });
 });
 
 // 2. 监听字体大小滑块
@@ -15142,14 +15300,11 @@ fontSizeSlider.addEventListener('input', () => {
 const customCssInputForPreview = document.getElementById('custom-css-input');
 customCssInputForPreview.addEventListener('input', updateSettingsPreview);
 
-// 4. 监听重置按钮
-document.getElementById('reset-theme-btn').addEventListener('click', () => {
-    document.getElementById('theme-default').checked = true;
-    updateSettingsPreview();
-});
-
-document.getElementById('reset-custom-css-btn').addEventListener('click', () => {
-    document.getElementById('custom-css-input').value = '';
+// 找到并【完整替换】旧的 'reset-theme-btn' 点击事件
+document.getElementById('reset-theme-btn').addEventListener('click', () => { 
+    document.getElementById('theme-default').checked = true; 
+    // 【增强】重置时，同时清空自定义CSS输入框
+    document.getElementById('custom-css-input').value = ''; 
     updateSettingsPreview();
 });
 
@@ -16165,6 +16320,24 @@ document.getElementById('existing-categories-list').addEventListener('click', (e
     }
 });
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
+
+// ▼▼▼ 2. 在 init() 的事件监听器区域，粘贴这整块全新的事件监听器 ▼▼▼
+// 绑定“保存当前CSS为主题”按钮
+document.getElementById('save-custom-css-theme-btn').addEventListener('click', saveCurrentCssTheme);
+
+// 使用事件委托处理“应用”和“删除”按钮
+document.getElementById('saved-bubble-themes-list').addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.tagName === 'BUTTON' && target.dataset.id) {
+        const themeId = target.dataset.id;
+        if (target.classList.contains('apply-btn')) {
+            applyCustomBubbleTheme(themeId);
+        } else if (target.classList.contains('delete-btn')) {
+            deleteCustomBubbleTheme(themeId);
+        }
+    }
+});
+
 
         // ===================================================================
         // 5. 启动！
