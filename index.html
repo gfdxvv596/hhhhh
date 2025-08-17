@@ -3472,14 +3472,26 @@ input[type="color"]::-webkit-color-swatch {
     transition: all 0.3s ease;
 }
 
-/* 4. 状态小圆点 */
+/* ============================
+   🌿 状态小圆点改成 SVG 图标
+   ============================ */
 .status-dot {
     width: 7px;
     height: 7px;
-    border-radius: 50%;
-    background-color: #4cd964; /* 默认绿色，代表在线 */
+
+    /* 使用 SVG 作为遮罩，显示图形 */
+    background-color: #4cd964; /* 保留原绿色 */
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg t="1755417122203" class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M134.869333 239.36a234.666667 234.666667 0 0 0 0 331.946667l286.634667 286.592a128 128 0 0 0 180.992 0l286.634667-286.634667a234.666667 234.666667 0 1 0-331.861334-331.861333l-6.058666 6.016 101.12 101.12a27.733333 27.733333 0 0 1-39.253334 39.168l-146.346666-146.346667a234.666667 234.666667 0 0 0-331.861334 0z" fill="white"/></svg>') no-repeat center / contain;
+    -webkit-mask-repeat: no-repeat;
+    mask: url('data:image/svg+xml;utf8,<svg t="1755417122203" class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M134.869333 239.36a234.666667 234.666667 0 0 0 0 331.946667l286.634667 286.592a128 128 0 0 0 180.992 0l286.634667-286.634667a234.666667 234.666667 0 1 0-331.861334-331.861333l-6.058666 6.016 101.12 101.12a27.733333 27.733333 0 0 1-39.253334 39.168l-146.346666-146.346667a234.666667 234.666667 0 0 0-331.861334 0z" fill="white"/></svg>') no-repeat center / contain;
+    mask-repeat: no-repeat;
+
+    /* 去掉圆形背景 */
+    border-radius: 0;
+
     transition: background-color 0.3s ease;
 }
+
 
 /* 当AI状态为“忙碌”或“离开”时，让圆点变灰色 */
 #chat-header-status.busy .status-dot {
@@ -14572,6 +14584,7 @@ worldBookCheckboxesContainer.addEventListener('change', (e) => {
     document.getElementById('font-size-value').textContent = `${fontSizeSlider.value}px`;
     const customCssInput = document.getElementById('custom-css-input');
     customCssInput.value = chat.settings.customCss || '';
+    await renderSavedBubbleThemes(); // <-- 新增这行，渲染已保存的气泡主题
     
     updateSettingsPreview(); 
     document.getElementById('chat-settings-modal').classList.add('visible');
