@@ -80,8 +80,105 @@ body {
         #clock-container { text-align: center; color: white; text-shadow: 0 3px 8px rgba(0,0,0,0.4); margin-bottom: 20px; flex-shrink: 0; }
         #main-time { font-size: 80px; font-weight: 200; }
         #main-date { font-size: 18px; font-weight: 500; }
-        #app-grid { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; padding: 20px; }
-        .app-row { display: flex; justify-content: center; gap: 25px; width: 100%; }
+/* ▼▼▼ 2. 修改主页布局样式：请用下面这【一整块】全新的CSS样式，替换掉所有旧的 #app-grid 和 .app-row 样式 ▼▼▼ */
+
+/* a. 定义黑胶唱片旋转动画 */
+@keyframes spin-vinyl {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* b. 重定义 #app-grid 为左右布局的 flex 容器 */
+#app-grid {
+    display: flex;
+    flex-direction: row; /* 水平排列 */
+    justify-content: center; /* 居中分布 */
+    align-items: center;
+    width: 100%;
+    margin-top: auto; /* 将整个容器推到底部，时钟保持在顶部 */
+    padding: 20px 10px;
+    gap: 15px; /* 左右两大块之间的间距 */
+}
+
+/* ▼▼▼ 用这整块新样式，替换掉所有旧的 vinyl-player 相关样式 ▼▼▼ */
+
+/* 1. 外层总容器，它只负责【模糊背景】和【定位】 */
+#vinyl-player-container {
+    width: 180px;
+    height: 180px;
+    position: relative; /* 关键：让内部的图片可以相对于它进行绝对定位 */
+    cursor: pointer;
+    border-radius: 15px;
+    overflow: hidden; /* <-- 添加这一行 */
+    
+    /* ▼▼▼ 新增：添加一个白色底色 ▼▼▼ */
+    background-color: white; 
+    
+    /* 默认背景图，JS会更新它 */
+    background-image: url('https://i.postimg.cc/CMZqNMRh/IMG-6497.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+#vinyl-player-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: inherit;
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px; /* <-- 修改这里 */
+    filter: blur(8px); 
+    transform: scale(1.1);
+    opacity: 0.8;
+    z-index: 1; 
+}
+
+/* 3. 【核心修复】静态的、不动的【透明黑胶圈】样式 */
+#vinyl-record-overlay {
+    position: absolute;
+    top: 10px;
+    left: -28px;
+    width: 110%;
+    height: 90%;
+    z-index: 3; /* <-- z-index 修改为 3 */
+    pointer-events: none !important;
+}
+
+/* 4. 【核心修复】唯一旋转的【专辑封面图】样式 */
+#vinyl-album-art {
+    position: absolute;
+    top: 10%;
+    left: 7%;
+    transform: translate(-50%, -50%); 
+    width: 85%;  
+    height: 85%;
+    border-radius: 50%;
+    object-fit: cover;
+    z-index: 2; /* <-- z-index 修改为 2 */
+    background-color: rgb(43, 43, 43); 
+    
+    animation: spin-vinyl 8s linear infinite; 
+}
+/* d. 右侧 2x2 图标网格 */
+#new-app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2列 */
+    grid-template-rows: repeat(2, 1fr);    /* 2行 */
+    gap: 15px; /* 图标间距 */
+}
+
+/* e. 微调新布局下的图标和小字大小 */
+#new-app-grid .app-icon .icon-bg {
+    width: 58px;
+    height: 58px;
+}
+
+#new-app-grid .app-icon .label {
+    font-size: 13px;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
         .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-size: 14px; font-weight: 500; text-align: center; }
         .app-icon .icon-bg { width: 65px; height: 65px; border-radius: 18px; background-color: var(--secondary-bg); display: flex; justify-content: center; align-items: center; font-size: 32px; margin-bottom: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s ease; overflow: hidden; }
         .app-icon:active .icon-bg { transform: scale(0.9); }
@@ -1099,6 +1196,44 @@ body:not(.bordered-mode) .comment-input {
 }
 
 /* ▲▲▲ 新样式替换结束 ▲▲▲ */
+
+/* ▼▼▼ 全新：主屏幕黑胶+图标网格布局样式 ▼▼▼ */
+
+/* 1. 定义旋转动画 */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 2. 修改 #app-grid 为新的 flex 容器 */
+#app-grid.new-home-layout {
+    flex-direction: row; /* 让子元素水平排列 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    gap: 20px; /* 左右两块的间距 */
+    padding: 0 20px; /* 给左右一些边距 */
+}
+
+/* ▼▼▼ 用这整块新样式，替换掉所有旧的 vinyl-player 和 vinyl-record-img 样式 ▼▼▼ */
+
+/* 6. 右侧 2x2 图标网格容器 */
+.right-app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 创建一个两列的网格 */
+    gap: 20px; /* 图标之间的间距 */
+}
+
+/* 7. 微调原有的 .app-row (由于HTML结构改变，这个样式不再需要，可以删除或忽略) */
+.app-row {
+   /* 这个样式在新的布局下已失效 */
+}
+
+/* 8. 确保图标在网格中正常显示 (通常不需要修改，但以防万一) */
+#app-grid.new-home-layout .app-icon {
+    margin: 0; /* 移除任何可能影响网格布局的外边距 */
+}
+
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 把所有这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
@@ -4875,52 +5010,45 @@ input:checked + .slider:before {
             
             <div id="home-screen" class="screen active">
                 <div id="clock-container"><div id="main-time">12:00</div><div id="main-date">星期一, 1月1日</div></div>
-                                                <!-- ▼▼▼ 用这整块代码替换你原来的 id="app-grid" ▼▼▼ -->
+<!-- ▼▼▼ 1. 修改主页布局：请用下面这【一整块】全新的代码，替换掉你原来的 id="app-grid" ▼▼▼ -->
 <div id="app-grid">
-    <!-- 第一行：放2个图标 -->
-    <div class="app-row">
+<!-- ▼▼▼ 请用这整块代码，替换掉旧的 id="vinyl-player-container" 里的所有内容 ▼▼▼ -->
+
+<div id="vinyl-player-container">
+    <!-- 静态的黑胶圈，它现在是独立的图片 -->
+    <img id="vinyl-record-overlay" src="https://i.postimg.cc/fb1JZLZV/13.png" alt="黑胶唱片">
+    
+    <!-- 唯一需要旋转的专辑图 -->
+    <img id="vinyl-album-art" src="https://i.postimg.cc/CMZqNMRh/IMG-6497.jpg" alt="专辑封面">
+
+    <!-- 文件上传 input 保持不变 -->
+    <input type="file" id="vinyl-cover-upload" accept="image/*" style="display: none;">
+</div>
+
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+    <!-- 右侧：2x2 应用图标网格 -->
+    <div class="right-app-grid">
         <div class="app-icon" onclick="showScreen('world-book-screen')">
-            <div class="icon-bg">
-                <!-- 【核心修改1】添加ID -->
-                <img id="icon-img-world-book" src="https://i.postimg.cc/HWf1JKzn/IMG-6435.jpg" alt="世界书">
-            </div>
+            <div class="icon-bg"><img id="icon-img-world-book" src="https://i.postimg.cc/HWf1JKzn/IMG-6435.jpg" alt="世界书"></div>
             <span class="label">世界书</span>
         </div>
         <div class="app-icon" onclick="showScreen('chat-list-screen')">
-            <div class="icon-bg">
-                <!-- 【核心修改2】添加ID -->
-                <img id="icon-img-qq" src="https://i.postimg.cc/MTC3Tkw8/IMG-6436.jpg" alt="QQ">
-            </div>
+            <div class="icon-bg"><img id="icon-img-qq" src="https://i.postimg.cc/MTC3Tkw8/IMG-6436.jpg" alt="QQ"></div>
             <span class="label">QQ</span>
         </div>
-    </div>
-    <!-- 第二行：放3个图标 -->
-    <div class="app-row">
         <div class="app-icon" onclick="showScreen('api-settings-screen')">
-            <div class="icon-bg">
-                <!-- 【核心修改3】添加ID -->
-                <img id="icon-img-api-settings" src="https://i.postimg.cc/MK8rJ8t7/IMG-6438.jpg" alt="API设置">
-            </div>
+            <div class="icon-bg"><img id="icon-img-api-settings" src="https://i.postimg.cc/MK8rJ8t7/IMG-6438.jpg" alt="API设置"></div>
             <span class="label">API设置</span>
         </div>
         <div class="app-icon" onclick="showScreen('wallpaper-screen')">
-            <div class="icon-bg">
-                <!-- 【核心修改4】添加ID -->
-                <img id="icon-img-wallpaper" src="https://i.postimg.cc/T1j03pQr/IMG-6440.jpg" alt="外观设置">
-            </div>
+            <div class="icon-bg"><img id="icon-img-wallpaper" src="https://i.postimg.cc/T1j03pQr/IMG-6440.jpg" alt="外观设置"></div>
             <span class="label">外观设置</span>
-        </div>
-        <div class="app-icon" onclick="showScreen('font-settings-screen')">
-            <div class="icon-bg">
-                <!-- 【核心修改5】添加ID -->
-                <img id="icon-img-font" src="https://i.postimg.cc/pXxk1JXk/IMG-6442.jpg" alt="字体">
-            </div>
-            <span class="label">字体</span>
         </div>
     </div>
 </div>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
-            </div>
+<!-- ▲▲▲ 新布局替换结束 ▲▲▲ -->
+ </div>
           
 <div id="world-book-screen" class="screen">
     <div class="header">
@@ -5428,6 +5556,30 @@ input:checked + .slider:before {
             </div>
         </div>
 
+        <!-- ▼▼▼ 5. 功能移动(粘贴)：将字体设置功能移动到外观设置页面 ▼▼▼ -->
+<hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
+
+<div id="font-settings-section" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+     <label class="section-title">全局字体</label>
+    <div class="form-group" style="width:100%;">
+        <label for="font-url-input">字体文件URL (.ttf, .otf, .woff等)</label>
+        <input type="text" id="font-url-input" placeholder="https://..../font.ttf">
+    </div>
+
+    <div class="form-group" style="width:100%;">
+        <label>实时预览</label>
+        <div id="font-preview">
+            <p style="font-size: 20px; margin: 0 0 10px 0;">你好世界 Hello World</p>
+            <p style="margin: 0;">这是字体预览效果，12345。</p>
+        </div>
+    </div>
+
+    <!-- 为了和页面上其他按钮统一，这里也加上了 style="width:100%" -->
+    <button class="form-button" id="save-font-btn" style="width:100%;">保存并应用字体</button>
+    <button class="form-button form-button-secondary" id="reset-font-btn" style="width:100%;">恢复默认字体</button>
+</div>
+<!-- ▲▲▲ 移动结束 ▲▲▲ -->
+
         <button class="form-button" id="save-wallpaper-btn" style="margin-top: 30px;">保存所有外观设置</button>
         <input type="file" id="app-icon-upload-input" accept="image/*" hidden>
     </div>
@@ -5449,31 +5601,6 @@ input:checked + .slider:before {
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
-
-<div id="font-settings-screen" class="screen">
-    <div class="header">
-        <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
-        <span>字体设置</span>
-        <span style="width: 30px;"></span>
-    </div>
-    <div class="form-container">
-        <div class="form-group">
-            <label for="font-url-input">字体文件URL (.ttf, .otf, .woff等)</label>
-            <input type="text" id="font-url-input" placeholder="https://..../font.ttf">
-        </div>
-
-        <div class="form-group">
-            <label>实时预览</label>
-<div id="font-preview">
-                <p style="font-size: 20px; margin: 0 0 10px 0;">你好世界 Hello World</p>
-                <p style="margin: 0;">这是字体预览效果，12345。</p>
-            </div>
-        </div>
-
-        <button class="form-button" id="save-font-btn">保存并应用</button>
-        <button class="form-button form-button-secondary" id="reset-font-btn">恢复默认字体</button>
-    </div>
-</div>
 
 <!-- ▼▼▼ 【全新】选择联系人以创建群聊的屏幕 ▼▼▼ -->
 <div id="contact-picker-screen" class="screen">
@@ -15274,6 +15401,16 @@ if (state.globalSettings.enableBackgroundActivity) {
 }
 // ▲▲▲ 添加结束 ▲▲▲
 
+            // --- 黑胶唱片封面上传功能 ---
+            const vinylPlayer = document.getElementById('vinyl-player-container');
+            const vinylUploadInput = document.getElementById('vinyl-cover-upload');
+
+            if (vinylPlayer && vinylUploadInput) {
+                vinylPlayer.addEventListener('click', () => {
+                    vinylUploadInput.click(); // 点击播放器时，触发隐藏的文件上传按钮
+                });
+            }
+
 // ▼▼▼ 【这是最终的正确代码】请粘贴这段代码到 init() 的事件监听器区域末尾 ▼▼▼
 
 // --- 统一处理所有影响预览的控件的事件 ---
@@ -16027,6 +16164,43 @@ document.getElementById('chat-messages').addEventListener('click', (e) => {
         }
     }
 });
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 找到旧的 vinylUploadInput 事件监听器，用这个新版本替换它 ▼▼▼
+
+vinylUploadInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const newCoverUrl = e.target.result;
+            
+            // 【核心修改】
+            // 1. 同时更新模糊背景
+            document.getElementById('vinyl-player-container').style.backgroundImage = `url(${newCoverUrl})`;
+            
+            // 2. 同时更新中间的专辑封面图
+            document.getElementById('vinyl-album-art').src = newCoverUrl;
+
+            // 3. 将图片地址保存到localStorage，以便刷新后保留（这部分逻辑不变）
+            localStorage.setItem('vinylCoverUrl', newCoverUrl);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 找到读取 localStorage 的旧代码，用这个新版本替换它 ▼▼▼
+
+const savedVinylCover = localStorage.getItem('vinylCoverUrl');
+if (savedVinylCover) {
+    // 【核心修改】
+    // 页面加载时，也需要同时更新背景和封面图
+    document.getElementById('vinyl-player-container').style.backgroundImage = `url(${savedVinylCover})`;
+    document.getElementById('vinyl-album-art').src = savedVinylCover;
+}
+
 // ▲▲▲ 替换结束 ▲▲▲
 
 // 在 init() 的事件监听区域添加
