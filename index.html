@@ -6496,7 +6496,48 @@ input:checked + .slider:before {
 
 <script>
 
+            // --- 已修正 ---
+        let state = { chats: {}, activeChatId: null, globalSettings: {}, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [], qzoneSettings: {}, activeAlbumId: null };
+        // --- 修正结束 ---
+
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
+            function toGeminiRequestData(model, apiKey, systemPrompt, messages, isGemini) {
+        // 这个函数用于构建对 Gemini API 的请求
+        const proxyUrl = state.apiConfig.proxyUrl; 
+        
+        const contents = formatMessagesForGemini(messages);
+        
+        const dataPayload = {
+            contents: contents,
+            generationConfig: { temperature: 0.8 },
+        };
+
+        if (systemPrompt && systemPrompt.trim() !== '') {
+            dataPayload.systemInstruction = { parts: [{ "text": systemPrompt }] };
+        }
+        
+        const fetchOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataPayload)
+        };
+        
+        let url;
+        const isStudioGemini = proxyUrl === 'https://generativelanguage.googleapis.com';
+        const isLegacyGemini = proxyUrl === 'https://generativelanguage.googleapis.com/v1beta/models';
+
+        if (isStudioGemini) {
+            url = `${proxyUrl}/v1beta/models/${model}:generateContent`;
+            fetchOptions.headers['x-goog-api-key'] = getRandomValue(apiKey);
+        } else if (isLegacyGemini) {
+            url = `${proxyUrl}/${model}:generateContent?key=${getRandomValue(apiKey)}`;
+        } else {
+            console.warn("toGeminiRequestData 被调用，但使用的是一个未知的 Gemini URL 格式。");
+            url = `${proxyUrl}/${model}:generateContent?key=${getRandomValue(apiKey)}`;
+        }
+
+        return { url: url, data: fetchOptions };
+    }
     // gemini如果是多个密钥, 那么随机获取一个
     function getRandomValue(str) {
         // 检查字符串是否包含逗号
@@ -6696,9 +6737,6 @@ if(Array.isArray(res) && res.length > 1) {
         // 1. 所有变量和常量定义
         // ===================================================================
         const db = new Dexie('GeminiChatDB');
-        // --- 已修正 ---
-        let state = { chats: {}, activeChatId: null, globalSettings: {}, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [], qzoneSettings: {}, activeAlbumId: null };
-        // --- 修正结束 ---
 let musicState = { 
     isActive: false, 
     activeChatId: null, 
@@ -8428,7 +8466,8 @@ else if (msg.type === 'share_card') {
         bubble.classList.add('is-ai-image');
         const altText = msg.type === 'user_photo' ? "用户描述的照片" : "AI生成的图片";
         contentHtml = `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="ai-generated-image" alt="${altText}" data-description="${msg.content}">`;
-    } else if (msg.type === 'voice_message') {
+    } 
+    else if (msg.type === 'voice_message') {
     bubble.classList.add('is-voice-message');
     
     // 【核心修正1】将语音原文存储在父级气泡的 data-* 属性中，方便事件处理器获取
@@ -8895,7 +8934,20 @@ let geminiConfig = toGeminiRequestData(model,apiKey,'', messagesForDecision,isGe
                     const data = await response.json();
 
                     // 净化并解析AI的回复
-    let rawContent = isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+let rawContent = '';
+if (isGemini) {
+    if (data.candidates && data.candidates.length > 0) {
+        rawContent = data.candidates[0].content.parts[0].text;
+    } else {
+        console.warn("Gemini API 返回了空的 candidates 数组，可能触发了安全策略。");
+    }
+} else {
+    if (data.choices && data.choices.length > 0) {
+        rawContent = data.choices[0].message.content;
+    } else {
+        console.warn("OpenAI API 返回了空的 choices 数组。");
+    }
+}
      rawContent = rawContent.replace(/^```json\s*/, '').replace(/```$/, '').trim()
                     const decisionObj = JSON.parse(rawContent);
 
@@ -9241,7 +9293,6 @@ ${sharedContext}
 // ▼▼▼ 请用这【一整块已修复时间戳】的代码，替换旧的【单人聊天】messagesPayload构建逻辑 ▼▼▼
 messagesPayload = historySlice.map(msg => {
     // 过滤掉不应发送给AI的消息
-    if (msg.isHidden) return null;
 
     if (msg.type === 'share_card') return null;
     
@@ -9412,7 +9463,22 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
                 throw new Error(errorMsg);
             }
             const data = await response.json();
-            const aiResponseContent = (isStudioGemini || isLegacyGemini) ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+let aiResponseContent = '';
+if (isStudioGemini || isLegacyGemini) {
+    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
+        aiResponseContent = data.candidates[0].content.parts[0].text;
+    } else {
+        console.error("Gemini API 返回的响应格式不正确或为空。", data);
+        throw new Error("AI未返回有效内容，可能触发了安全策略或API错误。");
+    }
+} else {
+    if (data.choices && data.choices.length > 0) {
+        aiResponseContent = data.choices[0].message.content;
+    } else {
+        console.error("OpenAI API 返回的响应格式不正确或为空。", data);
+        throw new Error("AI未返回有效内容，可能是API错误。");
+    }
+}
             console.log(`AI '${chat.name}' 的原始回复:`, aiResponseContent);
 
         chat.history = chat.history.filter(msg => !msg.isTemporary);
@@ -10759,8 +10825,17 @@ try {
                 console.warn(`API为空回或格式不正确，角色 "${chat.name}" 的本次后台活动跳过。`);
                 return;
             }
-            const responseArray = parseAiResponse(isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content);
-        
+let responseText = '';
+if (isGemini) {
+    if (data.candidates && data.candidates.length > 0) {
+        responseText = data.candidates[0].content.parts[0].text;
+    }
+} else {
+    if (data.choices && data.choices.length > 0) {
+        responseText = data.choices[0].message.content;
+    }
+}
+const responseArray = parseAiResponse(responseText);        
         // 后续处理AI返回指令的逻辑保持不变...
         for (const action of responseArray) {
             if (!action) continue;
@@ -12616,7 +12691,20 @@ ${contextSummary}
             const data = await response.json();
 
             // --- 【核心修正：在这里净化AI的回复】 ---
-            let rawContent = isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+let rawContent = '';
+if (isGemini) {
+    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
+        rawContent = data.candidates[0].content.parts[0].text;
+    } else {
+        throw new Error("Gemini未能生成申请理由，可能触发安全策略。");
+    }
+} else {
+    if (data.choices && data.choices.length > 0) {
+        rawContent = data.choices[0].message.content;
+    } else {
+        throw new Error("AI未能生成申请理由。");
+    }
+}
             // 1. 移除头尾可能存在的 "```json" 和 "```"
             rawContent = rawContent.replace(/^```json\s*/, '').replace(/```$/, '');
             // 2. 移除所有换行符和多余的空格，确保是一个干净的JSON字符串
@@ -15113,7 +15201,7 @@ document.getElementById('confirm-create-post-btn').addEventListener('click', asy
         // 只有满足条件的角色才会被通知
         if (shouldNotify) {
             const historyMessage = {
-                role: 'system',
+                role: 'user',
                 content: `[系统提示：用户刚刚发布了一条动态(ID: ${newPostId})，内容摘要是：“${postSummary}”。你现在可以对这条动态进行评论了。]`,
                 timestamp: Date.now(),
                 isHidden: true
