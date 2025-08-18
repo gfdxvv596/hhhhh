@@ -9827,18 +9827,41 @@ case 'qzone_post':
                     }
                     continue;
 
-                case 'qzone_comment':
-                    const postToComment = await db.qzonePosts.get(parseInt(msgData.postId));
-                    if (postToComment) {
-                        if (!postToComment.comments) postToComment.comments = [];
-                        postToComment.comments.push({ commenterName: chat.name, text: msgData.commentText, timestamp: Date.now() });
-                        await db.qzonePosts.update(postToComment.id, { comments: postToComment.comments });
-                        updateUnreadIndicator(unreadPostsCount + 1);
-                        if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
-                           await renderQzonePosts();
-                        }
-                    }
-                    continue;
+// ▼▼▼ 请用这块【全新的代码】替换旧的 case 'qzone_comment' ▼▼▼
+case 'qzone_comment': { 
+    const postToComment = await db.qzonePosts.get(parseInt(msgData.postId));
+    if (postToComment) {
+        if (!postToComment.comments) postToComment.comments = [];
+
+        const commentText = msgData.commentText;
+        const newComment = {
+            commenterName: chat.name,
+            timestamp: Date.now()
+        };
+        
+        // 【核心修复】修改了这里的正则表达式，不再将回复的第一个词错误地当成名字的一部分
+        const mentionRegex = /^@([\p{L}\w]+)\s*(.*)$/u; 
+        const match = commentText.match(mentionRegex);
+
+        if (match) {
+            newComment.replyTo = match[1].trim(); 
+            newComment.text = match[2];       
+        } else {
+            newComment.replyTo = null;
+            newComment.text = commentText;
+        }
+
+        postToComment.comments.push(newComment); 
+
+        await db.qzonePosts.update(postToComment.id, { comments: postToComment.comments });
+        updateUnreadIndicator(unreadPostsCount + 1);
+        if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
+           await renderQzonePosts();
+        }
+    }
+    continue;
+}
+// ▲▲▲ 替换结束 ▲▲▲
 
                 case 'qzone_like':
                    const postToLike = await db.qzonePosts.get(parseInt(msgData.postId));
@@ -15870,56 +15893,91 @@ postsList.addEventListener('click', async (e) => {
         await renderQzonePosts();
         return;
     }
-// ▼▼▼ 从这里开始替换 ▼▼▼
-    const sendBtn = target.closest('.comment-send-btn');
-    if (sendBtn) {
-        const postContainer = sendBtn.closest('.qzone-post-container');
-        if (!postContainer) return;
-        const postId = parseInt(postContainer.dataset.postId);
-        const commentInput = postContainer.querySelector('.comment-input');
-        const commentText = commentInput.value.trim();
-        if (!commentText) return alert('评论内容不能为空哦！');
+// ▼▼▼ 请用下面这块【全新的、功能增强的】代码，替换掉旧的 if (sendBtn) { ... } 代码块 ▼▼▼
+const sendBtn = target.closest('.comment-send-btn');
+if (sendBtn) {
+    const postContainer = sendBtn.closest('.qzone-post-container');
+    if (!postContainer) return;
+    const postId = parseInt(postContainer.dataset.postId);
+    const commentInput = postContainer.querySelector('.comment-input');
+    const commentText = commentInput.value.trim();
+    if (!commentText) return alert('评论内容不能为空哦！');
 
-        const post = await db.qzonePosts.get(postId);
-        if (!post) return;
-        if (!post.comments) post.comments = [];
+    const post = await db.qzonePosts.get(postId);
+    if (!post) return;
+    if (!post.comments) post.comments = [];
 
-        // 【核心修改】在这里解析评论内容
-        const newComment = {
-            commenterName: state.qzoneSettings.nickname,
-            timestamp: Date.now()
-        };
-        
-        // 使用正则表达式匹配开头的 @提及
-        const mentionRegex = /^@([\p{L}\w]+)\s*(.*)$/u;
-        const match = commentText.match(mentionRegex);
-
-        if (match) {
-            // 如果匹配成功，说明是回复
-            newComment.replyTo = match[1]; // 被@的人
-            newComment.text = match[2];    // 真实的评论内容
-        } else {
-            // 如果不匹配，说明是普通评论
-            newComment.replyTo = null;
-            newComment.text = commentText;
-        }
-
-        // 将构建好的新评论对象推入数组
-        post.comments.push(newComment);
-
-        await db.qzonePosts.update(postId, { comments: post.comments });
-        for (const chatId in state.chats) {
-            const chat = state.chats[chatId];
-            if (!chat.isGroup) {
-                // 【重要】通知AI时，我们发送完整的原始评论文本，让AI能理解上下文
-                chat.history.push({ role: 'system', content: `[系统提示：'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下发表了评论：“${commentText}”]`, timestamp: Date.now(), isHidden: true });
-                await db.chats.put(chat);
-            }
-        }
-        commentInput.value = '';
-        await renderQzonePosts();
-        return;
+    // 1. 【解析与保存】这部分逻辑与之前相同，确保用户的评论能被正确解析和保存
+    const newComment = {
+        commenterName: state.qzoneSettings.nickname,
+        timestamp: Date.now()
+    };
+    const mentionRegex = /^@([\p{L}\w]+)\s*(.*)$/u;
+    const match = commentText.match(mentionRegex);
+    if (match) {
+        newComment.replyTo = match[1].trim();
+        newComment.text = match[2];
+    } else {
+        newComment.replyTo = null;
+        newComment.text = commentText;
     }
+    post.comments.push(newComment);
+    await db.qzonePosts.update(postId, { comments: post.comments });
+    
+    // --- 【核心AI唤醒逻辑开始】 ---
+    
+    // 2. 【识别目标】检查这条评论是不是在回复某个AI
+    if (newComment.replyTo) {
+        // 尝试根据被回复的名字，找到对应的AI角色
+        const repliedToAI = Object.values(state.chats).find(chat => 
+            !chat.isGroup && chat.name === newComment.replyTo
+        );
+        
+        // 3. 【发送指令 & 立即唤醒】如果找到了被回复的AI
+        if (repliedToAI) {
+            console.log(`检测到用户回复了AI “${repliedToAI.name}”，正在准备唤醒...`);
+            
+            // a. 创建一条对用户隐藏的、专门给这个AI的系统指令
+            const hiddenInstruction = {
+                role: 'system',
+                content: `[系统指令：用户“${state.qzoneSettings.nickname}”刚刚在动态(ID: ${postId})下回复了【你】。TA说：“${newComment.text}”。请你根据你的人设，使用 qzone_comment 指令，并以“@${state.qzoneSettings.nickname}”开头，来回应TA。]`,
+                timestamp: Date.now(),
+                isHidden: true
+            };
+            
+            // b. 将指令存入这个AI的聊天记录
+            repliedToAI.history.push(hiddenInstruction);
+            await db.chats.put(repliedToAI);
+
+            // c. 【关键一步】立即触发这个AI的思考和响应！
+            triggerAiResponse(repliedToAI.id);
+        }
+    }
+    
+    // 4. 【广播通知】无论是不是回复，都像以前一样，通知所有其他AI“用户发了一条新评论”
+    //    这样可以确保其他AI也能看到这条评论，并根据自己的性格决定是否要“插话”
+    for (const chatId in state.chats) {
+        const chat = state.chats[chatId];
+        // 确保是单聊，并且不是我们刚刚已经单独“唤醒”过的那个AI
+        if (!chat.isGroup && (!newComment.replyTo || chat.name !== newComment.replyTo)) {
+            chat.history.push({ 
+                role: 'system', 
+                content: `[系统提示：'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下发表了评论：“${commentText}”]`, 
+                timestamp: Date.now(), 
+                isHidden: true 
+            });
+            await db.chats.put(chat);
+        }
+    }
+    
+    // --- 【AI唤醒逻辑结束】 ---
+
+    // 5. 【收尾】清空输入框并重新渲染动态列表
+    commentInput.value = '';
+    await renderQzonePosts();
+    return; // 明确地结束该点击事件的处理
+}
+// ▲▲▲ 替换结束 ▲▲▲
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
