@@ -1610,6 +1610,39 @@ body:not(.bordered-mode) .comment-input {
 
 /* ▲▲▲ 新样式结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】表情包批量管理样式 ▼▼▼ */
+.sticker-item.in-selection-mode {
+    cursor: pointer;
+}
+
+/* 选择框的默认样式 */
+.sticker-item.in-selection-mode::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+
+/* 选中后的样式 */
+.sticker-item.in-selection-mode.selected::after {
+    background-color: var(--accent-color);
+    border-color: white;
+    content: '✔';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 20px;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* === 相册页面背景色 === */
 #album-screen {
     background-color: #f0f2f5; /* 使用一个柔和的浅灰色，比纯白更护眼 */
@@ -5600,16 +5633,32 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 新增结束 ▲▲▲ -->
 
-    <!-- 表情面板 (保持不变) -->
-    <div id="sticker-panel">
-        <div id="sticker-panel-header">
-            <span class="panel-btn" id="close-sticker-panel-btn">取消</span>
-            <span class="title">我的表情</span>
-            <div style="display: flex; gap: 10px;">
+<!-- ▼▼▼ 请将这块代码粘贴到 id="chat-lock-overlay" 的 div 之后 ▼▼▼ -->
+
+<!-- ▼▼▼ 请用这整块代码，替换掉旧的 sticker-panel-header 和 sticker-grid ▼▼▼ -->
+
+<!-- 1. 这是包裹住整个表情面板的容器，它的CSS样式使其脱离主布局 -->
+<div id="sticker-panel">
+    
+    <!-- 2. 表情面板的头部 -->
+    <div id="sticker-panel-header">
+        <span class="panel-btn" id="close-sticker-panel-btn">取消</span>
+        <span class="title">我的表情</span>
+        <div id="sticker-panel-actions-wrapper">
+            <!-- 正常模式下的按钮 -->
+            <div id="sticker-panel-normal-actions" style="display: flex; gap: 10px;">
+              <span class="panel-btn" id="manage-stickers-btn">管理</span>
               <span class="panel-btn" id="add-sticker-btn">添加</span>
               <span class="panel-btn" id="upload-sticker-btn">上传</span>
             </div>
+            <!-- 编辑模式下的按钮 (默认隐藏) -->
+            <div id="sticker-panel-edit-actions" style="display: none; align-items: center; gap: 10px;">
+               <span class="panel-btn" id="select-all-stickers-btn">全选</span>
+               <span class="panel-btn" id="delete-selected-stickers-btn" style="color: #ff3b30; font-weight: 600;">删除</span>
+               <span class="panel-btn" id="done-managing-stickers-btn">完成</span>
+            </div>
         </div>
+    </div>
         <div id="sticker-grid"></div>
     </div>
     <input type="file" id="sticker-upload-input" accept="image/*" style="display: none;">
@@ -6745,7 +6794,9 @@ if(Array.isArray(res) && res.length > 1) {
         // ===================================================================
         // 1. 所有变量和常量定义
         // ===================================================================
-        const db = new Dexie('GeminiChatDB');
+const db = new Dexie('GeminiChatDB');
+let isStickerEditMode = false;
+let selectedStickers = new Set();
 let musicState = { 
     isActive: false, 
     activeChatId: null, 
@@ -8362,7 +8413,154 @@ async function openWorldBookEditor(bookId) {
     showScreen('world-book-editor-screen');
 }
 
-        function renderStickerPanel() { const grid = document.getElementById('sticker-grid'); grid.innerHTML = ''; if (state.userStickers.length === 0) { grid.innerHTML = '<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">大人请点击右上角“添加”或“上传”来添加你的第一个表情吧！</p>'; return; } state.userStickers.forEach(sticker => { const item = document.createElement('div'); item.className = 'sticker-item'; item.style.backgroundImage = `url(${sticker.url})`; item.title = sticker.name; item.addEventListener('click', () => sendSticker(sticker)); addLongPressListener(item, () => { if (isSelectionMode) return; const existingDeleteBtn = item.querySelector('.delete-btn'); if (existingDeleteBtn) return; const deleteBtn = document.createElement('div'); deleteBtn.className = 'delete-btn'; deleteBtn.innerHTML = '&times;'; deleteBtn.onclick = async (e) => { e.stopPropagation(); const confirmed = await showCustomConfirm('删除表情', `确定要删除表情 "${sticker.name}" 吗？`, { confirmButtonClass: 'btn-danger' }); if (confirmed) { await db.userStickers.delete(sticker.id); state.userStickers = state.userStickers.filter(s => s.id !== sticker.id); renderStickerPanel(); } }; item.appendChild(deleteBtn); deleteBtn.style.display = 'block'; setTimeout(() => item.addEventListener('mouseleave', () => deleteBtn.remove(), { once: true }), 3000); }); grid.appendChild(item); }); }
+function renderStickerPanel() {
+    const grid = document.getElementById('sticker-grid');
+    grid.innerHTML = '';
+
+    // 切换顶部操作按钮的显示/隐藏
+    document.getElementById('sticker-panel-normal-actions').style.display = isStickerEditMode ? 'none' : 'flex';
+    document.getElementById('sticker-panel-edit-actions').style.display = isStickerEditMode ? 'flex' : 'none';
+
+    if (state.userStickers.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">大人请点击右上角“添加”或“上传”来添加你的第一个表情吧！</p>';
+        return;
+    }
+
+    state.userStickers.forEach(sticker => {
+        const item = document.createElement('div');
+        item.className = 'sticker-item';
+        item.style.backgroundImage = `url(${sticker.url})`;
+        item.title = sticker.name;
+
+        if (isStickerEditMode) {
+            // 如果是编辑模式
+            item.classList.add('in-selection-mode');
+            if (selectedStickers.has(sticker.id)) {
+                item.classList.add('selected');
+            }
+            // 为表情本身绑定“选择/取消选择”的点击事件
+            item.addEventListener('click', () => {
+                toggleStickerSelection(sticker.id, item);
+            });
+        } else {
+            // 如果是正常模式
+            item.addEventListener('click', () => sendSticker(sticker));
+            addLongPressListener(item, () => {
+                if (isStickerEditMode) return;
+                const existingDeleteBtn = item.querySelector('.delete-btn');
+                if (existingDeleteBtn) return;
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    const confirmed = await showCustomConfirm('删除表情', `确定要删除表情 "${sticker.name}" 吗？`, { confirmButtonClass: 'btn-danger' });
+                    if (confirmed) {
+                        await db.userStickers.delete(sticker.id);
+                        state.userStickers = state.userStickers.filter(s => s.id !== sticker.id);
+                        renderStickerPanel();
+                    }
+                };
+                item.appendChild(deleteBtn);
+                deleteBtn.style.display = 'block';
+                setTimeout(() => item.addEventListener('mouseleave', () => deleteBtn.remove(), { once: true }), 3000);
+            });
+        }
+        grid.appendChild(item);
+    });
+}
+
+/**
+ * 进入表情编辑模式
+ */
+function enterStickerEditMode() {
+    isStickerEditMode = true;
+    renderStickerPanel();
+}
+
+/**
+ * 切换单个表情的选中状态
+ * @param {string} stickerId - 被点击的表情ID
+ * @param {HTMLElement} element - 被点击的表情DOM元素
+ */
+function toggleStickerSelection(stickerId, element) {
+    if (selectedStickers.has(stickerId)) {
+        selectedStickers.delete(stickerId);
+        element.classList.remove('selected');
+    } else {
+        selectedStickers.add(stickerId);
+        element.classList.add('selected');
+    }
+    // 实时更新删除按钮上的计数
+    document.getElementById('delete-selected-stickers-btn').textContent = `删除 (${selectedStickers.size})`;
+
+    // 【新增】根据当前选择情况，更新“全选”按钮的文字
+    const allStickerIds = state.userStickers.map(s => s.id);
+    const areAllSelected = allStickerIds.length > 0 && allStickerIds.every(id => selectedStickers.has(id));
+    document.getElementById('select-all-stickers-btn').textContent = areAllSelected ? '取消全选' : '全选';
+}
+
+/**
+ * 退出表情编辑模式
+ */
+function exitStickerEditMode() {
+    isStickerEditMode = false;
+    selectedStickers.clear();
+    document.getElementById('delete-selected-stickers-btn').textContent = `删除`;
+    // 【新增】退出时重置“全选”按钮的文字
+    document.getElementById('select-all-stickers-btn').textContent = `全选`;
+    renderStickerPanel();
+}
+
+/**
+ * 全选或取消全选所有表情
+ */
+function selectAllStickers() {
+    const allStickerIds = state.userStickers.map(s => s.id);
+    if (allStickerIds.length === 0) return; // 如果没有表情，则不执行任何操作
+
+    const areAllSelected = allStickerIds.every(id => selectedStickers.has(id));
+    const selectAllBtn = document.getElementById('select-all-stickers-btn');
+
+    if (areAllSelected) {
+        // 如果已经全选了，则取消全选
+        selectedStickers.clear();
+        selectAllBtn.textContent = '全选';
+    } else {
+        // 否则，执行全选
+        allStickerIds.forEach(id => selectedStickers.add(id));
+        selectAllBtn.textContent = '取消全选';
+    }
+
+    // 重新渲染面板以更新视觉上的选中状态
+    renderStickerPanel();
+    
+    // 手动更新删除按钮的计数
+    document.getElementById('delete-selected-stickers-btn').textContent = `删除 (${selectedStickers.size})`;
+}
+
+/**
+ * 删除所有选中的表情
+ */
+async function deleteSelectedStickers() {
+    if (selectedStickers.size === 0) {
+        alert('请先选择要删除的表情。');
+        return;
+    }
+
+    const confirmed = await showCustomConfirm(
+        '删除表情',
+        `确定要删除选中的 ${selectedStickers.size} 个表情吗？此操作不可恢复。`,
+        { confirmButtonClass: 'btn-danger' }
+    );
+
+    if (confirmed) {
+        const idsToDelete = Array.from(selectedStickers);
+        await db.userStickers.bulkDelete(idsToDelete);
+        state.userStickers = state.userStickers.filter(s => !selectedStickers.has(s.id));
+        exitStickerEditMode(); // 退出编辑模式，这会自动刷新列表
+    }
+}
 
 // ▼▼▼ 用这个【已更新】的版本替换旧的 createMessageElement 函数 ▼▼▼
 function createMessageElement(msg, chat) {
@@ -14394,6 +14592,7 @@ applyAppIcons();
             document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-data-input').click());
             document.getElementById('import-data-input').addEventListener('change', e => importBackup(e.target.files[0]));
             document.getElementById('back-to-list-btn').addEventListener('click', () => { 
+document.getElementById('sticker-panel').classList.remove('visible');
 
     // ▼▼▼ 修改这两行 ▼▼▼
     applyScopedCss('', '#chat-messages', 'custom-bubble-style'); // 清除真实聊天界面的自定义样式
@@ -15005,7 +15204,10 @@ document.getElementById('add-sticker-btn').addEventListener('click', async () =>
 // ▲▲▲ 替换到这里结束 ▲▲▲
             document.getElementById('upload-sticker-btn').addEventListener('click', () => document.getElementById('sticker-upload-input').click());
             document.getElementById('sticker-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = async () => { const base64Url = reader.result; const name = await showCustomPrompt("命名表情", "请为这个表情命名 (例如：好耶、疑惑)"); if (name && name.trim()) { const newSticker = { id: 'sticker_' + Date.now(), url: base64Url, name: name.trim() }; await db.userStickers.add(newSticker); state.userStickers.push(newSticker); renderStickerPanel(); } else if (name !== null) alert("表情名不能为空！"); }; event.target.value = null; });
-
+document.getElementById('manage-stickers-btn').addEventListener('click', enterStickerEditMode);
+document.getElementById('done-managing-stickers-btn').addEventListener('click', exitStickerEditMode);
+document.getElementById('select-all-stickers-btn').addEventListener('click', selectAllStickers); // <-- 就是这一行
+document.getElementById('delete-selected-stickers-btn').addEventListener('click', deleteSelectedStickers);
             document.getElementById('upload-image-btn').addEventListener('click', () => document.getElementById('image-upload-input').click());
             document.getElementById('image-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (!file || !state.activeChatId) return; const reader = new FileReader(); reader.onload = async (e) => { const base64Url = e.target.result; const chat = state.chats[state.activeChatId]; const msg = { role: 'user', content: [{ type: 'image_url', image_url: { url: base64Url } }], timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); }; reader.readAsDataURL(file); event.target.value = null; });
             document.getElementById('voice-message-btn').addEventListener('click', async () => { if (!state.activeChatId) return; const text = await showCustomPrompt("发送语音", "请输入你想说的内容："); if (text && text.trim()) { const chat = state.chats[state.activeChatId]; const msg = { role: 'user', type: 'voice_message', content: text.trim(), timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); } });
