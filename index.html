@@ -9511,6 +9511,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 # 你可以使用的操作指令 (JSON数组中的元素):
 +   **【全新】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "content": "你想让AI说出后立刻消失的话"}\` (用于模拟说错话、后悔等场景，消息会短暂出现后自动变为“已撤回”)
 - **【【【核心指令】】】发送可交互HTML模块**: \`{"type": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\`
+-   **【全新】修改用户备注**: \`{"type": "change_user_nickname", "newName": "你想给用户起的新外号"}\` (提示：当你觉得气氛合适，或者想给用户一个亲密的昵称时，可以使用这个指令。系统会自动生成提示，你可以紧接着发一条消息来解释或调侃你的行为)
 -   **【新增】更新状态**: \`{"type": "update_status", "status_text": "我去做什么了", "is_busy": false}\` (is_busy: true代表忙碌/离开, false代表空闲)
 -   **【新增】切换歌曲**: \`{"type": "change_music", "song_name": "你想切换到的歌曲名"}\` (歌曲名必须在下面的播放列表中)
 -   **【新增】记录回忆**: \`{"type": "create_memory", "description": "用你自己的话，记录下这个让你印象深刻的瞬间。"}\`
@@ -10335,6 +10336,37 @@ case 'quote_reply':
     }
     break;
 // ▲▲▲ 新增 case 结束 ▲▲▲
+
+                // ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼
+                case 'change_user_nickname':
+                    // 这是一个单聊专属的功能
+                    if (!chat.isGroup && msgData.newName) {
+                        const newNickname = msgData.newName.trim();
+                        
+                        // 更新聊天设置中的用户昵称
+                        chat.settings.myNickname = newNickname;
+                        
+                        // 创建一条对用户可见的系统消息
+                        const systemMessage = {
+                            role: 'system',
+                            type: 'pat_message', // 复用“拍一拍”的居中样式
+                            content: `[${chat.name} 将你的备注修改为 “${newNickname}”]`,
+                            timestamp: messageTimestamp++ // 使用递增的时间戳确保顺序
+                        };
+                        
+                        // 将系统消息添加到历史记录中
+                        chat.history.push(systemMessage);
+                        
+                        // 如果用户正在当前聊天界面，则实时显示这条系统消息
+                        if (isViewingThisChat) {
+                            appendMessage(systemMessage, chat);
+                        }
+                        
+                        console.log(`AI Action: 角色 "${chat.name}" 将用户备注修改为 "${newNickname}"`);
+                    }
+                    // 这条指令本身不产生AI的气泡，只是一个后台动作，所以用 continue 继续处理AI返回的下一条消息（通常是解释说明的文本）
+                    continue;
+                // ▲▲▲ 新代码粘贴结束 ▲▲▲
 
 // ▼▼▼ 在 switch (msgData.type) 语句中，添加这个全新的 case ▼▼▼
 case 'send_and_recall': {
