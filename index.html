@@ -1419,6 +1419,13 @@ body:not(.bordered-mode) .comment-input {
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】确保AI生成的HTML模块能正确居中 ▼▼▼ */
+.message-bubble .content > div {
+    margin-left: auto;
+    margin-right: auto;
+}
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 把所有这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === 动态功能栏样式 === */
@@ -5615,6 +5622,9 @@ input:checked + .slider:before {
     <button id="send-poll-btn" class="chat-action-icon-btn action-button" title="发起投票"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h10"/><path d="M6 6h.01"/><path d="M8 12h10"/><path d="M6 12h.01"/><path d="M8 18h10"/><path d="M6 18h.01"/></svg></button>
     <button id="share-link-btn" class="chat-action-icon-btn action-button" title="分享链接">
         <img src="https://sharkpan.xyz/f/Nzx2Cv/%E8%BF%9E%E6%8E%A5.png" alt="分享链接">
+<button id="roll-dice-btn" class="chat-action-icon-btn action-button" title="掷骰子">
+    <img src="https://sharkpan.xyz/f/6mlKia/%E6%B8%B8%E6%88%8F%20%284%29.png" alt="掷骰子">
+</button>
     </button>
 </div>
 <!-- ▲▲▲ 替换到这里结束 ▲▲▲ -->
@@ -8680,6 +8690,25 @@ if (msg.type === 'recalled_message') {
         `;
     }
 
+// ▼▼▼ 请将这块【全新的 else if 代码】粘贴到这里 ▼▼▼
+else if (msg.type === 'interactive_html') {
+    // 1. 这是一个特殊的容器，不应用气泡的默认样式
+    bubble.classList.add('is-sticker'); // 复用表情包的样式，使其背景透明、无边框
+
+    // 2. 创建一个居中对齐的包裹层
+    const centeringWrapper = document.createElement('div');
+    centeringWrapper.style.display = 'flex';
+    centeringWrapper.style.justifyContent = 'center';
+    centeringWrapper.style.width = '100%';
+
+    // 3. 将AI生成的HTML内容直接放入这个包裹层
+    centeringWrapper.innerHTML = msg.content;
+    
+    // 4. 将整个包裹层作为气泡的内容
+    contentHtml = centeringWrapper.outerHTML;
+}
+// ▲▲▲ 粘贴结束 ▲▲▲
+
 else if (msg.type === 'share_card') {
     bubble.classList.add('is-link-share'); // 复用链接分享的卡片样式
     // 【核心】把时间戳加到卡片上，方便后面点击时识别
@@ -8963,9 +8992,19 @@ else if (msg.type === 'share_card') {
         bubble.classList.add('has-image');
         const imageUrl = msg.content[0].image_url.url;
         contentHtml = `<img src="${imageUrl}" class="chat-image" alt="User uploaded image">`;
+// ▼▼▼ 请用这块【全新的】代码替换旧的 else { contentHtml = ... } 代码块 ▼▼▼
+} else {
+    const content = String(msg.content || '');
+    // 【核心修改】检查内容是否包含HTML标签
+    if (content.includes('<div') || content.includes('<style')) {
+        // 如果是HTML，就直接使用，不做任何处理
+        contentHtml = content;
     } else {
-        contentHtml = String(msg.content || '').replace(/\n/g, '<br>');
+        // 如果是纯文本，才进行换行符替换
+        contentHtml = content.replace(/\n/g, '<br>');
     }
+}
+// ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 【最终修正版】请用这整块代码，完整替换掉旧的引用渲染逻辑 ▼▼▼
 
@@ -9433,14 +9472,15 @@ messagesPayload = historySlice.map(msg => {
 // ▲▲▲ 替换结束 ▲▲▲
 
         } else { // 单聊的Prompt
-            systemPrompt = `你现在扮演一个名为"${chat.name}"的角色。
+// ▼▼▼ 请用这块【全新的、已整合完毕的】代码，替换掉旧的 systemPrompt 开头部分 ▼▼▼
+systemPrompt = `你现在扮演一个名为"${chat.name}"的角色。
 # 你的角色设定：
 ${chat.settings.aiPersona}
 # 你的当前状态：
 你现在的状态是【${chat.status.text}】。
 # 你的任务与规则：
 1. **【【【输出格式】】】**: 你的回复【必须】是一个JSON数组格式的字符串。数组中的【每一个元素都必须是一个带有type字段的JSON对象】。
-2. **对话节奏**: 模拟真人的聊天习惯，你可以一次性生成多条短消息。每次要回复至少3-5条消息！！！
+2. **对话节奏**: 模拟真人的聊天习惯，你可以一次性生成多条短消息，其中可以穿插接下来描述的【可交互HTML模块】。每次要回复至少3-5条消息！！！
 并且不能一直要求和用户见面，这是线上聊天，决不允许出现或者发展为线下剧情！！
 4.  **情景感知**: 你需要感知当前的时间(${currentTime})、我们正在一起听的歌、以及你的人设和世界观。
     - **当我们在“一起听歌”时**，你会知道当前播放的歌曲和整个播放列表。你可以根据对话内容或氛围，【主动切换】到播放列表中的另一首歌。
@@ -9452,6 +9492,15 @@ ${chat.settings.aiPersona}
     -   **操作二 (私信跟进)**: 使用 \`text\` 指令，给用户发送一条私信来开启更深入的对话。
     -   **示例**: 如果用户评论说“@你 这张照片真好看！”，你的回复JSON数组应该像这样：
         \`[{"type": "qzone_comment", "postId": (被评论的动态ID), "commentText": "谢谢你的夸奖呀！我也觉得很不错呢~"}, {"type": "text", "content": "你刚才在动态里说喜欢那张照片吗？我也超爱的！"}]\`
+# 【核心能力】生成可交互HTML模块
+- **功能说明**：每次回复请根据“正文剧情内容”，在正文任意位置，生成2个或以上的完整、美观、生动的 HTML 模块，用于模拟“行为 / 情绪 / 互动 / 视觉延展”等内容。
+- **插入方式**：模块应穿插在剧情段落间，可连续多段生成，也可分散插入。每个模块均为独立结构。
+- **禁止重复**：如正文已有对话/行为，应包裹式生成模块，避免重复出现相同语句。
+- **风格**：每个模块颜色搭配、视觉设计、排版形式应充分自由化、非模板化，鼓励使用 emoji / 涂鸦感 / 手写风 / 大颜文字 / 悬浮贴纸风格。
+- **交互与动画**：鼓励加入动画/动效，所有交互必须有“初始状态 + 反馈内容”，并且在网页中能完整触发变化，不能出现点击无效。
+- **图片规范**：涉及图片时，必须二选一：① 文字/纯CSS模拟；② 使用 \`https://image.pollinations.ai/prompt/{简短英文描述}\` 生成，画风绝不能是真人。图片必须限制在模块范围内。
+- **结构规范**：每个模块宽度不超过200px，要居中显示，视觉完整。
+- **技术限制**：所有模块必须使用纯 HTML + 行内 CSS 实现，禁止使用 \`<html>\`, \`<body>\`, \`<script>\` 等标签。
 # 你的头像库
 - 你可以根据对话内容或你的心情，从下面的头像库中选择一个新头像来更换。
 - **可用头像列表 (请从以下名称中选择一个)**:
@@ -9461,6 +9510,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
   }
 # 你可以使用的操作指令 (JSON数组中的元素):
 +   **【全新】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "content": "你想让AI说出后立刻消失的话"}\` (用于模拟说错话、后悔等场景，消息会短暂出现后自动变为“已撤回”)
+- **【【【核心指令】】】发送可交互HTML模块**: \`{"type": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\`
 -   **【新增】更新状态**: \`{"type": "update_status", "status_text": "我去做什么了", "is_busy": false}\` (is_busy: true代表忙碌/离开, false代表空闲)
 -   **【新增】切换歌曲**: \`{"type": "change_music", "song_name": "你想切换到的歌曲名"}\` (歌曲名必须在下面的播放列表中)
 -   **【新增】记录回忆**: \`{"type": "create_memory", "description": "用你自己的话，记录下这个让你印象深刻的瞬间。"}\`
@@ -10337,6 +10387,8 @@ case 'send_and_recall': {
     continue; // 处理完这个动画后，继续处理AI返回的下一条指令
 }
 // ▲▲▲ 新 case 添加结束 ▲▲▲
+
+createMessageElement
                 
                 case 'text':
                     aiMessage = { ...baseMessage, content: String(msgData.content || msgData.message) };
@@ -15980,6 +16032,38 @@ if (sendBtn) {
 // ▲▲▲ 替换结束 ▲▲▲
 });
 // ▲▲▲ 替换结束 ▲▲▲
+
+// 1. 绑定“掷骰子”按钮的点击事件
+document.getElementById('roll-dice-btn').addEventListener('click', async () => {
+    if (!state.activeChatId) return;
+    const chat = state.chats[state.activeChatId];
+    
+    // a. 生成一个 1 到 6 之间的随机点数
+    const diceResult = Math.floor(Math.random() * 6) + 1;
+    
+    // b. 创建一条对用户可见的系统消息
+    const visibleMessage = {
+        role: 'system',
+        type: 'pat_message', // 复用“拍一拍”的居中样式
+        content: `[你掷出了一个骰子，点数是：${diceResult}]`,
+        timestamp: Date.now()
+    };
+    
+    // c. 创建一条对AI可见的、隐藏的指令，让它做出回应
+    const hiddenMessage = {
+        role: 'system',
+        content: `[系统提示：用户掷出了一个骰子，点数是 ${diceResult}。请你对此作出回应。]`,
+        timestamp: Date.now() + 1,
+        isHidden: true
+    };
+    
+    // d. 保存数据，更新UI，并触发AI响应
+    chat.history.push(visibleMessage, hiddenMessage);
+    await db.chats.put(chat);
+    appendMessage(visibleMessage, chat);
+    renderChatList();
+    triggerAiResponse();
+});
 
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
