@@ -16065,37 +16065,55 @@ if (sendBtn) {
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
-// 1. 绑定“掷骰子”按钮的点击事件
-document.getElementById('roll-dice-btn').addEventListener('click', async () => {
-    if (!state.activeChatId) return;
-    const chat = state.chats[state.activeChatId];
-    
-    // a. 生成一个 1 到 6 之间的随机点数
-    const diceResult = Math.floor(Math.random() * 6) + 1;
-    
-    // b. 创建一条对用户可见的系统消息
-    const visibleMessage = {
-        role: 'system',
-        type: 'pat_message', // 复用“拍一拍”的居中样式
-        content: `[你掷出了一个骰子，点数是：${diceResult}]`,
-        timestamp: Date.now()
-    };
-    
-    // c. 创建一条对AI可见的、隐藏的指令，让它做出回应
-    const hiddenMessage = {
-        role: 'system',
-        content: `[系统提示：用户掷出了一个骰子，点数是 ${diceResult}。请你对此作出回应。]`,
-        timestamp: Date.now() + 1,
-        isHidden: true
-    };
-    
-    // d. 保存数据，更新UI，并触发AI响应
-    chat.history.push(visibleMessage, hiddenMessage);
-    await db.chats.put(chat);
-    appendMessage(visibleMessage, chat);
-    renderChatList();
-    triggerAiResponse();
-});
+ // ▼▼▼ 用下面这块全新的代码，完整替换掉旧的 'roll-dice-btn' 事件监听器 ▼▼▼
+    document.getElementById('roll-dice-btn').addEventListener('click', async () => {
+        if (!state.activeChatId) return;
+        const chat = state.chats[state.activeChatId];
+
+        // 1. 【核心修改】现在为用户和AI分别生成点数
+        const userDiceResult = Math.floor(Math.random() * 6) + 1;
+        const aiDiceResult = Math.floor(Math.random() * 6) + 1;
+
+        // 2. 【核心修改】判断胜负结果
+        let outcomeText = '';
+        let outcomeForAI = '';
+        if (userDiceResult > aiDiceResult) {
+            outcomeText = '你赢了！';
+            outcomeForAI = '用户赢了';
+        } else if (aiDiceResult > userDiceResult) {
+            outcomeText = `${chat.name}赢了！`;
+            outcomeForAI = '你赢了';
+        } else {
+            outcomeText = '是平局！';
+            outcomeForAI = '平局';
+        }
+
+        // 3. 创建对用户可见的、包含完整结果的系统消息
+        const visibleMessageContent = `[你掷出了 ${userDiceResult}点，${chat.name} 掷出了 ${aiDiceResult}点。${outcomeText}]`;
+        const visibleMessage = {
+            role: 'system',
+            type: 'pat_message', // 复用居中样式
+            content: visibleMessageContent,
+            timestamp: Date.now()
+        };
+
+        // 4. 【核心修改】创建对AI可见的、更详细的隐藏指令，让它能做出智能回应
+        const hiddenMessageContent = `[系统提示：你们进行了一次掷骰子游戏。你的点数是 ${aiDiceResult}，用户的点数是 ${userDiceResult}。结果是：${outcomeForAI}。请你对此作出回应。]`;
+        const hiddenMessage = {
+            role: 'system',
+            content: hiddenMessageContent,
+            timestamp: Date.now() + 1,
+            isHidden: true
+        };
+
+        // 5. 保存数据，更新UI，并触发AI响应 (这部分逻辑和原来一样)
+        chat.history.push(visibleMessage, hiddenMessage);
+        await db.chats.put(chat);
+        appendMessage(visibleMessage, chat);
+        renderChatList();
+        triggerAiResponse();
+    });
+    // ▲▲▲ 替换到这里结束 ▲▲▲
 
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
