@@ -14933,7 +14933,76 @@ const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container
             const stickerPanel = document.getElementById('sticker-panel');
             document.getElementById('open-sticker-panel-btn').addEventListener('click', () => { renderStickerPanel(); stickerPanel.classList.add('visible'); });
             document.getElementById('close-sticker-panel-btn').addEventListener('click', () => stickerPanel.classList.remove('visible'));
-            document.getElementById('add-sticker-btn').addEventListener('click', async () => { const url = await showCustomPrompt("添加表情(URL)", "请输入表情包的图片URL"); if (!url || !url.trim().startsWith('http')) return url && alert("请输入有效的URL (以http开头)"); const name = await showCustomPrompt("命名表情", "请为这个表情命名 (例如：开心、疑惑)"); if (name && name.trim()) { const newSticker = { id: 'sticker_' + Date.now(), url: url.trim(), name: name.trim() }; await db.userStickers.add(newSticker); state.userStickers.push(newSticker); renderStickerPanel(); } else if (name !== null) alert("表情名不能为空！"); });
+// ▼▼▼ 从这里开始，完整替换旧的 'add-sticker-btn' 事件监听器 ▼▼▼
+
+document.getElementById('add-sticker-btn').addEventListener('click', async () => {
+    // 1. 弹出带有文本域的输入框，并提供清晰的格式说明
+    const instructions = "每行一个表情，格式为：\n图片URL,表情包名称\n\n例如：\nhttps://.../happy.gif,开心\nhttps://.../sad.png,难过";
+    const batchInput = await showCustomPrompt(
+        "批量添加表情 (URL)",
+        "请按照指定格式粘贴...", // 这是输入框的占位符
+        "",                     // 初始值为空
+        "textarea",             // 指定输入框类型为<textarea>
+        `<p style="font-size: 12px; color: #666; text-align: left; white-space: pre-wrap; background: #f0f0f0; padding: 8px; border-radius: 6px;">${instructions}</p>` // 将说明作为额外HTML注入
+    );
+
+    // 如果用户点击了取消，则直接返回
+    if (batchInput === null) return;
+
+    const lines = batchInput.trim().split('\n');
+    const newStickers = [];
+    let invalidLines = 0;
+
+    // 2. 遍历用户输入的每一行
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) continue; // 跳过空行
+
+        // 3. 解析每一行，用第一个逗号分割URL和名称
+        //    这种方式可以确保表情名称本身包含逗号时不会出错
+        const firstCommaIndex = trimmedLine.indexOf(',');
+        if (firstCommaIndex === -1) {
+            invalidLines++;
+            continue;
+        }
+
+        const url = trimmedLine.substring(0, firstCommaIndex).trim();
+        const name = trimmedLine.substring(firstCommaIndex + 1).trim();
+
+        // 4. 验证解析出的数据
+        if (!url.startsWith('http') || !name) {
+            invalidLines++;
+            continue;
+        }
+
+        // 5. 创建新的表情对象
+        const newSticker = {
+            id: 'sticker_' + (Date.now() + newStickers.length), // 确保同一批次的ID不重复
+            url: url,
+            name: name
+        };
+        newStickers.push(newSticker);
+    }
+
+    // 6. 如果有成功解析的表情，就进行批量添加
+    if (newStickers.length > 0) {
+        // 使用 bulkAdd 提高数据库操作效率
+        await db.userStickers.bulkAdd(newStickers);
+        state.userStickers.push(...newStickers);
+        renderStickerPanel();
+
+        // 7. 给出清晰的操作结果反馈
+        let successMessage = `成功添加了 ${newStickers.length} 个新表情！`;
+        if (invalidLines > 0) {
+            successMessage += `\n有 ${invalidLines} 行因格式错误或内容无效而被跳过。`;
+        }
+        await showCustomAlert('操作完成', successMessage);
+    } else {
+        await showCustomAlert('操作失败', '没有找到任何有效格式的表情信息。请检查您的输入是否符合“URL,名称”的格式。');
+    }
+});
+
+// ▲▲▲ 替换到这里结束 ▲▲▲
             document.getElementById('upload-sticker-btn').addEventListener('click', () => document.getElementById('sticker-upload-input').click());
             document.getElementById('sticker-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = async () => { const base64Url = reader.result; const name = await showCustomPrompt("命名表情", "请为这个表情命名 (例如：好耶、疑惑)"); if (name && name.trim()) { const newSticker = { id: 'sticker_' + Date.now(), url: base64Url, name: name.trim() }; await db.userStickers.add(newSticker); state.userStickers.push(newSticker); renderStickerPanel(); } else if (name !== null) alert("表情名不能为空！"); }; event.target.value = null; });
 
