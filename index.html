@@ -300,6 +300,74 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 美化样式替换结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新终极修复版】头像框与弹窗样式 (完整替换所有旧版相关代码) ▼▼▼ */
+
+/* 1. 弹窗层级修复：确保应用弹窗在头像框库之上 */
+#avatar-frame-apply-modal {
+    z-index: 101; /* 比其他模态框的 z-index (通常是100) 更高 */
+}
+
+/* ▼▼▼ 【QQ头像框特效 - 终极版CSS】(请用这整块代码替换所有旧的头像框相关CSS) ▼▼▼ */
+
+/* 1. 通用包裹容器：它的尺寸就是头像的尺寸 */
+.avatar-frame-wrapper {
+    position: relative; /* 关键：成为内部头像框的定位基准 */
+    flex-shrink: 0;
+    /* 容器本身没有背景或边框 */
+}
+
+/* 2. 内部的头像图片：撑满整个容器 */
+.avatar-frame-wrapper .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%; /* 确保头像是正圆形 */
+    display: block; /* 移除图片默认的底部间隙 */
+}
+
+/* 3. 【【【核心魔法】】】叠加的头像框图片 */
+.avatar-frame-wrapper .avatar-frame-overlay {
+    position: absolute; /* 脱离文档流，悬浮起来 */
+    z-index: 1;         /* 确保在头像图片之上 */
+    pointer-events: none; /* 让鼠标可以穿透它 */
+
+    /* 关键：让头像框比容器（也就是头像）大 25% */
+    width: 150%;
+    height: 150%;
+    
+    /* 关键：使用 transform 技巧，将放大的头像框完美居中对齐 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+}
+
+/* 4. 【适配】不同位置的头像尺寸（这部分保持不变，但很重要） */
+/* a. 聊天列表 */
+.chat-list-item .avatar-frame-wrapper {
+    width: 45px;
+    height: 45px;
+    margin-right: 12px;
+}
+/* b. 聊天气泡 */
+.message-bubble .avatar-frame-wrapper {
+    width: 34px;
+    height: 34px;
+}
+/* c. 聊天设置预览区 */
+#chat-settings-modal .avatar-frame-wrapper {
+    width: 34px;
+    height: 34px;
+}
+/* d. 头像框应用弹窗预览区 */
+#avatar-frame-apply-modal .avatar-frame-wrapper {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 10px;
+    padding: 2px;
+    border-radius: 50%;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* 修改后的 #world-book-list 样式 */
 #world-book-list {
     flex-grow: 1;
@@ -422,7 +490,6 @@ body.bordered-mode #status-bar {
         .modal-footer .save { background-color: var(--accent-color); color: white; }
         .modal-footer .cancel { background-color: white; color: var(--accent-color); }
         .avatar-upload { display: flex; align-items: center; gap: 15px; }
-        .avatar-upload img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background-color: #eee; }
         .avatar-upload button { padding: 8px 12px; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 5px; cursor: pointer; }
         #open-persona-library-btn { font-size: 14px; padding: 6px 10px; margin-left: 0; }
         .avatar-upload input[type="file"] { display: none; }
@@ -4361,6 +4428,64 @@ input[type="color"]::-webkit-color-swatch {
 
 /* ▼▼▼ 把这一整块全新的CSS，粘贴到 <style> 的末尾 ▼▼▼ */
 
+    /* ▼▼▼ 【全新】美化版应用弹窗样式 ▼▼▼ */
+/* 1. 预览区域容器 */
+.frame-apply-preview-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 95%;
+    background-color: #f9f9f9;
+    padding: 15px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+#phone-screen.dark-mode .frame-apply-preview-container {
+    background-color: #1c1c1e; /* 夜间模式适配 */
+}
+
+/* 2. 单个预览目标 (头像 + 文字) */
+.frame-apply-target {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.frame-apply-target .avatar-frame-wrapper {
+    width: 70px;
+    height: 70px;
+}
+
+/* 3. 操作按钮容器 */
+.frame-apply-actions {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 15px;
+}
+
+/* 4. 小尺寸按钮样式 */
+.form-button.small {
+    padding: 8px 15px;
+    font-size: 14px;
+    flex: 1; /* 让按钮平分宽度 */
+    margin: 0 !important;
+}
+
+/* 5. 链接式按钮样式 (用于“移除”) */
+.button-as-link {
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--text-secondary);
+}
+.button-as-link.danger {
+    color: #ff3b30;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* === 【全新】夜间模式样式 === */
 
 /* 核心：当 #phone-screen 拥有 .dark-mode 类时，激活以下所有样式 */
@@ -5819,6 +5944,7 @@ input:checked + .slider:before {
     <input type="file" id="sticker-upload-input" accept="image/*" style="display: none;">
     <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
     <input type="file" id="ai-avatar-library-upload-input" accept="image/*" hidden>
+    <input type="file" id="avatar-frame-upload-input" accept="image/png, image/gif, image/webp" hidden multiple>
     
     <!-- 音乐播放器 (保持不变) -->
 <div id="music-player-overlay">
@@ -6141,8 +6267,12 @@ input:checked + .slider:before {
                     </div>
                 </div>
             </div>
-            <div class="form-group" id="ai-persona-group"><label for="ai-persona">对方人设 (AI Persona)</label><textarea id="ai-persona" rows="3"></textarea></div><div class="form-group" id="ai-avatar-group"><label>对方头像</label><div class="avatar-upload"><img id="ai-avatar-preview"><button onclick="document.getElementById('ai-avatar-input').click()">上传对方头像</button><button id="manage-ai-avatar-library-btn">管理头像库</button>
-<input type="file" id="ai-avatar-input" accept="image/*"></div></div><div class="form-group" id="my-persona-group"><label for="my-persona">我的人设 (My Persona)</label><textarea id="my-persona" rows="3"></textarea></div><div class="form-group" id="my-avatar-group"><label>我的头像</label><div class="avatar-upload"><img id="my-avatar-preview"><button onclick="document.getElementById('my-avatar-input').click()">上传我的头像</button><button id="open-persona-library-btn">预设</button><input type="file" id="my-avatar-input" accept="image/*"></div></div><div class="form-group" id="group-members-group"><label>群成员人设</label><div id="group-members-settings"></div>
+            <div class="form-group" id="ai-persona-group"><label for="ai-persona">对方人设 (AI Persona)</label><textarea id="ai-persona" rows="3"></textarea></div><div class="form-group" id="ai-avatar-group"><label>对方头像</label><div class="avatar-upload"><div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
+    <img id="ai-avatar-preview" class="avatar-img">
+</div><button onclick="document.getElementById('ai-avatar-input').click()">上传对方头像</button><button id="manage-ai-avatar-library-btn">管理头像库</button>
+<input type="file" id="ai-avatar-input" accept="image/*"></div></div><div class="form-group" id="my-persona-group"><label for="my-persona">我的人设 (My Persona)</label><textarea id="my-persona" rows="3"></textarea></div><div class="form-group" id="my-avatar-group"><label>我的头像</label><div class="avatar-upload"><div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
+    <img id="my-avatar-preview" class="avatar-img">
+</div><button onclick="document.getElementById('my-avatar-input').click()">上传我的头像</button><button id="open-persona-library-btn">预设</button><button id="open-avatar-frame-library-btn">头像框</button><input type="file" id="my-avatar-input" accept="image/*"></div></div><div class="form-group" id="group-members-group"><label>群成员人设</label><div id="group-members-settings"></div>
 
     <!-- 【新增】管理成员按钮 -->
     <button id="manage-members-btn" class="form-button form-button-secondary" style="margin-top: 15px;">管理群成员</button></div>
@@ -6584,6 +6714,71 @@ input:checked + .slider:before {
     </div>
 </div>
 
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- 【【【全新】】】头像框库模态框 -->
+<div id="avatar-frame-library-modal" class="modal">
+    <div class="modal-content" style="height: 70%;">
+        <div class="modal-header">
+            <span id="avatar-frame-library-title">头像框库</span>
+            <button id="add-avatar-frame-btn" class="action-button">添加</button>
+        </div>
+        <div class="modal-body" style="padding: 15px;">
+            <div id="avatar-frame-library-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 15px;">
+                <!-- 头像框库内容将由JS动态生成 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="save" id="close-avatar-frame-library-btn" style="width: 100%;">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新设计】头像框应用选择模态框 (用此代码替换旧的) ▼▼▼ -->
+<div id="avatar-frame-apply-modal" class="modal">
+    <div class="modal-content" style="width: 280px; height: auto;">
+        <div class="modal-header">
+            <span>应用头像框</span>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            
+            <!-- 1. 全新的预览区域 -->
+            <div class="frame-apply-preview-container">
+                <!-- “我”的预览 -->
+                <div class="frame-apply-target">
+                    <div id="frame-apply-preview-me" class="avatar-frame-wrapper">
+                        <img class="avatar-img" src="">
+                        <img class="avatar-frame-overlay" src="">
+                    </div>
+                    <span style="font-size: 14px; font-weight: 500;">我</span>
+                </div>
+                <!-- “对方”的预览 -->
+                <div class="frame-apply-target">
+                    <div id="frame-apply-preview-ai" class="avatar-frame-wrapper">
+                        <img class="avatar-img" src="">
+                        <img class="avatar-frame-overlay" src="">
+                    </div>
+                    <span style="font-size: 14px; font-weight: 500;">对方</span>
+                </div>
+            </div>
+
+            <!-- 2. 全新的操作按钮区域 -->
+            <div class="frame-apply-actions">
+                <button data-choice="me" class="form-button small">应用给我</button>
+                <button data-choice="ai" class="form-button small">应用给对方</button>
+            </div>
+            <div class="frame-apply-actions">
+                <button data-choice="remove_me" class="button-as-link danger">移除我的</button>
+                <button data-choice="remove_ai" class="button-as-link danger">移除对方的</button>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button data-choice="cancel" class="cancel" style="width: 100%;">返回</button>
+        </div>
+    </div>
+</div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新】用户分享链接模态框 ▼▼▼ -->
@@ -7134,7 +7329,7 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // ===================================================================
 
 // ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
-db.version(24).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
+db.version(25).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
     globalSettings: '&id', 
@@ -7152,7 +7347,8 @@ db.version(24).stores({ // <-- Increment the version number by 1 (e.g., from 23 
     memories: '++id, chatId, timestamp, type, targetDate' ,
     callRecords: '++id, chatId, timestamp, customName',
     customThemes: '&id, name',
-    customBubbleThemes: '&id, name' // <-- 【全新添加】这张表用来存储自定义气泡主题
+    customBubbleThemes: '&id, name',// <-- 【全新添加】这张表用来存储自定义气泡主题
+    avatarFrames: '&id, name, url' // <-- 【全新添加】这张表用来存储头像框
 });
 // ▲▲▲ Modification Ends ▲▲▲
 
@@ -7782,7 +7978,8 @@ async function loadAllDataFromDB() {
         musicLib,
         personaPresets,
         qzoneSettings,
-        initialFavorites // 将 initialFavorites 加入到解构赋值中
+        initialFavorites,
+        avatarFrames // 将 initialFavorites 加入到解构赋值中
     ] = await Promise.all([
         db.chats.toArray(),
         db.apiConfig.get('main'),
@@ -7792,6 +7989,7 @@ async function loadAllDataFromDB() {
         db.musicLibrary.get('main'),
         db.personaPresets.toArray(),
         db.qzoneSettings.get('main'),
+        db.avatarFrames.toArray(),
         db.favorites.orderBy('timestamp').reverse().toArray() // 确保这一行在 Promise.all 的数组参数内
     ]);
     // ▲▲▲ 【修改结束】 ▲▲▲
@@ -7883,6 +8081,7 @@ async function loadAllDataFromDB() {
 state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings.appIcons || {}) };
 
     state.userStickers = userStickers || [];
+    state.avatarFrames = avatarFrames || [];
     state.worldBooks = worldBooks || [];
     musicState.playlist = musicLib?.playlist || [];
     state.personaPresets = personaPresets || [];
@@ -8177,8 +8376,26 @@ else if (!chat.isGroup && chat.relationship?.status === 'blocked_by_ai') {
     item.dataset.chatId = chat.id;
     const avatar = chat.isGroup ? chat.settings.groupAvatar : chat.settings.aiAvatar;
     
+    // ▼▼▼【用下面这整块代码，替换掉旧的 item.innerHTML 赋值语句】▼▼▼
+    let avatarHtml;
+    const avatarSrc = chat.isGroup ? (chat.settings.groupAvatar || defaultGroupAvatar) : (chat.settings.aiAvatar || defaultAvatar);
+    const aiFrameSrc = !chat.isGroup ? chat.settings.aiAvatarFrame : ''; // 列表只显示AI的框
+
+    if (aiFrameSrc) {
+        avatarHtml = `
+            <div class="avatar-frame-wrapper">
+                <img src="${avatarSrc}" class="avatar-img">
+                <img src="${aiFrameSrc}" class="avatar-frame-overlay">
+            </div>`;
+    } else {
+        avatarHtml = `
+            <div class="avatar-frame-wrapper">
+                <img src="${avatarSrc}" class="avatar-img">
+            </div>`;
+    }
+
     item.innerHTML = `
-        <img src="${avatar || defaultAvatar}" class="avatar">
+        ${avatarHtml}
         <div class="info">
             <div class="name-line">
                 <span class="name">${chat.name}</span>
@@ -8186,12 +8403,11 @@ else if (!chat.isGroup && chat.relationship?.status === 'blocked_by_ai') {
             </div>
             <div class="last-msg" style="color: ${chat.isGroup ? 'var(--text-secondary)' : '#b5b5b5'}; font-style: italic;">${lastMsgDisplay}</div>
         </div>
-        <!-- 这里就是我们新加的红点HTML结构 -->
         <div class="unread-count-wrapper">
             <span class="unread-count" style="display: none;">0</span>
         </div>
     `;
-    
+
     // 【核心修改2】在这里添加控制红点显示/隐藏的逻辑
     const unreadCount = chat.unreadCount || 0;
     const unreadEl = item.querySelector('.unread-count');
@@ -8858,25 +9074,45 @@ if (msg.type === 'recalled_message') {
     timestampEl.className = 'timestamp';
     timestampEl.textContent = formatTimestamp(msg.timestamp);
 
-    // ▼▼▼【粘贴这段新代码】▼▼▼
-    let avatarSrc; // 我们现在只需要头像图片，不再需要头像框了
+    // ▼▼▼【用下面这整块代码，替换掉旧的 avatarSrc 和 avatarHtml 生成逻辑】▼▼▼
+    let avatarHtml;
+    let avatarSrc, frameSrc;
+
     if (chat.isGroup) {
         if (isUser) {
             avatarSrc = chat.settings.myAvatar || defaultMyGroupAvatar;
+            frameSrc = chat.settings.myAvatarFrame;
         } else {
             const member = chat.members.find(m => m.originalName === msg.senderName);
             avatarSrc = member ? member.avatar : defaultGroupMemberAvatar;
+            // 群聊中AI成员暂不支持独立头像框，可后续扩展
+            frameSrc = ''; 
         }
-    } else {
+    } else { // 单聊
         if (isUser) {
             avatarSrc = chat.settings.myAvatar || defaultAvatar;
+            frameSrc = chat.settings.myAvatarFrame;
         } else {
             avatarSrc = chat.settings.aiAvatar || defaultAvatar;
+            frameSrc = chat.settings.aiAvatarFrame;
         }
     }
-    // 直接生成最简单的头像HTML，不再有任何和头像框相关的逻辑
-    const avatarHtml = `<img src="${avatarSrc}" class="avatar">`;
-    // ▲▲▲【粘贴结束】▲▲▲
+
+    // 根据是否有头像框，构建不同的HTML
+    if (frameSrc) {
+        avatarHtml = `
+            <div class="avatar-frame-wrapper">
+                <img src="${avatarSrc}" class="avatar-img">
+                <img src="${frameSrc}" class="avatar-frame-overlay">
+            </div>`;
+    } else {
+        // 如果没有框，就使用旧的简单<img>结构，但用wrapper包起来以统一尺寸
+        avatarHtml = `
+            <div class="avatar-frame-wrapper">
+                <img src="${avatarSrc}" class="avatar-img">
+            </div>`;
+    }
+    // ▲▲▲【替换结束】▲▲▲
 
     let contentHtml;
 
@@ -14417,6 +14653,149 @@ function cancelReplyMode() {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】头像框库核心功能函数 ▼▼▼
+
+/**
+ * 打开头像框库模态框
+ */
+function openAvatarFrameLibrary() {
+    renderAvatarFrameLibrary();
+    document.getElementById('avatar-frame-library-modal').classList.add('visible');
+}
+
+/**
+ * 关闭头像框库模态框
+ */
+function closeAvatarFrameLibrary() {
+    document.getElementById('avatar-frame-library-modal').classList.remove('visible');
+}
+
+/**
+ * 渲染头像框库的网格内容
+ */
+async function renderAvatarFrameLibrary() {
+    const grid = document.getElementById('avatar-frame-library-grid');
+    grid.innerHTML = '';
+    const frames = await db.avatarFrames.toArray();
+    state.avatarFrames = frames; // 同步内存状态
+
+    if (frames.length === 0) {
+        grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">头像框库是空的，点击“添加”上传吧！</p>';
+        return;
+    }
+
+    frames.forEach(frame => {
+        const item = document.createElement('div');
+        item.className = 'sticker-item'; // 复用表情的样式
+        item.style.cursor = 'pointer';
+        item.title = frame.name;
+        
+        // 创建一个预览用的头像框结构
+        item.innerHTML = `
+            <div class="avatar-frame-wrapper" style="width: 100%; height: 100%;">
+                <img src="${defaultAvatar}" class="avatar-img" style="border-radius: 18px;">
+                <img src="${frame.url}" class="avatar-frame-overlay">
+            </div>
+        `;
+
+        // 点击事件：应用头像框
+        item.addEventListener('click', () => applyAvatarFrame(frame.url));
+        
+        // 长按事件：删除头像框
+        addLongPressListener(item, async () => {
+            const confirmed = await showCustomConfirm('删除头像框', `确定要删除头像框“${frame.name}”吗？`, { confirmButtonClass: 'btn-danger' });
+            if (confirmed) {
+                await db.avatarFrames.delete(frame.id);
+                renderAvatarFrameLibrary(); // 刷新库
+            }
+        });
+        
+        grid.appendChild(item);
+    });
+}
+
+/**
+ * 批量添加头像框（从本地文件）
+ */
+async function addAvatarFrames() {
+    // 1. 创建一个Promise来等待用户选择文件
+    const files = await new Promise(resolve => {
+        const fileInput = document.getElementById('avatar-frame-upload-input');
+        const changeHandler = (event) => {
+            resolve(event.target.files);
+            fileInput.removeEventListener('change', changeHandler);
+            fileInput.value = '';
+        };
+        fileInput.addEventListener('change', changeHandler);
+        fileInput.click();
+    });
+
+    if (!files || files.length === 0) return;
+
+    const newFrames = [];
+    // 2. 遍历所有选中的文件
+    for (const file of files) {
+        // a. 读取文件为Base64
+        const base64Url = await new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.readAsDataURL(file);
+        });
+        
+        // b. 让用户为每个文件命名
+        const defaultName = file.name.replace(/\.[^/.]+$/, ""); // 移除扩展名
+        const name = await showCustomPrompt(`为头像框命名`, `请输入 "${defaultName}" 的名称`, defaultName);
+        if (!name || !name.trim()) continue; // 如果用户取消或输入为空，则跳过这个文件
+
+        newFrames.push({
+            id: 'frame_' + (Date.now() + newFrames.length),
+            name: name.trim(),
+            url: base64Url
+        });
+    }
+
+    // 3. 批量保存到数据库并刷新
+    if (newFrames.length > 0) {
+        await db.avatarFrames.bulkAdd(newFrames);
+        renderAvatarFrameLibrary();
+        alert(`成功添加了 ${newFrames.length} 个新头像框！`);
+    }
+}
+
+// ▼▼▼ 【全新简洁版】请用此函数完整替换旧的 applyAvatarFrame 函数 ▼▼▼
+/**
+ * 【V3版】打开并填充全新的、可视化的头像框应用弹窗
+ * @param {string} frameUrl - 被选中的头像框URL
+ */
+async function applyAvatarFrame(frameUrl) {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+
+    // 1. 获取模态框和所有需要填充的元素
+    const modal = document.getElementById('avatar-frame-apply-modal');
+    
+    const meAvatarImg = document.querySelector('#frame-apply-preview-me .avatar-img');
+    const meFrameOverlay = document.querySelector('#frame-apply-preview-me .avatar-frame-overlay');
+    
+    const aiAvatarImg = document.querySelector('#frame-apply-preview-ai .avatar-img');
+    const aiFrameOverlay = document.querySelector('#frame-apply-preview-ai .avatar-frame-overlay');
+    
+    // 2. 填充预览区的头像 (从当前聊天设置中读取)
+    meAvatarImg.src = chat.settings.myAvatar || defaultAvatar;
+    aiAvatarImg.src = chat.settings.aiAvatar || defaultAvatar;
+    
+    // 3. 将用户选择的头像框URL应用到两个预览上
+    meFrameOverlay.src = frameUrl;
+    aiFrameOverlay.src = frameUrl;
+    
+    // 4. 【关键】将 frameUrl 存储在模态框的主DIV上，以便事件处理器能获取到
+    modal.dataset.frameUrl = frameUrl;
+    
+    // 5. 显示模态框
+    modal.classList.add('visible');
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
 // ▼▼▼ 【全新】用户处理转账的核心功能函数 ▼▼▼
 
 let activeTransferTimestamp = null; // 用于暂存被点击的转账消息的时间戳
@@ -14759,6 +15138,83 @@ async function fabricateCommentsForPost(post, authorChat) {
 }
 
 // ▲▲▲ 替换到这里结束 ▲▲▲
+
+// ▼▼▼ 请用下面这段【全新的、智能解析的函数】，完整替换掉旧的 addAvatarFrames 函数 ▼▼▼
+
+/**
+ * 【全新智能URL版】批量添加头像框
+ */
+async function addAvatarFrames() {
+    // 1. 弹出输入框，这部分逻辑不变
+    const instructions = "每行一个头像框，支持多种格式：\n- URL,名称\n- URL 名称\n- 名称 URL\n- 只有 URL (会自动命名)";
+    const batchInput = await showCustomPrompt(
+        "批量添加头像框 (URL)",
+        "请粘贴...",
+        "",
+        "textarea",
+        `<p style="font-size: 12px; color: #666; text-align: left; white-space: pre-wrap; background: #f0f0f0; padding: 8px; border-radius: 6px;">${instructions}</p>`
+    );
+
+    if (!batchInput || !batchInput.trim()) {
+        return;
+    }
+
+    const lines = batchInput.trim().split('\n');
+    const newFrames = [];
+    let invalidLines = 0;
+
+    // 2. 【核心修改】使用更智能的解析逻辑
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) continue;
+
+        // a. 正则表达式，用于从一行中提取出URL
+        const urlRegex = /(https?:\/\/[^\s,]+)|(data:image\/[^,]+)/i;
+        const urlMatch = trimmedLine.match(urlRegex);
+
+        let url = '';
+        let name = '';
+
+        if (urlMatch) {
+            // b. 如果成功匹配到URL
+            url = urlMatch[0];
+            // c. 将URL从原字符串中移除，剩下的部分就是名称
+            name = trimmedLine.replace(url, '').replace(/[,;:\t]/, '').trim();
+
+            // d. 如果移除URL后名称为空，就自动生成一个
+            if (!name) {
+                name = '未命名-' + (Date.now() + newFrames.length).toString().slice(-4);
+            }
+        } else {
+            // e. 如果整行都匹配不到URL，则视为无效行
+            invalidLines++;
+            continue;
+        }
+        
+        // f. 创建新的头像框对象
+        newFrames.push({
+            id: 'frame_' + (Date.now() + newFrames.length),
+            name: name,
+            url: url
+        });
+    }
+
+    // 3. 后续的保存和反馈逻辑保持不变
+    if (newFrames.length > 0) {
+        await db.avatarFrames.bulkAdd(newFrames);
+        await renderAvatarFrameLibrary();
+
+        let successMessage = `成功添加了 ${newFrames.length} 个新头像框！`;
+        if (invalidLines > 0) {
+            successMessage += `\n有 ${invalidLines} 行因格式无法识别而被跳过。`;
+        }
+        await showCustomAlert('操作完成', successMessage);
+    } else {
+        await showCustomAlert('操作失败', '没有找到任何有效的头像框信息。请确保每行都包含一个有效的图片URL。');
+    }
+}
+
+// ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 请用这个【全新函数】替换掉你旧的 handleStatusResetClick 函数 ▼▼▼
 
@@ -15181,6 +15637,8 @@ const newChat = {
     customCss: '', // <--- 新增这行
     linkedWorldBookIds: [], 
     aiAvatarLibrary: [],
+    myAvatarFrame: '',
+    aiAvatarFrame: ''
     }, 
     history: [], 
     musicData: { totalTime: 0 } 
@@ -15423,6 +15881,39 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     document.getElementById('chat-name-input').value = chat.name;
     document.getElementById('my-persona').value = chat.settings.myPersona;
     document.getElementById('my-avatar-preview').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
+    const myAvatarPreviewWrapper = document.getElementById('my-avatar-preview').parentElement;
+    myAvatarPreviewWrapper.querySelector('.avatar-img').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
+    let myFrameOverlay = myAvatarPreviewWrapper.querySelector('.avatar-frame-overlay');
+    if (chat.settings.myAvatarFrame) {
+        if (!myFrameOverlay) {
+            myFrameOverlay = document.createElement('img');
+            myFrameOverlay.className = 'avatar-frame-overlay';
+            myAvatarPreviewWrapper.appendChild(myFrameOverlay);
+        }
+        myFrameOverlay.src = chat.settings.myAvatarFrame;
+        myFrameOverlay.style.display = 'block';
+    } else if (myFrameOverlay) {
+        myFrameOverlay.style.display = 'none';
+    }
+    
+    // 如果是单聊，才处理AI头像
+    if (!isGroup) {
+        const aiAvatarPreviewWrapper = document.getElementById('ai-avatar-preview').parentElement;
+        aiAvatarPreviewWrapper.querySelector('.avatar-img').src = chat.settings.aiAvatar || defaultAvatar;
+        let aiFrameOverlay = aiAvatarPreviewWrapper.querySelector('.avatar-frame-overlay');
+        if (chat.settings.aiAvatarFrame) {
+            if (!aiFrameOverlay) {
+                aiFrameOverlay = document.createElement('img');
+                aiFrameOverlay.className = 'avatar-frame-overlay';
+                aiAvatarPreviewWrapper.appendChild(aiFrameOverlay);
+            }
+            aiFrameOverlay.src = chat.settings.aiAvatarFrame;
+            aiFrameOverlay.style.display = 'block';
+        } else if (aiFrameOverlay) {
+            aiFrameOverlay.style.display = 'none';
+        }
+    }
+
     document.getElementById('max-memory').value = chat.settings.maxMemory;
     const bgPreview = document.getElementById('bg-preview');
     const removeBgBtn = document.getElementById('remove-bg-btn');
@@ -16203,6 +16694,14 @@ document.getElementById('confirm-create-post-btn').addEventListener('click', asy
     modal.classList.remove('visible');
     alert('动态发布成功！');
 });
+
+// ... 在 init() 函数的事件监听器区域 ...
+
+// ▼▼▼ 【全新】头像框库相关事件绑定 ▼▼▼
+document.getElementById('open-avatar-frame-library-btn').addEventListener('click', openAvatarFrameLibrary);
+document.getElementById('close-avatar-frame-library-btn').addEventListener('click', closeAvatarFrameLibrary);
+document.getElementById('add-avatar-frame-btn').addEventListener('click', addAvatarFrames);
+// ▲▲▲ 绑定结束 ▲▲▲
 
 // ▼▼▼ 请用这【一整块】包含所有滑动和点击事件的完整代码，替换掉旧的 postsList 事件监听器 ▼▼▼
 
@@ -17439,6 +17938,59 @@ document.getElementById('close-ai-avatar-library-btn').addEventListener('click',
     });
 
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
+
+// ▼▼▼ 【全新可靠的事件处理逻辑】粘贴到 init() 的事件监听区 ▼▼▼
+
+/**
+ * 【辅助函数】处理所有头像框应用/移除的操作
+ * @param {string} choice - 用户的选择 (e.g., 'me', 'ai', 'remove_me')
+ */
+async function handleFrameApplyChoice(choice) {
+    const modal = document.getElementById('avatar-frame-apply-modal');
+    const frameUrl = modal.dataset.frameUrl || ''; // 从主DIV获取URL
+    const chat = state.chats[state.activeChatId];
+    if (!chat || !choice || choice === 'cancel') {
+        modal.classList.remove('visible');
+        return;
+    }
+
+    // 根据用户的选择，更新聊天设置
+    switch (choice) {
+        case 'me':        chat.settings.myAvatarFrame = frameUrl; break;
+        case 'ai':        chat.settings.aiAvatarFrame = frameUrl; break;
+        case 'remove_me': chat.settings.myAvatarFrame = '';     break;
+        case 'remove_ai': chat.settings.aiAvatarFrame = '';     break;
+    }
+
+    // 保存设置并刷新所有相关UI
+    await db.chats.put(chat);
+    modal.classList.remove('visible'); // 关闭应用弹窗
+    closeAvatarFrameLibrary();     // 同时关闭头像框库
+
+    // 强制刷新聊天设置弹窗（如果它是打开的）
+    const chatSettingsModal = document.getElementById('chat-settings-modal');
+    if (chatSettingsModal.classList.contains('visible')) {
+        // 点击两次以确保在已打开的情况下也能强制重绘
+        document.getElementById('chat-settings-btn').click(); 
+        document.getElementById('chat-settings-btn').click();
+    }
+    
+    // 刷新聊天界面和列表，让新头像框立刻生效
+    renderChatInterface(state.activeChatId);
+    renderChatList();
+}
+
+// 【事件委托】为整个应用弹窗绑定一个点击事件监听器
+document.getElementById('avatar-frame-apply-modal').addEventListener('click', (e) => {
+    // 检查被点击的元素是否是一个带有 data-choice 属性的按钮
+    const choice = e.target.dataset.choice;
+    if (choice) {
+        // 如果是，就调用我们的核心处理函数
+        handleFrameApplyChoice(choice);
+    }
+});
+
+// ▲▲▲ 新代码粘贴结束 ▲▲▲```
 
 // ▼▼▼ 在 init() 函数的末尾，粘贴这段【全新的事件监听器】 ▼▼▼
 
