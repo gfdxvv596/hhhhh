@@ -806,7 +806,151 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 1. 粘贴结束 ▲▲▲ */
 
-/* ▲▲▲ 2. 粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新】游戏功能样式 (从这里开始粘贴) ▼▼▼ */
+
+/* 1. 游戏选择面板 (类似表情包面板) */
+#game-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(242, 242, 247, 0.9);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border-color);
+    border-radius: 20px 20px 0 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    visibility: hidden;
+}
+#game-panel.visible {
+    transform: translateY(0);
+    visibility: visible;
+}
+#phone-screen.dark-mode #game-panel {
+    background-color: rgba(40, 40, 40, 0.9);
+}
+
+/* 2. 游戏面板头部 */
+.game-panel-header {
+    padding: 15px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+#phone-screen.dark-mode .game-panel-header {
+    border-bottom-color: #38383a;
+}
+.game-panel-header .close-btn {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+/* 3. 游戏选项网格 */
+.game-options-grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+.game-option-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+.game-option-item .icon-bg {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+.game-option-item:active .icon-bg {
+    transform: scale(0.9);
+}
+.game-option-item .icon-bg img {
+    width: 60%;
+    height: 60%;
+}
+.game-option-item .label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+#phone-screen.dark-mode .game-option-item .icon-bg {
+    background-color: #3e3e42;
+}
+
+/* ▼▼▼ 【游戏样式修正版】请用这块新CSS替换旧的第4、5、6、7点样式 ▼▼▼ */
+
+/* 4. 游戏事件消息的样式 (类似拍一拍) */
+.game-event-message {
+    align-self: center; /* 居中显示 */
+    padding: 6px 14px;
+    margin: 8px 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-secondary);
+    font-size: 13px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 90%;
+}
+#phone-screen.dark-mode .game-event-message {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 5. 游戏后续操作按钮的容器 */
+.game-actions-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px; /* 与上方的结果文字拉开距离 */
+}
+
+/* 6. 单个操作按钮的样式 */
+.game-action-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 18px; /* 胶囊形状 */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+.game-action-btn:active {
+    transform: scale(0.95);
+}
+.game-action-btn.secondary {
+    background-color: #f0f0f0;
+    color: var(--text-primary);
+}
+#phone-screen.dark-mode .game-action-btn.secondary {
+    background-color: #3e3e42;
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+/* ▲▲▲ (粘贴到这里结束) ▲▲▲ */
 
 /* ▼▼▼ 1. 【全新】消息操作菜单美化 (参考P2) ▼▼▼ */
 
@@ -5622,8 +5766,9 @@ input:checked + .slider:before {
     <button id="send-poll-btn" class="chat-action-icon-btn action-button" title="发起投票"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h10"/><path d="M6 6h.01"/><path d="M8 12h10"/><path d="M6 12h.01"/><path d="M8 18h10"/><path d="M6 18h.01"/></svg></button>
     <button id="share-link-btn" class="chat-action-icon-btn action-button" title="分享链接">
         <img src="https://sharkpan.xyz/f/Nzx2Cv/%E8%BF%9E%E6%8E%A5.png" alt="分享链接">
-<button id="roll-dice-btn" class="chat-action-icon-btn action-button" title="掷骰子">
-    <img src="https://sharkpan.xyz/f/6mlKia/%E6%B8%B8%E6%88%8F%20%284%29.png" alt="掷骰子">
+</button>
+<button id="open-game-panel-btn" class="chat-action-icon-btn action-button" title="游戏">
+    <img src="https://sharkpan.xyz/f/6mlKia/%E6%B8%B8%E6%88%8F%20%284%29.png" alt="游戏">
 </button>
     </button>
 </div>
@@ -6504,6 +6649,29 @@ input:checked + .slider:before {
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】游戏选择面板 (粘贴到 <body> 末尾) ▼▼▼ -->
+<div id="game-panel">
+    <div class="game-panel-header">
+        <span class="close-btn" id="close-game-panel-btn">取消</span>
+        <span>开始一个游戏</span>
+    </div>
+    <div class="game-options-grid">
+        <div class="game-option-item" id="start-truth-dare-btn">
+            <div class="icon-bg"><img src="https://i.postimg.cc/Y9c1wx32/Fluent-Emoji-High-Contrast-Love-Letter.png" alt="真心话大冒险"></div>
+            <span class="label">真心话大冒险</span>
+        </div>
+        <div class="game-option-item" id="start-erotic-cards-btn">
+            <div class="icon-bg"><img src="https://i.postimg.cc/kMLdPRr1/Solar-Hearts-Bold-Duotone.png" alt="情侣牌"></div>
+            <span class="label">情侣牌</span>
+        </div>
+        <div class="game-option-item" id="start-standalone-dice-btn">
+            <div class="icon-bg"><img src="https://i.postimg.cc/ZqPqCFm5/MdiDice.png" alt="摇个骰子"></div>
+            <span class="label">摇个骰子</span>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新】分享目标选择器模态框 ▼▼▼ -->
 <div id="share-target-modal" class="modal">
@@ -8611,6 +8779,39 @@ if (msg.type === 'recalled_message') {
         return null;
     }
 
+ // 【核心修复】将游戏事件的处理逻辑提前并加固
+    if (msg.type && (msg.type.endsWith('_start') || msg.type === 'dice_roll')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper system-pat'; 
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble game-event-message'; 
+        bubble.dataset.timestamp = msg.timestamp;
+        bubble.textContent = msg.content; // 无论数据是否完整，都安全地显示文本
+        wrapper.appendChild(bubble);
+
+        // 【安全检查】只有在数据完整(msg.result存在)且轮到用户行动时，才添加按钮
+        if (msg.result && typeof msg.result.user !== 'undefined' && msg.nextTurn === 'user') {
+            const actionsContainer = document.createElement('div');
+            actionsContainer.className = 'game-actions-container';
+            
+            if (msg.type === 'truth_or_dare_start') {
+                actionsContainer.innerHTML = `
+                    <button class="game-action-btn" data-action="truth" data-timestamp="${msg.timestamp}">真心话</button>
+                    <button class="game-action-btn secondary" data-action="dare" data-timestamp="${msg.timestamp}">大冒险</button>
+                `;
+            } else if (msg.type === 'erotic_cards_start') {
+                 actionsContainer.innerHTML = `
+                    <button class="game-action-btn" data-action="erotic_card" data-timestamp="${msg.timestamp}">抽一张牌</button>
+                `;
+            }
+            
+            wrapper.appendChild(actionsContainer);
+        }
+        // 对于游戏这类特殊的系统消息，在这里直接返回，不走下面的常规气泡渲染流程
+        return wrapper;
+    }
+
     if (msg.type === 'pat_message') {
         const wrapper = document.createElement('div');
         wrapper.className = 'message-wrapper system-pat'; 
@@ -8673,6 +8874,56 @@ if (msg.type === 'recalled_message') {
     // ▲▲▲【粘贴结束】▲▲▲
 
     let contentHtml;
+
+ // 现在，所有的 else if 都可以安全地使用 bubble 变量了
+    if (msg.type && msg.type.endsWith('_start') || msg.type === 'dice_roll') {
+        bubble.classList.add('is-game-card');
+        
+        const isGameStart = msg.type.endsWith('_start');
+        const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
+        let gameTitle = '';
+        let cardClass = '';
+
+        if (msg.type === 'truth_or_dare_start') {
+            gameTitle = '真心话大冒险';
+            cardClass = 'game-start-card';
+        } else if (msg.type === 'erotic_cards_start') {
+            gameTitle = '情侣牌';
+            cardClass = 'game-start-card';
+        } else {
+            gameTitle = '摇个骰子';
+            cardClass = 'dice-roll-card';
+        }
+
+        let diceDotsHtml = '';
+        for (let i = 1; i <= msg.result.user; i++) {
+            diceDotsHtml += `<div class="dice-dot dot-${i}"></div>`;
+        }
+        let aiDiceDotsHtml = '';
+        for (let i = 1; i <= msg.result.ai; i++) {
+            aiDiceDotsHtml += `<div class="dice-dot dot-${i}"></div>`;
+        }
+
+        contentHtml = `
+            <div class="game-card-wrapper ${cardClass}">
+                <div class="game-title">${gameTitle}</div>
+                <div class="dice-display">
+                    <div class="dice-container">
+                        <div class="label">${myNickname}</div>
+                        <div class="dice" data-value="${msg.result.user}">${diceDotsHtml}</div>
+                    </div>
+                    <div class="dice-container">
+                        <div class="label">${chat.name}</div>
+                        <div class="dice" data-value="${msg.result.ai}">${aiDiceDotsHtml}</div>
+                    </div>
+                </div>
+                <div class="dice-result-area">
+                    <div>你掷出了 ${msg.result.user}点, ${chat.name} 掷出了 ${msg.result.ai}点</div>
+                    <div class="outcome">${msg.outcome}</div>
+                </div>
+            </div>
+        `;
+    }
     
     if (msg.type === 'share_link') {
         bubble.classList.add('is-link-share');
@@ -8992,19 +9243,26 @@ else if (msg.type === 'share_card') {
         bubble.classList.add('has-image');
         const imageUrl = msg.content[0].image_url.url;
         contentHtml = `<img src="${imageUrl}" class="chat-image" alt="User uploaded image">`;
-// ▼▼▼ 请用这块【全新的】代码替换旧的 else { contentHtml = ... } 代码块 ▼▼▼
-} else {
+// ... 其他 else if ...
+} else if (msg.type === 'interactive_html') {
+    // 无条件地为它添加透明气泡样式
+    bubble.classList.add('is-sticker'); 
+    // 直接将内容作为HTML处理
+    contentHtml = msg.content;
+} 
+
+// 2. 【修改】将原来的 else if 改为最后的 else，处理所有剩下的情况（普通文本、无类型消息等）
+else { 
     const content = String(msg.content || '');
-    // 【核心修改】检查内容是否包含HTML标签
+    // 这段智能检查逻辑依然保留，用于处理用户手动粘贴的HTML
     if (content.includes('<div') || content.includes('<style')) {
-        // 如果是HTML，就直接使用，不做任何处理
         contentHtml = content;
     } else {
-        // 如果是纯文本，才进行换行符替换
+        // 对于纯文本，替换换行符
         contentHtml = content.replace(/\n/g, '<br>');
     }
 }
-// ▲▲▲ 替换结束 ▲▲▲
+
 
 // ▼▼▼ 【最终修正版】请用这整块代码，完整替换掉旧的引用渲染逻辑 ▼▼▼
 
@@ -9384,7 +9642,7 @@ const membersList = chat.members.map(m => `- **${m.originalName}**: ${m.persona}
     - 如果提示是**用户投了票**，你可以根据自己的性格决定是否也使用 "vote" 指令跟票。
     - 如果提示是**投票已结束**，你应该根据投票结果发表你的看法或评论。
     - 你也可以随时主动发起投票。
-
+8.  **【【【游戏规则】】】**: 当历史记录出现 \`[系统提示：...]\` 表明游戏开始时，所有角色都应根据提示（谁先手等）和自己的人设，自然地参与到游戏中。游戏内容（真心话、大冒险等）通过普通的文本消息进行。
 ## 你可以使用的操作指令 (JSON数组中的元素):
 -   **发送文本**: \`{"type": "text", "name": "角色名", "message": "文本内容"}\`
 -   **【【【全新】】】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "name": "角色名", "content": "你想让角色说出后立刻消失的话"}\`
@@ -9492,6 +9750,10 @@ ${chat.settings.aiPersona}
     -   **操作二 (私信跟进)**: 使用 \`text\` 指令，给用户发送一条私信来开启更深入的对话。
     -   **示例**: 如果用户评论说“@你 这张照片真好看！”，你的回复JSON数组应该像这样：
         \`[{"type": "qzone_comment", "postId": (被评论的动态ID), "commentText": "谢谢你的夸奖呀！我也觉得很不错呢~"}, {"type": "text", "content": "你刚才在动态里说喜欢那张照片吗？我也超爱的！"}]\`
+9.  **游戏规则**: 当历史记录出现 \`[系统提示：你们开始了一场'游戏名'游戏...]\`时，这意味着一个新游戏的开始。**你需要**：
+    -   **游戏开始**：仔细阅读系统提示，了解游戏名称、摇骰子结果以及谁先开始。
+    -   **游戏进程**：根据你的人设和游戏进程，用普通的文本消息来提出问题（真心话）、下达指令（大冒险）或描述卡牌内容（情侣牌）。
+    -   **需知**：所有游戏内容都由你和用户自由发挥，没有固定的题库。
 # 【核心能力】生成可交互HTML模块
 - **功能说明**：每次回复请根据“正文剧情内容”，在正文任意位置，生成2个或以上的完整、美观、生动的 HTML 模块，用于模拟“行为 / 情绪 / 互动 / 视觉延展”等内容。
 - **插入方式**：模块应穿插在剧情段落间，可连续多段生成，也可分散插入。每个模块均为独立结构。
@@ -10316,6 +10578,12 @@ case 'change_avatar':
 
 // ▲▲▲ 添加结束 ▲▲▲
 
+// ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼
+                case 'interactive_html':
+                    aiMessage = { ...baseMessage, type: 'interactive_html', content: msgData.content };
+                    break;
+// ▲▲▲ 新代码粘贴结束 ▲▲▲
+
 // ▼▼▼ 在 triggerAiResponse 的 switch (msgData.type) 语句中，添加这个新的 case ▼▼▼
 case 'quote_reply':
     const originalMessage = chat.history.find(m => m.timestamp === msgData.target_timestamp);
@@ -10936,6 +11204,144 @@ function closePhotoViewer() {
 }
 
 // --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
+
+// ▼▼▼ 【全新】游戏功能核心函数 (粘贴到功能函数定义区) ▼▼▼
+
+/**
+ * 打开游戏选择面板
+ */
+function openGamePanel() {
+    document.getElementById('game-panel').classList.add('visible');
+}
+
+/**
+ * 关闭游戏选择面板
+ */
+function closeGamePanel() {
+    document.getElementById('game-panel').classList.remove('visible');
+}
+
+// ▼▼▼ 【游戏功能重构】用这块全新的代码，替换旧的整个 startGame 函数 ▼▼▼
+async function startGame(gameType) {
+    if (!state.activeChatId) return;
+    const chat = state.chats[state.activeChatId];
+    closeGamePanel();
+
+    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
+    
+    // 1. 摇骰子，这部分不变
+    const userRoll = Math.floor(Math.random() * 6) + 1;
+    const aiRoll = Math.floor(Math.random() * 6) + 1;
+    
+    let outcomeText = '';
+    let outcomeForAI = '';
+    let nextTurn = ''; // 【新增】明确记录下一步该谁行动
+
+    if (userRoll > aiRoll) {
+        outcomeText = '你先开始！';
+        outcomeForAI = '用户赢得了先手';
+        nextTurn = 'user'; // 轮到用户
+    } else if (aiRoll > userRoll) {
+        outcomeText = `${chat.name}先开始！`;
+        outcomeForAI = '你赢得了先手';
+        nextTurn = 'ai'; // 轮到AI
+    } else {
+        outcomeText = '是平局！';
+        outcomeForAI = '平局';
+        nextTurn = 'none'; // 平局，谁都不行动
+    }
+    
+    // 2. 【核心修改】构建用户将看到的、和您图片中完全一样的文本
+    const visibleContent = `[你掷出了 ${userRoll}点, ${chat.name} 掷出了 ${aiRoll}点。${outcomeText}]`;
+
+    // ▼▼▼ 【核心修正】在这里，我们将骰子结果(result)和获胜信息(outcome)也保存到消息对象中 ▼▼▼
+    const visibleMessage = {
+        role: 'system',
+        type: gameType === 'dice_roll' ? 'dice_roll' : `${gameType}_start`,
+        timestamp: Date.now(),
+        content: visibleContent,
+        result: { user: userRoll, ai: aiRoll }, // <--- 新增
+        outcome: outcomeText,                  // <--- 新增
+        nextTurn: nextTurn,
+    };
+    // ▲▲▲ 修正结束 ▲▲▲
+    
+    // 4. 构建对AI更详细、更智能的隐藏指令
+    let gameNameForAI = '';
+    if (gameType === 'truth_or_dare') gameNameForAI = '真心话大冒险';
+    else if (gameType === 'erotic_cards') gameNameForAI = '情侣牌';
+    else gameNameForAI = '摇骰子';
+
+    let instructionForAI = `结果是：${outcomeForAI}。`;
+    if (nextTurn === 'ai') {
+        instructionForAI += `现在轮到你了，请根据游戏“${gameNameForAI}”，主动向用户发起挑战或提问。`;
+    } else if (nextTurn === 'user') {
+        instructionForAI += `现在轮到用户了，请等待用户的选择或行动，并准备好回应。`;
+    } else {
+        instructionForAI += `请你对平局的结果发表评论，可以提议再来一次。`;
+    }
+
+    const hiddenMessageContent = `[系统提示：你们开始了一场“${gameNameForAI}”游戏。摇骰子决定先手，你的点数是 ${aiRoll}，用户的点数是 ${userRoll}。${instructionForAI}]`;
+    const hiddenMessage = {
+        role: 'system',
+        content: hiddenMessageContent,
+        timestamp: Date.now() + 1,
+        isHidden: true,
+    };
+
+    // 5. 保存并更新UI
+    chat.history.push(visibleMessage, hiddenMessage);
+    await db.chats.put(chat);
+    appendMessage(visibleMessage, chat);
+    renderChatList();
+    
+    // 6. 【优化】只有在轮到AI行动或平局时，才立即触发AI响应
+    if (nextTurn === 'ai' || nextTurn === 'none') {
+        triggerAiResponse();
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】在JS功能函数定义区粘贴这个新函数 ▼▼▼
+/**
+ * 处理用户点击游戏操作按钮（真心话/大冒险等）
+ * @param {string} action - 用户选择的动作 ('truth', 'dare', 'erotic_card')
+ * @param {number} timestamp - 触发该动作的游戏消息的时间戳
+ */
+async function handleGameActionClick(action, timestamp) {
+    if (!state.activeChatId) return;
+    const chat = state.chats[state.activeChatId];
+
+    // 1. 从界面上移除按钮，防止重复点击
+    const buttonContainer = document.querySelector(`.game-actions-container`);
+    if (buttonContainer) {
+        // 平滑地让按钮消失
+        buttonContainer.style.transition = 'opacity 0.3s';
+        buttonContainer.style.opacity = '0';
+        setTimeout(() => buttonContainer.remove(), 300);
+    }
+    
+    // 2. 根据用户的选择，构建给AI的指令
+    let actionText = '';
+    if (action === 'truth') actionText = '真心话';
+    else if (action === 'dare') actionText = '大冒险';
+    else if (action === 'erotic_card') actionText = '抽一张情侣牌';
+
+    const hiddenMessageContent = `[系统提示：用户选择了“${actionText}”。请根据游戏规则，向用户提出相应的问题或指令。]`;
+    const hiddenMessage = {
+        role: 'system',
+        content: hiddenMessageContent,
+        timestamp: Date.now(),
+        isHidden: true,
+    };
+    
+    // 3. 保存并触发AI响应
+    chat.history.push(hiddenMessage);
+    await db.chats.put(chat);
+    triggerAiResponse();
+}
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
         // ▼▼▼ 请将这个新函数粘贴到你的JS功能函数定义区 ▼▼▼
         
         /**
@@ -16065,56 +16471,6 @@ if (sendBtn) {
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
- // ▼▼▼ 用下面这块全新的代码，完整替换掉旧的 'roll-dice-btn' 事件监听器 ▼▼▼
-    document.getElementById('roll-dice-btn').addEventListener('click', async () => {
-        if (!state.activeChatId) return;
-        const chat = state.chats[state.activeChatId];
-
-        // 1. 【核心修改】现在为用户和AI分别生成点数
-        const userDiceResult = Math.floor(Math.random() * 6) + 1;
-        const aiDiceResult = Math.floor(Math.random() * 6) + 1;
-
-        // 2. 【核心修改】判断胜负结果
-        let outcomeText = '';
-        let outcomeForAI = '';
-        if (userDiceResult > aiDiceResult) {
-            outcomeText = '你赢了！';
-            outcomeForAI = '用户赢了';
-        } else if (aiDiceResult > userDiceResult) {
-            outcomeText = `${chat.name}赢了！`;
-            outcomeForAI = '你赢了';
-        } else {
-            outcomeText = '是平局！';
-            outcomeForAI = '平局';
-        }
-
-        // 3. 创建对用户可见的、包含完整结果的系统消息
-        const visibleMessageContent = `[你掷出了 ${userDiceResult}点，${chat.name} 掷出了 ${aiDiceResult}点。${outcomeText}]`;
-        const visibleMessage = {
-            role: 'system',
-            type: 'pat_message', // 复用居中样式
-            content: visibleMessageContent,
-            timestamp: Date.now()
-        };
-
-        // 4. 【核心修改】创建对AI可见的、更详细的隐藏指令，让它能做出智能回应
-        const hiddenMessageContent = `[系统提示：你们进行了一次掷骰子游戏。你的点数是 ${aiDiceResult}，用户的点数是 ${userDiceResult}。结果是：${outcomeForAI}。请你对此作出回应。]`;
-        const hiddenMessage = {
-            role: 'system',
-            content: hiddenMessageContent,
-            timestamp: Date.now() + 1,
-            isHidden: true
-        };
-
-        // 5. 保存数据，更新UI，并触发AI响应 (这部分逻辑和原来一样)
-        chat.history.push(visibleMessage, hiddenMessage);
-        await db.chats.put(chat);
-        appendMessage(visibleMessage, chat);
-        renderChatList();
-        triggerAiResponse();
-    });
-    // ▲▲▲ 替换到这里结束 ▲▲▲
-
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
             // 绑定动态页和收藏页的返回按钮
@@ -17426,6 +17782,33 @@ document.getElementById('existing-categories-list').addEventListener('click', (e
     }
 });
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
+
+// ▼▼▼ 在 init() 的事件监听器区域末尾，粘贴这段新代码 ▼▼▼
+
+// 游戏面板控制
+document.getElementById('open-game-panel-btn').addEventListener('click', openGamePanel);
+document.getElementById('close-game-panel-btn').addEventListener('click', closeGamePanel);
+
+// 游戏开始按钮
+document.getElementById('start-truth-dare-btn').addEventListener('click', () => startGame('truth_or_dare'));
+document.getElementById('start-erotic-cards-btn').addEventListener('click', () => startGame('erotic_cards'));
+document.getElementById('start-standalone-dice-btn').addEventListener('click', () => startGame('dice_roll'));
+
+// ▲▲▲ 粘贴结束 ▲▲▲
+
+// ▼▼▼ 在 init() 的事件监听器区域末尾，粘贴这段新代码 ▼▼▼
+// 使用事件委托处理所有游戏操作按钮的点击
+document.getElementById('chat-messages').addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('game-action-btn')) {
+        const action = target.dataset.action;
+        const timestamp = parseInt(target.dataset.timestamp);
+        if (action && !isNaN(timestamp)) {
+            handleGameActionClick(action, timestamp);
+        }
+    }
+});
+// ▲▲▲ 粘贴结束 ▲▲▲
 
 // ▼▼▼ 2. 在 init() 的事件监听器区域，粘贴这整块全新的事件监听器 ▼▼▼
 // 绑定“保存当前CSS为主题”按钮
