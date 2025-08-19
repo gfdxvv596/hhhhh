@@ -5818,6 +5818,7 @@ input:checked + .slider:before {
     </div>
     <input type="file" id="sticker-upload-input" accept="image/*" style="display: none;">
     <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+    <input type="file" id="ai-avatar-library-upload-input" accept="image/*" hidden>
     
     <!-- 音乐播放器 (保持不变) -->
 <div id="music-player-overlay">
@@ -7330,6 +7331,10 @@ async function renderQzonePosts() {
         } 
         else if (post.type === 'text_image') {
             contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`;
+        }
+
+        else if (post.type === 'interactive_html') {
+            contentHtml = `<div class="post-content" style="display: flex; justify-content: center; margin-bottom: 10px;">${post.content}</div>`;
         }
 
         let likesHtml = '';
@@ -9791,6 +9796,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **【新】回应视频通话-拒绝**: \`{"type": "video_call_response", "decision": "reject"}\`
 - **发布说说**: \`{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}\`
 - **发布文字图**: \`{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}\`
+-   **【【【全新】】】发布可交互模块**: \`{"type": "qzone_post", "postType": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\` (这允许你在动态中发布一个和聊天时类似的、可交互的、视觉丰富的HTML模块，用于展示心情、小游戏或特殊事件。请遵守和聊天时一样的HTML模块生成规范。)
 - **评论动态**: \`{"type": "qzone_comment", "postId": 123, "commentText": "@作者名 这太有趣了！"}\`
 - **点赞动态**: \`{"type": "qzone_like", "postId": 456}\`
 -   **拍一拍用户**: \`{"type": "pat_user", "suffix": "(可选)你想加的后缀，如“的脑袋”"}\`
@@ -11511,6 +11517,7 @@ async function triggerInactiveAiAction(chatId) {
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
 -   **发说说**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
 - **发布文字图**: \`{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}\`
+-   **发布可交互模块**: \`[{"type": "qzone_post", "postType": "interactive_html", "content": "<div>...你的HTML代码...</div>"}]\`
 -   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
@@ -14066,32 +14073,66 @@ function renderAiAvatarLibrary() {
     });
 }
 
+// ▼▼▼ 请用下面这段【全新的函数】，完整替换掉旧的 addAvatarToLibrary 函数 ▼▼▼
+
 /**
- * 向当前AI的头像库中添加新头像
+ * 【全新版本】向当前AI的头像库中添加新头像（通过本地上传）
  */
 async function addAvatarToLibrary() {
+    // 1. 像以前一样，先让用户为新头像命名
     const name = await showCustomPrompt("添加头像", "请为这个头像起个名字（例如：开心、哭泣）");
-    if (!name || !name.trim()) return;
+    if (!name || !name.trim()) return; // 如果用户取消或未输入，则退出
 
-    const url = await showCustomPrompt("添加头像", "请输入头像的图片URL", "", "url");
-    if (!url || !url.trim().startsWith('http')) {
-        alert("请输入有效的图片URL！");
+    // 2. 【核心修改】不再弹出URL输入框，而是创建一个Promise来等待用户选择文件
+    const base64Url = await new Promise(resolve => {
+        const fileInput = document.getElementById('ai-avatar-library-upload-input');
+
+        // a. 定义一个一次性的事件处理器
+        const changeHandler = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // b. 如果用户选择了文件，就用FileReader读取它
+                const reader = new FileReader();
+                reader.onload = (readEvent) => {
+                    resolve(readEvent.target.result); // c. 读取成功后，用Base64结果兑现Promise
+                };
+                reader.onerror = () => {
+                    resolve(null); // 读取失败
+                };
+                reader.readAsDataURL(file);
+            } else {
+                resolve(null); // 用户取消了文件选择
+            }
+            
+            // d. 任务完成，清理工作：移除监听器并清空输入框
+            fileInput.removeEventListener('change', changeHandler);
+            fileInput.value = '';
+        };
+
+        // e. 绑定这个一次性的处理器，并触发文件选择框
+        fileInput.addEventListener('change', changeHandler);
+        fileInput.click();
+    });
+
+    // 3. 检查文件读取结果
+    if (!base64Url) {
+        alert("未选择任何文件或文件读取失败。");
         return;
     }
     
+    // 4. 后续的保存逻辑保持不变，只是现在保存的是Base64格式的URL
     const chat = state.chats[state.activeChatId];
     if (!chat.settings.aiAvatarLibrary) {
         chat.settings.aiAvatarLibrary = [];
     }
 
-    chat.settings.aiAvatarLibrary.push({ name: name.trim(), url: url.trim() });
+    chat.settings.aiAvatarLibrary.push({ name: name.trim(), url: base64Url });
     await db.chats.put(chat);
-    renderAiAvatarLibrary();
+    renderAiAvatarLibrary(); // 刷新头像库列表，显示新头像
 }
 
-/**
- * 关闭AI头像库管理模态框
- */
+// ▲▲▲ 替换结束 ▲▲▲
+
 function closeAiAvatarLibraryModal() {
     document.getElementById('ai-avatar-library-modal').classList.remove('visible');
 }
@@ -15890,7 +15931,7 @@ document.getElementById('create-shuoshuo-btn').addEventListener('click', async (
     modal.classList.add('visible');
 });
 
-// ▼▼▼ 【修正后】的“动态”（图片）按钮事件 ▼▼▼
+// ▼▼▼ 用下面这段全新的代码进行替换 ▼▼▼
 document.getElementById('create-post-btn').addEventListener('click', async () => {
     // 1. 重置并获取模态框
     resetCreatePostModal();
@@ -15899,17 +15940,19 @@ document.getElementById('create-post-btn').addEventListener('click', async () =>
     // 2. 设置为“复杂动态”模式
     modal.dataset.mode = 'complex';
     
-// 3. 确保与图片/文字图相关的部分是可见的
-modal.querySelector('.post-mode-switcher').style.display = 'flex';
-// 显式激活“上传图片”模式...
-modal.querySelector('#image-mode-content').classList.add('active');
-// ...同时确保“文字图”模式是隐藏的
-modal.querySelector('#text-image-mode-content').classList.remove('active');
+    // 3. 【核心修复】强制重置所有相关UI元素的显示状态
+    modal.querySelector('.post-mode-switcher').style.display = 'flex';
+    modal.querySelector('#image-mode-content').style.display = 'block'; // 强制显示图片区
+    modal.querySelector('#text-image-mode-content').style.display = 'block'; // 强制显示文字图区
     
-    // 4. 恢复主输入框的默认提示语
+    // 4. 激活“上传图片”模式，同时确保其他模式被取消激活
+    modal.querySelector('#image-mode-content').classList.add('active');
+    modal.querySelector('#text-image-mode-content').classList.remove('active');
+    
+    // 5. 恢复主输入框的默认提示语
     modal.querySelector('#post-public-text').placeholder = '分享新鲜事...（非必填的公开文字）';
 
-    // 5. 准备并显示模态框（与“说说”按钮的逻辑相同）
+    // 6. 准备并显示模态框（这部分逻辑不变）
     const visibilityGroupsContainer = document.getElementById('post-visibility-groups');
     visibilityGroupsContainer.innerHTML = '';
     const groups = await db.qzoneGroups.toArray();
@@ -15925,6 +15968,8 @@ modal.querySelector('#text-image-mode-content').classList.remove('active');
     }
     modal.classList.add('visible');
 });
+// ▲▲▲ 替换结束 ▲▲▲
+
             document.getElementById('open-album-btn').addEventListener('click', async () => { await renderAlbumList(); showScreen('album-screen'); });
             document.getElementById('album-back-btn').addEventListener('click', () => { showScreen('chat-list-screen'); switchToChatListView('qzone-screen'); });
 
