@@ -1830,6 +1830,99 @@ body:not(.bordered-mode) .comment-input {
 
 /* ▲▲▲ 新样式结束 ▲▲▲ */
 
+/* ▼▼▼ 第1步：将这块CSS粘贴到 <style> 的末尾 ▼▼▼ */
+/* === 【全新】日历确认弹窗按钮美化 === */
+#custom-modal-footer button#custom-modal-cancel {
+    color: var(--text-secondary); /* 使用次要文字颜色 */
+    font-weight: bold;
+    font-size: 22px; /* 放大符号 */
+    line-height: 1;
+}
+#custom-modal-footer button#custom-modal-confirm.confirm-check {
+    color: var(--accent-color); /* 使用主题强调色 */
+    font-weight: bold;
+    font-size: 22px; /* 放大符号 */
+    line-height: 1;
+}
+/* ▲▲▲ CSS粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【第2步】用这整块新CSS，替换旧的 .cute-event-viewer-content 相关样式 ▼▼▼ */
+
+/* === 可爱的日历事件查看器样式 (V2版) === */
+#cute-event-viewer-modal .cute-event-viewer-content {
+    background-color: #fffaf0;
+    width: 290px;
+    border-radius: 16px;
+    border-top: 6px solid #f6ad55;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-family: 'bulangni', sans-serif;
+}
+
+.cute-event-header { margin-bottom: 10px; }
+.cute-event-icon { font-size: 28px; line-height: 1; }
+.cute-event-title { font-size: 20px; font-weight: 600; color: #a56707; margin: 0 0 12px 0; }
+.cute-event-meta {
+    font-size: 11px; color: #b79452; margin-bottom: 18px;
+    padding-bottom: 10px; border-bottom: 1px dashed rgba(165, 103, 7, 0.2); width: 100%;
+}
+.cute-event-memo {
+    font-size: 14px; line-height: 1.7; color: #6d4c41; white-space: pre-wrap;
+    word-break: break-word; text-align: left; width: 100%; margin-bottom: 25px;
+    background-color: rgba(255, 255, 255, 0.5); padding: 10px; border-radius: 8px;
+    max-height: 150px; /* 增加最大高度和滚动条 */
+    overflow-y: auto;
+}
+/* 【核心修改】为底部操作栏和按钮添加样式 */
+.cute-event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+.cute-event-action-btn {
+    flex: 1; /* 让按钮平分宽度 */
+    background: none;
+    border: 2px solid;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.cute-event-action-btn.danger {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+.cute-event-action-btn.danger:hover {
+    background-color: #ef4444;
+    color: white;
+}
+.cute-event-action-btn:not(.danger):not(.secondary) { /* 编辑按钮 */
+    color: #f6ad55;
+    border-color: #f6ad55;
+}
+.cute-event-action-btn:not(.danger):not(.secondary):hover {
+    background-color: #f6ad55;
+    color: white;
+}
+.cute-event-action-btn.secondary { /* 关闭按钮 */
+    color: #a1887f;
+    border-color: #d7ccc8;
+}
+.cute-event-action-btn.secondary:hover {
+    background-color: #d7ccc8;
+    color: #5d4037;
+}
+
+/* ▲▲▲ CSS替换结束 ▲▲▲ */
+
 /* ▼▼▼ 【全新】表情包批量管理样式 ▼▼▼ */
 .sticker-item.in-selection-mode {
     cursor: pointer;
@@ -2541,7 +2634,145 @@ input[type="color"]::-webkit-color-swatch {
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
+/* === 【全新】纪念日与日历功能样式 === */
+
+/* 1. 纪念日计数器卡片 */
+.anniversary-counter-card {
+    background-color: var(--secondary-bg);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+#phone-screen.dark-mode .anniversary-counter-card {
+    background-color: #2c2c2e;
+}
+
+.counter-avatars {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.counter-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    object-fit: cover;
+}
+.counter-avatar:last-child {
+    margin-left: -15px; /* 让头像有重叠效果 */
+}
+
+.counter-days {
+    color: #f59e0b; /* 参考p3的橙色 */
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1;
+}
+.counter-days span {
+    font-size: 48px;
+    font-weight: 200; /* 细一点的数字更好看 */
+    letter-spacing: -2px;
+}
+.counter-date {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+/* 2. 日历卡片 */
+.calendar-card {
+    background-color: var(--secondary-bg);
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color);
+}
+#phone-screen.dark-mode .calendar-card {
+    background-color: #2c2c2e;
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.calendar-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.calendar-header button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #fbbf24; /* 参考p3的黄色 */
+    margin-bottom: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+.calendar-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s, color 0.2s;
+}
+.calendar-day.empty {
+    cursor: default;
+    opacity: 0;
+}
+.calendar-day.today {
+    background-color: #f59e0b; /* 橙色 */
+    color: white;
+    font-weight: bold;
+}
+.calendar-day:not(.empty):not(.today):hover {
+    background-color: #fffbeb; /* 悬停时淡黄色 */
+}
+#phone-screen.dark-mode .calendar-day:not(.empty):not(.today):hover {
+    background-color: #3e3e42;
+}
+
+/* 日期上的小圆点标记 */
+.calendar-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #ef4444; /* 红色标记 */
+}
+.calendar-day.today.has-event::after {
+    background-color: white; /* 今天有事件，标记为白色 */
+}
+
 
 /* === 搜索栏样式 === */
 .search-bar-container {
@@ -2669,6 +2900,26 @@ input[type="color"]::-webkit-color-swatch {
     background-color: #ff3b30;
     color: white;
 }
+
+/* ▼▼▼ 第3步：将这块CSS粘贴到 <style> 的末尾 ▼▼▼ */
+/* 【全新】纪念日页面AI切换器样式 */
+#memories-ai-switcher {
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    text-align: center;
+    direction: rtl; /* 让下拉箭头显示在左边，更像原生标题 */
+    padding-right: 15px;
+}
+#memories-ai-switcher:focus {
+    outline: none;
+}
+/* ▲▲▲ CSS粘贴结束 ▲▲▲ */
 
 /* === 【修正】聊天界面头部控件切换逻辑 === */
 
@@ -5721,23 +5972,58 @@ input:checked + .slider:before {
 <!-- 新增：收藏页底部操作栏 -->
 <div id="favorites-action-bar" style="display: none;">
     <button id="favorites-delete-selected-btn" class="action-bar-btn">删除 (0)</button>
-</div>
+    </div>
 
     </div>
 
-<!-- ▼▼▼ 【全新】回忆录界面视图 ▼▼▼ -->
 <div id="memories-view" class="chat-list-view">
-    <div class="header"> 
-        <span class="back-btn" id="memories-back-btn">‹</span>
-        <span>我们的回忆</span>
-            <span class="action-btn" id="add-countdown-btn">+</span>
+    <!-- 使用您提供的第二段header代码（已移除齿轮按钮）-->
+ <div class="header"> 
+    <span class="back-btn" id="memories-back-btn">‹</span>
+    <!-- 【核心修改】将静态标题替换为下拉选择器 -->
+    <select id="memories-ai-switcher"></select>
+    <span class="action-btn" style="width: 24px;"></span>
+    </div>
+    
+    <!-- 保留原内容容器 -->
+    <div id="memories-list" class="list-container" style="padding: 15px; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- 纪念日计数器 -->
+        <div class="anniversary-counter-card">
+            <div class="counter-avatars">
+                <img id="anniversary-my-avatar" src="https://i.postimg.cc/PxZrFFFL/o-o-1.jpg" class="counter-avatar">
+                <img id="anniversary-ai-avatar" src="https://i.postimg.cc/PxZrFFFL/o-o-1.jpg" class="counter-avatar">
+            </div>
+            <div class="counter-days">
+                <span id="anniversary-days">0</span> 天
+            </div>
+            <div class="counter-date" id="anniversary-start-date">点击右上角设置起始日</div>
         </div>
-    <div id="memories-list" class="list-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px;">
-        <!-- 回忆卡片将由JS动态生成在这里 -->
+
+        <!-- 日历 -->
+        <div class="calendar-card">
+            <div class="calendar-header">
+                <button id="calendar-prev-month">‹</button>
+                <h2 id="calendar-month-year">2025 年 9 月</h2>
+                <button id="calendar-next-month">›</button>
+            </div>
+            <div class="calendar-weekdays">
+                <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- 日期格子将由JS动态生成 -->
+            </div>
+        </div>
+
+        <!-- 旧的回忆录容器 -->
+        <div id="old-memories-container" style="display: none; flex-direction: column; gap: 15px;">
+            <h3 style="text-align: center; color: var(--text-secondary); font-weight: 500;">往日随笔</h3>
+            <!-- 旧的回忆卡片会加载到这里 -->
+        </div>
+
     </div>
 </div>
-<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
-    
+
     <!-- 底部导航栏 -->
 <div id="chat-list-bottom-nav">
     <div class="nav-item active" data-view="messages-view">
@@ -5748,7 +6034,7 @@ input:checked + .slider:before {
     </div>
     <!-- ▼▼▼ 在“动态”和“收藏”之间，加入这个新页签 ▼▼▼ -->
     <div class="nav-item" data-view="memories-view">
-        <span>回忆</span>
+        <span>纪念</span>
     </div>
     <!-- ▲▲▲ 添加结束 ▲▲▲ -->
     <div class="nav-item" data-view="favorites-view">
@@ -5790,6 +6076,67 @@ input:checked + .slider:before {
         <div id="photos-grid-page">
             <!-- 照片列表将由 JS 动态生成在这里 -->
         </div>
+
+<!-- ▼▼▼ 第2.3步：在 <body> 末尾添加这两个全新的模态框 ▼▼▼ -->
+<!-- 日历事件/备忘录模态框 -->
+<div id="calendar-event-modal" class="modal">
+    <div class="modal-content" style="height: auto;">
+        <div class="modal-header">
+            <span id="event-modal-title">添加备忘</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="event-title-input">标题</label>
+                <input type="text" id="event-title-input" placeholder="简短地描述一下...">
+            </div>
+            <div class="form-group">
+                <label for="event-memo-textarea">备忘录</label>
+                <textarea id="event-memo-textarea" rows="4" placeholder="在这里写下详细内容..."></textarea>
+            </div>
+            <p id="event-creator-info" style="font-size: 12px; color: #888; text-align: right; display: none;"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="delete-event-btn" style="color: #ff3b30; display: none;">删除</button>
+            <button class="cancel" id="cancel-event-btn">取消</button>
+            <button class="save" id="save-event-btn">保存</button>
+        </div>
+    </div>
+</div>
+<!-- 纪念日设置模态框 -->
+<div id="anniversary-settings-modal" class="modal">
+    <div class="modal-content" style="height: auto;">
+        <div class="modal-header">
+            <span>纪念日设置</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="anniversary-start-date-input">我们的起始日</label>
+                <input type="date" id="anniversary-start-date-input">
+            </div>
+            <div class="form-group">
+                <label>我的头像</label>
+                <div class="avatar-upload">
+                    <img id="anniversary-my-avatar-preview" src="" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                    <button onclick="document.getElementById('anniversary-my-avatar-input').click()">上传头像</button>
+                    <input type="file" id="anniversary-my-avatar-input" accept="image/*" hidden>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>对方的头像</label>
+                <div class="avatar-upload">
+                    <img id="anniversary-ai-avatar-preview" src="" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                    <button onclick="document.getElementById('anniversary-ai-avatar-input').click()">上传头像</button>
+                    <input type="file" id="anniversary-ai-avatar-input" accept="image/*" hidden>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="cancel-anniversary-settings-btn">取消</button>
+            <button class="save" id="save-anniversary-settings-btn">保存</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 添加结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 请将这段新的 HTML 粘贴到所有模态框的末尾 ▼▼▼ -->
 <div id="photo-viewer-modal" class="modal">
@@ -5947,6 +6294,8 @@ input:checked + .slider:before {
     <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
     <input type="file" id="ai-avatar-library-upload-input" accept="image/*" hidden>
     <input type="file" id="avatar-frame-upload-input" accept="image/png, image/gif, image/webp" hidden multiple>
+  <input type="file" id="anniversary-my-avatar-input-global" accept="image/*" hidden>
+<input type="file" id="anniversary-ai-avatar-input-global" accept="image/*" hidden>
     
     <!-- 音乐播放器 (保持不变) -->
 <div id="music-player-overlay">
@@ -6737,6 +7086,33 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 【第1步】用这个新版本，替换旧的 id="cute-event-viewer-modal" ▼▼▼ -->
+<div id="cute-event-viewer-modal" class="modal">
+    <div class="cute-event-viewer-content">
+        <!-- 顶部图标 (不变) -->
+        <div class="cute-event-header">
+            <span class="cute-event-icon">📌</span>
+        </div>
+        
+        <!-- 事件标题 (不变) -->
+        <h2 id="cute-event-title" class="cute-event-title"></h2>
+        
+        <!-- 元数据：作者和时间 (不变) -->
+        <div id="cute-event-meta" class="cute-event-meta"></div>
+        
+        <!-- 事件备忘录内容 (不变) -->
+        <div id="cute-event-memo" class="cute-event-memo"></div>
+        
+        <!-- 【核心修改】全新的底部操作栏 -->
+        <div class="cute-event-footer">
+            <button id="cute-event-delete-btn" class="cute-event-action-btn danger">删除</button>
+            <button id="cute-event-edit-btn" class="cute-event-action-btn">编辑</button>
+            <button id="close-cute-event-viewer-btn" class="cute-event-action-btn secondary">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ HTML替换结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 【全新设计】头像框应用选择模态框 (用此代码替换旧的) ▼▼▼ -->
 <div id="avatar-frame-apply-modal" class="modal">
     <div class="modal-content" style="width: 280px; height: auto;">
@@ -7173,6 +7549,7 @@ if(Array.isArray(res) && res.length > 1) {
 const db = new Dexie('GeminiChatDB');
 let isStickerEditMode = false;
 let selectedStickers = new Set();
+let currentMemoriesViewChatId = null;
 let musicState = { 
     isActive: false, 
     activeChatId: null, 
@@ -7331,7 +7708,7 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // ===================================================================
 
 // ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
-db.version(25).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
+db.version(26).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
     globalSettings: '&id', 
@@ -7350,7 +7727,8 @@ db.version(25).stores({ // <-- Increment the version number by 1 (e.g., from 23 
     callRecords: '++id, chatId, timestamp, customName',
     customThemes: '&id, name',
     customBubbleThemes: '&id, name',// <-- 【全新添加】这张表用来存储自定义气泡主题
-    avatarFrames: '&id, name, url' // <-- 【全新添加】这张表用来存储头像框
+    avatarFrames: '&id, name, url', // <-- 【全新添加】这张表用来存储头像框
+    calendarEvents: '++id, [chatId+date], createdBy'// <-- 【全新添加】这张表用来存储日历事件
 });
 // ▲▲▲ Modification Ends ▲▲▲
 
@@ -7969,89 +8347,56 @@ async function importBackup(file) {
             alert('已恢复默认字体。');
         }
 
+// ▼▼▼ 请用这块【已彻底修复纪念日继承问题】的代码，完整替换旧的 loadAllDataFromDB 函数 ▼▼▼
 async function loadAllDataFromDB() {
-    // ▼▼▼ 【核心修改在这里】 ▼▼▼
     const [
-        chatsArr,
-        apiConfig,
-        globalSettings,
-        userStickers,
-        worldBooks,
-        musicLib,
-        personaPresets,
-        qzoneSettings,
-        initialFavorites,
-        avatarFrames // 将 initialFavorites 加入到解构赋值中
+        chatsArr, apiConfig, globalSettings, userStickers, worldBooks,
+        musicLib, personaPresets, qzoneSettings, avatarFrames, initialFavorites
     ] = await Promise.all([
-        db.chats.toArray(),
-        db.apiConfig.get('main'),
-        db.globalSettings.get('main'),
-        db.userStickers.toArray(),
-        db.worldBooks.toArray(),
-        db.musicLibrary.get('main'),
-        db.personaPresets.toArray(),
-        db.qzoneSettings.get('main'),
-        db.avatarFrames.toArray(),
-        db.favorites.orderBy('timestamp').reverse().toArray() // 确保这一行在 Promise.all 的数组参数内
+        db.chats.toArray(), db.apiConfig.get('main'), db.globalSettings.get('main'),
+        db.userStickers.toArray(), db.worldBooks.toArray(), db.musicLibrary.get('main'),
+        db.personaPresets.toArray(), db.qzoneSettings.get('main'),
+        db.avatarFrames.toArray(), db.favorites.orderBy('timestamp').reverse().toArray()
     ]);
-    // ▲▲▲ 【修改结束】 ▲▲▲
+
+    // 【核心修复1】如果全局设置里还存着旧的、共享的纪念日日期...
+    const oldGlobalAnniversaryDate = globalSettings ? globalSettings.anniversaryStartDate : null;
 
     state.chats = chatsArr.reduce((acc, chat) => {
+        // --- 下面是为所有旧数据进行兼容性补全的代码 ---
+        if (!chat.settings) chat.settings = {};
+        if (typeof chat.settings.anniversaryStartDate === 'undefined') {
+            chat.settings.anniversaryStartDate = null;
+        }
 
-    if (typeof chat.unreadCount === 'undefined') {
-        chat.unreadCount = 0; // 如果这个聊天对象没有 unreadCount 属性，就给它初始化为 0
-    }
-
-        // ★★★【核心重构：数据迁移脚本】★★★
-        // 检查是否是群聊，并且其成员对象使用的是旧的 `name` 结构
+        // 【核心修复2】...我们就把它应用给【每一个】还没有设置过纪念日的AI角色
+        if (oldGlobalAnniversaryDate && !chat.isGroup && !chat.settings.anniversaryStartDate) {
+            chat.settings.anniversaryStartDate = oldGlobalAnniversaryDate;
+            console.log(`为角色 "${chat.name}" 迁移了旧的全局纪念日设置。`);
+            db.chats.put(chat); // 别忘了存回数据库
+        }
+        
+        // --- 后续的其他兼容性代码保持不变 ---
+        if (typeof chat.unreadCount === 'undefined') chat.unreadCount = 0;
         if (chat.isGroup && chat.members && chat.members.length > 0 && chat.members[0].name) {
-            console.log(`检测到旧版群聊数据 for "${chat.name}"，正在执行迁移...`);
             chat.members.forEach(member => {
-                // 如果这个成员对象没有 originalName，说明是旧数据
                 if (typeof member.originalName === 'undefined') {
-                    member.originalName = member.name; // 将旧的 name 作为 originalName
-                    member.groupNickname = member.name; // 同时创建一个初始的 groupNickname
-                    delete member.name; // 删除旧的、有歧义的 name 字段
-                    needsUpdate = true; // 标记需要存回数据库
+                    member.originalName = member.name;
+                    member.groupNickname = member.name;
+                    delete member.name;
                 }
             });
-             console.log(`迁移完成 for "${chat.name}"`);
         }
-
-        // --- ▼▼▼ 核心修复就在这里 ▼▼▼ ---
-        // 检查1：如果是一个单聊，并且没有 status 属性
         if (!chat.isGroup && !chat.status) {
-            // 就为它补上一个默认的 status 对象
-            chat.status = {
-                text: '在线',
-                lastUpdate: Date.now(),
-                isBusy: false
-            };
-            console.log(`为旧角色 "${chat.name}" 补全了status属性。`);
+            chat.status = { text: '在线', lastUpdate: Date.now(), isBusy: false };
         }
-        // --- ▲▲▲ 修复结束 ▲▲▲
-
-        // --- ▼▼▼ 核心修复就在这里 ▼▼▼ ---
-        // 检查2：兼容最新的“关系”功能
         if (!chat.isGroup && !chat.relationship) {
-            // 如果是单聊，且没有 relationship 对象，就补上一个默认的
-            chat.relationship = {
-                status: 'friend',
-                blockedTimestamp: null,
-                applicationReason: ''
-            };
-            console.log(`为旧角色 "${chat.name}" 补全了 relationship 属性。`);
+            chat.relationship = { status: 'friend', blockedTimestamp: null, applicationReason: '' };
         }
-        // --- ▲▲▲ 修复结束 ▲▲▲
-
-    // ▼▼▼ 在这里添加 ▼▼▼
-    if (!chat.isGroup && (!chat.settings || !chat.settings.aiAvatarLibrary)) {
-        if (!chat.settings) chat.settings = {}; // 以防万一连settings都没有
-        chat.settings.aiAvatarLibrary = [];
-        console.log(`为旧角色 "${chat.name}" 补全了aiAvatarLibrary属性。`);
-    }
-    // ▲▲▲ 添加结束 ▲▲▲
-
+        if (!chat.isGroup && (!chat.settings || !chat.settings.aiAvatarLibrary)) {
+            if (!chat.settings) chat.settings = {};
+            chat.settings.aiAvatarLibrary = [];
+        }
         if (!chat.musicData) chat.musicData = { totalTime: 0 };
         if (chat.settings && chat.settings.linkedWorldBookId && !chat.settings.linkedWorldBookIds) {
             chat.settings.linkedWorldBookIds = [chat.settings.linkedWorldBookId];
@@ -8060,38 +8405,31 @@ async function loadAllDataFromDB() {
         acc[chat.id] = chat;
         return acc;
     }, {});
+    
+    // 加载全局设置
     state.apiConfig = apiConfig || { id: 'main', proxyUrl: '', apiKey: '', model: '' };
+    state.globalSettings = globalSettings || { 
+        id: 'main', wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', fontUrl: '', 
+        enableBackgroundActivity: false, backgroundActivityInterval: 60, blockCooldownHours: 1,
+        appIcons: { ...DEFAULT_APP_ICONS }, borderMode: 'borderless', topBarColor: '#fdfdfd', 
+        topBarTextColor: '#1f1f1f', bottomBarColor: '#f8f8f8', activeBubbleTheme: 'default'
+    };
+    
+    // 【核心修复3】在迁移完成后，从全局设置中删除掉这个旧字段，防止下次重复迁移
+    if (state.globalSettings.anniversaryStartDate) {
+        delete state.globalSettings.anniversaryStartDate;
+        db.globalSettings.put(state.globalSettings);
+    }
 
-        state.globalSettings = globalSettings || { 
-            id: 'main', 
-            wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', 
-            fontUrl: '', 
-            enableBackgroundActivity: false, 
-            backgroundActivityInterval: 60,
-            blockCooldownHours: 1,
-            appIcons: { ...DEFAULT_APP_ICONS },
-            borderMode: 'borderless',
-            // ▼▼▼ 【全新添加】主题相关默认值 ▼▼▼
-            topBarColor: '#fdfdfd',
-            topBarTextColor: '#1f1f1f',
-            bottomBarColor: '#f8f8f8',
-            activeBubbleTheme: 'default'
-            // ▲▲▲ 添加结束 ▲▲▲
-        };
-
-// 【核心修改】合并已保存的图标和默认图标，防止更新后旧数据丢失新图标
-state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings.appIcons || {}) };
-
+    // --- 后续的其他加载逻辑保持不变 ---
+    state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings.appIcons || {}) };
     state.userStickers = userStickers || [];
     state.avatarFrames = avatarFrames || [];
     state.worldBooks = worldBooks || [];
     musicState.playlist = musicLib?.playlist || [];
     state.personaPresets = personaPresets || [];
     state.qzoneSettings = qzoneSettings || { id: 'main', nickname: '{{user}}', avatar: 'https://files.catbox.moe/q6z5fc.jpeg', banner: 'https://files.catbox.moe/r5heyt.gif' };
-
-    // ▼▼▼ 【确保这一行在 Promise.all 之后，并使用解构赋值得到的 initialFavorites】 ▼▼▼
     allFavoriteItems = initialFavorites || [];
-    // ▲▲▲ 【修改结束】 ▲▲▲
 }
 
         async function saveGlobalPlaylist() { await db.musicLibrary.put({ id: 'main', playlist: musicState.playlist }); }
@@ -8237,6 +8575,67 @@ async function renderChatList() {
     });
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【B】用这个新版本，替换旧的 showCuteEventViewer 函数 ▼▼▼
+/**
+ * 【V3版】打开并填充可爱的事件查看器，并为按钮绑定事件
+ * @param {object} event - 从数据库中读取到的事件对象
+ */
+function showCuteEventViewer(event) {
+    const modal = document.getElementById('cute-event-viewer-modal');
+    if (!modal) return;
+
+    // 1. 确保在切换到查看模式前，显示元素已存在（防止点击“取消”时崩溃）
+    if (!document.getElementById('cute-event-title')) {
+        disableCuteViewerEditMode(event);
+        return; // 调用 disableCuteViewerEditMode 会递归调用 showCuteEventViewer，所以这里直接返回
+    }
+
+    // 填充内容
+    document.getElementById('cute-event-title').textContent = event.title;
+    document.getElementById('cute-event-memo').textContent = event.memo || '(没有写详细备忘哦~)';
+    const authorName = event.createdBy === 'user' ? '你' : (state.chats[event.chatId]?.name || '对方');
+    const createdTime = new Date(event.timestamp).toLocaleString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    document.getElementById('cute-event-meta').innerHTML = `由 <strong>${authorName}</strong> 在 ${createdTime} 记下`;
+    
+    // 获取按钮
+    const editBtn = document.getElementById('cute-event-edit-btn');
+    const deleteBtn = document.getElementById('cute-event-delete-btn');
+    
+    // 2. 设置按钮的显示/隐藏状态
+    const isUserCreated = event.createdBy === 'user';
+    editBtn.style.display = isUserCreated ? 'block' : 'none';
+    deleteBtn.style.display = isUserCreated ? 'block' : 'none';
+    
+    // 3. 移除所有旧监听器，并绑定新的事件
+    // 为了防止重复绑定，先克隆并替换，再绑定新的事件处理器
+    const newEditBtn = editBtn.cloneNode(true);
+    editBtn.parentNode.replaceChild(newEditBtn, editBtn);
+    
+    const newDeleteBtn = deleteBtn.cloneNode(true);
+    deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
+
+    // 4. 绑定事件
+    newEditBtn.addEventListener('click', () => {
+        // 点击“编辑”按钮时，启用编辑模式
+        enableCuteViewerEditMode(event);
+    });
+    
+    newDeleteBtn.addEventListener('click', async () => {
+        // 点击“删除”按钮时，执行删除逻辑
+        const confirmed = await showCustomConfirm('删除备忘', '确定要删除这条备忘录吗？', { confirmButtonClass: 'btn-danger' });
+        if (confirmed) {
+            await db.calendarEvents.delete(event.id);
+            modal.classList.remove('visible');
+            await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            alert('备忘已删除。');
+        }
+    });
+
+    // 5. 显示弹窗
+    modal.classList.add('visible');
+}
+// ▲▲▲ 函数替换结束 ▲▲▲
 
 // ▼▼▼ 【全新】将这【一整块】新函数粘贴到JS功能函数定义区 ▼▼▼
 
@@ -9972,7 +10371,30 @@ messagesPayload = historySlice.map(msg => {
 }).filter(Boolean);
 // ▲▲▲ 替换结束 ▲▲▲
 
-        } else { // 单聊的Prompt
+        } else { // 【全新】在构建Prompt前，先准备好纪念日和日历的上下文
+let anniversaryContext = '';
+if (state.globalSettings.anniversaryStartDate) {
+    const startDate = new Date(state.globalSettings.anniversaryStartDate);
+    const now = new Date();
+    const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffTime = Math.abs(today - startDay);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    anniversaryContext = `\n# 你们的关系:\n- 你们的纪念起始日是 ${state.globalSettings.anniversaryStartDate}，到今天已经是第 ${diffDays} 天。`;
+}
+
+let calendarContext = '';
+const upcomingEvents = await db.calendarEvents
+    .where('chatId').equals(chatId)
+    .filter(event => new Date(event.date) >= new Date()) // 只看今天及未来的事件
+    .sortBy('date');
+
+if (upcomingEvents.length > 0) {
+    const eventsSummary = upcomingEvents.slice(0, 3) // 最多显示最近的3个
+        .map(e => `- ${e.date}: ${e.title} (${e.createdBy === 'user' ? '用户' : '你'}创建)`)
+        .join('\n');
+    calendarContext = `\n# 你们的日历备忘 (今天及未来):\n${eventsSummary}`;
+}
 // ▼▼▼ 请用这块【全新的、已整合完毕的】代码，替换掉旧的 systemPrompt 开头部分 ▼▼▼
 systemPrompt = `你现在扮演一个名为"${chat.name}"的角色。
 # 你的角色设定：
@@ -10016,6 +10438,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 # 你可以使用的操作指令 (JSON数组中的元素):
 +   **【全新】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "content": "你想让AI说出后立刻消失的话"}\` (用于模拟说错话、后悔等场景，消息会短暂出现后自动变为“已撤回”)
 - **【【【核心指令】】】发送可交互HTML模块**: \`{"type": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\`
+-   **【全新】创建日历备忘**:\`{"type": "create_calendar_event", "date": "YYYY-MM-DD", "title": "事件标题", "memo": "事件的详细备忘..."}\` (你可以用这个来记录重要的纪念日，或者你们约定好要做的事)
 -   **【全新】修改用户备注**: \`{"type": "change_user_nickname", "newName": "你想给用户起的新外号"}\` (提示：当你觉得气氛合适，或者想给用户一个亲密的昵称时，可以使用这个指令。系统会自动生成提示，你可以紧接着发一条消息来解释或调侃你的行为)
 -   **【新增】更新状态**: \`{"type": "update_status", "status_text": "我去做什么了", "is_busy": false}\` (is_busy: true代表忙碌/离开, false代表空闲)
 -   **【新增】切换歌曲**: \`{"type": "change_music", "song_name": "你想切换到的歌曲名"}\` (歌曲名必须在下面的播放列表中)
@@ -10827,6 +11250,44 @@ case 'change_avatar':
                     aiMessage = { ...baseMessage, type: 'interactive_html', content: msgData.content };
                     break;
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
+
+// ▼▼▼ 第2.2步：在 triggerAiResponse 的 switch 语句中，用这块代码替换旧的 case 'create_calendar_event' ▼▼▼
+case 'create_calendar_event':
+    if (msgData.date && msgData.title) {
+        // 【核心增强】在添加前，先检查当天是否已有事件，避免重复
+        const existingEvent = await db.calendarEvents.where({ chatId: state.activeChatId, date: msgData.date }).first();
+        if (!existingEvent) {
+            const newEvent = {
+                chatId: state.activeChatId,
+                date: msgData.date,
+                title: msgData.title,
+                memo: msgData.memo || '',
+                createdBy: 'ai'
+            };
+            await db.calendarEvents.add(newEvent);
+
+            // 刷新日历（如果可见）
+            if (document.getElementById('memories-view').classList.contains('active')) {
+                await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            }
+
+            // 创建系统消息
+            const systemMessage = {
+                role: 'system',
+                type: 'pat_message',
+                content: `[“${chat.name}”在你们的日历上标记了：${msgData.title}]`,
+                timestamp: messageTimestamp++
+            };
+            chat.history.push(systemMessage);
+            if (isViewingThisChat) {
+                appendMessage(systemMessage, chat);
+            }
+        } else {
+            console.log(`AI 尝试重复创建事件，已阻止：${msgData.date} - ${msgData.title}`);
+        }
+    }
+    continue;
+// ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 在 triggerAiResponse 的 switch (msgData.type) 语句中，添加这个新的 case ▼▼▼
 case 'quote_reply':
@@ -11981,6 +12442,45 @@ function updateSettingsPreview() {
 
 // ▲▲▲ 替换结束 ▲▲▲
 
+// ▼▼▼ 请将这个【新函数】粘贴到您的JS功能函数定义区 ▼▼▼
+
+/**
+ * 【全新】打开模态框以显示已存在的事件详情
+ * @param {object} event - 从数据库中读取到的事件对象
+ */
+function showEventDetails(event) {
+    const modal = document.getElementById('calendar-event-modal');
+    const titleEl = document.getElementById('event-modal-title');
+    const titleInput = document.getElementById('event-title-input');
+    const memoTextarea = document.getElementById('event-memo-textarea');
+    const deleteBtn = document.getElementById('delete-event-btn');
+    const creatorInfo = document.getElementById('event-creator-info');
+    const saveBtn = document.getElementById('save-event-btn');
+
+    // 填充数据
+    modal.dataset.date = event.date;
+    modal.dataset.eventId = event.id; // 标记为编辑模式
+    titleEl.textContent = `备忘录 - ${event.date}`;
+    titleInput.value = event.title;
+    memoTextarea.value = event.memo;
+
+    // 根据创建者决定是否可编辑和删除
+    const isUserCreated = event.createdBy === 'user';
+    titleInput.readOnly = !isUserCreated;
+    memoTextarea.readOnly = !isUserCreated;
+    deleteBtn.style.display = isUserCreated ? 'block' : 'none';
+    saveBtn.style.display = isUserCreated ? 'block' : 'none';
+
+    // 显示创建者信息
+    const authorName = isUserCreated ? '你' : (state.chats[event.chatId]?.name || '对方');
+    creatorInfo.textContent = `由 ${authorName} 创建`;
+    creatorInfo.style.display = 'block';
+
+    modal.classList.add('visible');
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
 // ▼▼▼ 请将这些【新函数】粘贴到JS功能函数定义区 ▼▼▼
 
 async function openGroupManager() {
@@ -12428,6 +12928,100 @@ async function saveEditedMessage(timestamp, simpleContent = null) {
 }
 
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 第2步：将这个【新函数】粘贴到您的JS功能函数定义区 ▼▼▼
+/**
+ * 【全新】显示自定义的日历事件确认/输入弹窗
+ * @param {string} dateString - "YYYY-MM-DD"
+ * @returns {Promise<string|null>} - 用户确认则返回输入的标题，取消则返回null
+ */
+function showCalendarPrompt(dateString) {
+    return new Promise(resolve => {
+        modalResolve = resolve;
+        modalTitle.textContent = '记录这一天';
+        // 【核心】构建全新的弹窗内容
+        modalBody.innerHTML = `
+            <p style="margin-bottom: 15px;">这天是值得纪念的一天吗？</p>
+            <input 
+                type="text" 
+                id="calendar-prompt-input" 
+                placeholder="你想写一点什么呢？" 
+                style="width: 100%; box-sizing: border-box;"
+            >
+        `;
+        
+        // 【核心】修改按钮样式和文本
+        modalCancelBtn.textContent = '×';
+        modalConfirmBtn.textContent = '√';
+        modalConfirmBtn.classList.add('confirm-check'); // 添加一个class用于CSS美化
+
+        const input = document.getElementById('calendar-prompt-input');
+
+        modalConfirmBtn.onclick = () => { 
+            // 移除美化class，防止影响其他弹窗
+            modalConfirmBtn.classList.remove('confirm-check');
+            resolve(input.value); 
+            hideCustomModal(); 
+        };
+        modalCancelBtn.onclick = () => { 
+            modalConfirmBtn.classList.remove('confirm-check');
+            resolve(null); 
+            hideCustomModal(); 
+        };
+        
+        showCustomModal();
+        setTimeout(() => input.focus(), 100); // 自动聚焦输入框
+    });
+}
+// ▲▲▲ 添加结束 ▲▲▲
+
+// ▼▼▼ 第2步：将这个【新函数】粘贴到您的JS功能函数定义区 ▼▼▼
+
+/**
+ * 【全新】显示自定义的日历事件确认/输入弹窗
+ * @param {string} dateString - "YYYY-MM-DD"
+ * @returns {Promise<string|null>} - 用户确认则返回输入的标题，取消则返回null
+ */
+function showCalendarPrompt(dateString) {
+    return new Promise(resolve => {
+        modalResolve = resolve;
+        modalTitle.textContent = '记录这一天';
+        // 【核心】构建全新的弹窗内容
+        modalBody.innerHTML = `
+            <p style="margin-bottom: 15px;">这天是值得纪念的一天吗？</p>
+            <input 
+                type="text" 
+                id="calendar-prompt-input" 
+                placeholder="你想写一点什么呢？" 
+                style="width: 100%; box-sizing: border-box;"
+            >
+        `;
+        
+        // 【核心】修改按钮样式和文本
+        modalCancelBtn.textContent = '×';
+        modalConfirmBtn.textContent = '√';
+        modalConfirmBtn.classList.add('confirm-check'); // 添加一个class用于CSS美化
+
+        const input = document.getElementById('calendar-prompt-input');
+
+        modalConfirmBtn.onclick = () => { 
+            // 移除美化class，防止影响其他弹窗
+            modalConfirmBtn.classList.remove('confirm-check');
+            resolve(input.value); 
+            hideCustomModal(); 
+        };
+        modalCancelBtn.onclick = () => { 
+            modalConfirmBtn.classList.remove('confirm-check');
+            resolve(null); 
+            hideCustomModal(); 
+        };
+        
+        showCustomModal();
+        setTimeout(() => input.focus(), 100); // 自动聚焦输入框
+    });
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 // ▼▼▼ 请将这【一整块新函数】粘贴到JS功能函数定义区的末尾 ▼▼▼
 
@@ -13359,6 +13953,45 @@ function toggleCallButtons(isGroup) {
     document.getElementById('group-video-call-btn').style.display = isGroup ? 'flex' : 'none';
 }
 // ▲▲▲ 粘贴结束 ▲▲▲
+
+// ▼▼▼ 第1步：将这个【新函数】粘贴到您的JS功能函数定义区 ▼▼▼
+
+/**
+ * 【全新】打开模态框以显示已存在的事件详情
+ * @param {object} event - 从数据库中读取到的事件对象
+ */
+function showEventDetails(event) {
+    const modal = document.getElementById('calendar-event-modal');
+    const titleEl = document.getElementById('event-modal-title');
+    const titleInput = document.getElementById('event-title-input');
+    const memoTextarea = document.getElementById('event-memo-textarea');
+    const deleteBtn = document.getElementById('delete-event-btn');
+    const creatorInfo = document.getElementById('event-creator-info');
+    const saveBtn = document.getElementById('save-event-btn');
+
+    // 填充数据
+    modal.dataset.date = event.date;
+    modal.dataset.eventId = event.id; // 标记为编辑模式
+    titleEl.textContent = `备忘录 - ${event.date}`;
+    titleInput.value = event.title;
+    memoTextarea.value = event.memo;
+
+    // 根据创建者决定是否可编辑和删除
+    const isUserCreated = event.createdBy === 'user';
+    titleInput.readOnly = !isUserCreated;
+    memoTextarea.readOnly = !isUserCreated;
+    deleteBtn.style.display = isUserCreated ? 'block' : 'none';
+    saveBtn.style.display = isUserCreated ? 'block' : 'none';
+
+    // 显示创建者信息
+    const authorName = isUserCreated ? '你' : (state.chats[event.chatId]?.name || '对方');
+    creatorInfo.textContent = `由 ${authorName} 创建`;
+    creatorInfo.style.display = 'block';
+
+    modal.classList.add('visible');
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 // ▼▼▼ 【全新】这个函数是本次修复的核心，请粘贴到你的JS功能区 ▼▼▼
 async function handleWaimaiResponse(originalTimestamp, choice) {
@@ -14655,6 +15288,220 @@ function cancelReplyMode() {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
+// ▼▼▼ 第4.2步：用这整块【全新重构版】代码，替换从 renderMemoriesScreen 到 handleAnniversaryAvatarUpload 的所有旧函数 ▼▼▼
+
+// === 【全新重构版】纪念日与日历功能核心函数 ===
+let currentCalendarDate = new Date();
+
+/**
+ * 【主渲染函数】渲染整个纪念日/日历页面
+ */
+async function renderMemoriesScreen() {
+    // 1. 填充AI切换器
+    const switcher = document.getElementById('memories-ai-switcher');
+    switcher.innerHTML = '';
+    const aiChats = Object.values(state.chats).filter(c => !c.isGroup);
+
+    if (aiChats.length === 0) {
+        // 如果没有AI，显示提示信息
+        document.getElementById('memories-list').innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">请先创建至少一个AI角色</p>';
+        const option = document.createElement('option');
+        option.textContent = '暂无角色';
+        switcher.appendChild(option);
+        return;
+    }
+
+    aiChats.forEach(chat => {
+        const option = document.createElement('option');
+        option.value = chat.id;
+        option.textContent = `与 ${chat.name} 的日子`;
+        switcher.appendChild(option);
+    });
+
+    // 2. 确定当前要显示的AI
+    if (!currentMemoriesViewChatId || !state.chats[currentMemoriesViewChatId]) {
+        currentMemoriesViewChatId = aiChats[0].id; // 默认显示第一个
+    }
+    switcher.value = currentMemoriesViewChatId;
+
+    // 3. 根据当前选中的AI，渲染页面内容
+    const chat = state.chats[currentMemoriesViewChatId];
+    if (!chat) return;
+
+    document.getElementById('anniversary-my-avatar').src = chat.settings.myAvatar || defaultAvatar;
+    document.getElementById('anniversary-ai-avatar').src = chat.settings.aiAvatar || defaultAvatar;
+    
+    await renderAnniversaryCounter(currentMemoriesViewChatId);
+    await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+}
+
+/**
+ * 渲染指定AI的纪念日计数器
+ * @param {string} chatId 
+ */
+function renderAnniversaryCounter(chatId) {
+    const chat = state.chats[chatId];
+    if (!chat) return;
+
+    const startDateStr = chat.settings.anniversaryStartDate;
+    const daysEl = document.getElementById('anniversary-days');
+    const dateEl = document.getElementById('anniversary-start-date');
+
+    if (startDateStr) {
+        const startDate = new Date(startDateStr);
+        const now = new Date();
+        const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffTime = Math.abs(today - startDay);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        daysEl.textContent = diffDays;
+        dateEl.textContent = `始于 ${startDate.getFullYear()}.${String(startDate.getMonth() + 1).padStart(2, '0')}.${String(startDate.getDate()).padStart(2, '0')}`;
+    } else {
+        daysEl.textContent = '0';
+        dateEl.textContent = '点击天数或日期设置起始日';
+    }
+}
+
+/**
+ * 渲染指定AI的日历
+ * @param {number} year 
+ * @param {number} month (0-11)
+ */
+async function renderCalendar(year, month) {
+    const grid = document.getElementById('calendar-grid');
+    const monthYearEl = document.getElementById('calendar-month-year');
+    grid.innerHTML = '';
+    monthYearEl.textContent = `${year} 年 ${month + 1} 月`;
+    currentCalendarDate.setFullYear(year, month, 1);
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    const eventsThisMonth = await db.calendarEvents
+        .where({ chatId: currentMemoriesViewChatId })
+        .filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+        })
+        .toArray();
+    
+    const eventDays = new Set(eventsThisMonth.map(e => new Date(e.date).getDate()));
+
+    for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += `<div class="calendar-day empty"></div>`;
+    }
+    const today = new Date();
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = i;
+        dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        if (i === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
+            dayEl.classList.add('today');
+        }
+        if (eventDays.has(i)) {
+            dayEl.classList.add('has-event');
+        }
+        grid.appendChild(dayEl);
+    }
+}
+
+/**
+ * 打开事件编辑器，可用于新建或编辑
+ * @param {string} dateString
+ * @param {object} [eventToEdit=null]
+ */
+async function openEventEditor(dateString, eventToEdit = null) {
+    const modal = document.getElementById('calendar-event-modal');
+    const titleEl = document.getElementById('event-modal-title');
+    const titleInput = document.getElementById('event-title-input');
+    const memoTextarea = document.getElementById('event-memo-textarea');
+    const deleteBtn = document.getElementById('delete-event-btn');
+    const creatorInfo = document.getElementById('event-creator-info');
+    const saveBtn = document.getElementById('save-event-btn');
+
+    modal.dataset.date = dateString;
+    titleEl.textContent = eventToEdit ? `编辑备忘 - ${dateString}` : `新建备忘 - ${dateString}`;
+    
+    if (eventToEdit) {
+        titleInput.value = eventToEdit.title;
+        memoTextarea.value = eventToEdit.memo;
+        deleteBtn.style.display = 'block';
+        creatorInfo.textContent = `由 ${eventToEdit.createdBy === 'user' ? '你' : state.chats[eventToEdit.chatId].name} 创建`;
+        creatorInfo.style.display = 'block';
+        modal.dataset.eventId = eventToEdit.id;
+    } else {
+        titleInput.value = '';
+        memoTextarea.value = '';
+        deleteBtn.style.display = 'none';
+        creatorInfo.style.display = 'none';
+        delete modal.dataset.eventId;
+    }
+    
+    titleInput.readOnly = false;
+    memoTextarea.readOnly = false;
+    saveBtn.style.display = 'block';
+
+    modal.classList.add('visible');
+}
+
+/**
+ * 保存日历事件（兼容新建与编辑）
+ */
+async function saveCalendarEvent() {
+    const modal = document.getElementById('calendar-event-modal');
+    const date = modal.dataset.date;
+    const eventId = modal.dataset.eventId ? parseInt(modal.dataset.eventId) : null;
+    const title = document.getElementById('event-title-input').value.trim();
+    const memo = document.getElementById('event-memo-textarea').value.trim();
+    const chatId = currentMemoriesViewChatId;
+
+    if (!chatId || !title) {
+        alert(chatId ? '标题不能为空！' : '无法确定当前操作的角色。');
+        return;
+    }
+
+    const eventData = { chatId, date, title, memo, createdBy: 'user' };
+    if (eventId) {
+        await db.calendarEvents.update(eventId, { title, memo });
+    } else {
+        await db.calendarEvents.add(eventData);
+    }
+    
+    modal.classList.remove('visible');
+    await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+}
+
+/**
+ * 删除备忘录
+ */
+async function deleteCalendarEvent() {
+    const modal = document.getElementById('calendar-event-modal');
+    const eventId = modal.dataset.eventId ? parseInt(modal.dataset.eventId) : null;
+    if (!eventId) return;
+    const confirmed = await showCustomConfirm('删除备忘', '确定要删除这条备忘录吗？');
+    if (confirmed) {
+        await db.calendarEvents.delete(eventId);
+        modal.classList.remove('visible');
+        await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+    }
+}
+
+/**
+ * 弹出日期选择框设置起始日
+ */
+async function promptForAnniversaryDate() {
+    const chat = state.chats[currentMemoriesViewChatId];
+    if (!chat) return;
+    const currentDate = chat.settings.anniversaryStartDate || new Date().toISOString().split('T')[0];
+    const newDateStr = await showCustomPrompt('设置纪念起始日', '', currentDate, 'date');
+    if (newDateStr) {
+        chat.settings.anniversaryStartDate = newDateStr;
+        await db.chats.put(chat);
+        renderAnniversaryCounter(currentMemoriesViewChatId);
+    }
+}
+
 // ▼▼▼ 【全新】头像框库核心功能函数 ▼▼▼
 
 /**
@@ -14797,6 +15644,26 @@ async function applyAvatarFrame(frameUrl) {
     modal.classList.add('visible');
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 第2.1步：将这个【新函数】粘贴到您的JS功能函数定义区 ▼▼▼
+/**
+ * 【全新】弹出日期选择框，让用户设置纪念起始日
+ */
+async function promptForAnniversaryDate() {
+    const currentDate = state.globalSettings.anniversaryStartDate || new Date().toISOString().split('T')[0];
+    const newDateStr = await showCustomPrompt(
+        '设置纪念起始日', 
+        '', 
+        currentDate, 
+        'date'
+    );
+    if (newDateStr) {
+        state.globalSettings.anniversaryStartDate = newDateStr;
+        await db.globalSettings.put(state.globalSettings);
+        renderAnniversaryCounter(); // 实时更新天数
+    }
+}
+// ▲▲▲ 添加结束 ▲▲▲
 
 // ▼▼▼ 【全新】用户处理转账的核心功能函数 ▼▼▼
 
@@ -15455,6 +16322,104 @@ async function recallMessage(timestamp, isUserRecall) {
     renderChatInterface(state.activeChatId);
     if(isUserRecall) renderChatList(); // 用户撤回时，最后一条消息变了，需要刷新列表
 }
+
+// ▼▼▼ 【A】粘贴以下三个新函数到 JS 功能区 ▼▼▼
+
+/**
+ * 启用可爱的事件查看器内的编辑模式
+ * @param {object} event - 要编辑的事件对象
+ */
+function enableCuteViewerEditMode(event) {
+    const titleContainer = document.getElementById('cute-event-title');
+    const memoContainer = document.getElementById('cute-event-memo');
+    const editBtn = document.getElementById('cute-event-edit-btn');
+    const closeBtn = document.getElementById('close-cute-event-viewer-btn');
+    const deleteBtn = document.getElementById('cute-event-delete-btn');
+    const metaContainer = document.getElementById('cute-event-meta');
+
+    // 1. 将标题替换为输入框
+    titleContainer.outerHTML = `<input type="text" id="cute-title-input" class="cute-event-title" value="${event.title}">`;
+    
+    // 2. 将备忘录替换为文本域
+    memoContainer.outerHTML = `<textarea id="cute-memo-textarea" class="cute-event-memo">${event.memo || ''}</textarea>`;
+
+    // 3. 隐藏元数据信息
+    metaContainer.style.display = 'none';
+
+    // 4. 更改按钮功能和文本
+    editBtn.textContent = '保存修改';
+    editBtn.id = 'cute-event-save-btn'; // 更改ID以便于绑定新事件
+    closeBtn.textContent = '取消';
+    deleteBtn.style.display = 'none'; // 隐藏删除按钮，只在查看模式显示
+
+    // 【重要】将事件ID存储到模态框上，以备保存时使用
+    const modal = document.getElementById('cute-event-viewer-modal');
+    modal.dataset.editingId = event.id;
+    modal.dataset.editingDate = event.date;
+
+    // 重新绑定保存事件 (因为ID变了，需要重新获取DOM对象)
+    document.getElementById('cute-event-save-btn').addEventListener('click', handleCuteViewerSave);
+}
+
+/**
+ * 处理在可爱查看器中点击“保存修改”的逻辑
+ */
+async function handleCuteViewerSave() {
+    const modal = document.getElementById('cute-event-viewer-modal');
+    const eventId = parseInt(modal.dataset.editingId);
+    const newTitle = document.getElementById('cute-title-input').value.trim();
+    const newMemo = document.getElementById('cute-memo-textarea').value.trim();
+    
+    if (!newTitle) {
+        alert('标题不能为空哦！');
+        return;
+    }
+
+    // 1. 更新数据库
+    await db.calendarEvents.update(eventId, { title: newTitle, memo: newMemo });
+
+    // 2. 获取更新后的事件对象
+    const updatedEvent = await db.calendarEvents.get(eventId);
+
+    // 3. 切换回查看模式
+    disableCuteViewerEditMode(updatedEvent);
+
+    // 4. 刷新日历，确保红点正确显示（如果标题有变）
+    await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+    
+    alert('备忘已保存！');
+}
+
+/**
+ * 禁用编辑模式，切换回查看模式
+ * @param {object} event - 最终的事件对象
+ */
+function disableCuteViewerEditMode(event) {
+    const modal = document.getElementById('cute-event-viewer-modal');
+    const titleInput = document.getElementById('cute-title-input');
+    const memoTextarea = document.getElementById('cute-memo-textarea');
+    const saveBtn = document.getElementById('cute-event-save-btn');
+    const closeBtn = document.getElementById('close-cute-event-viewer-btn');
+
+    // 1. 将输入框/文本域替换回显示元素
+    titleInput.outerHTML = `<h2 id="cute-event-title" class="cute-event-title">${event.title}</h2>`;
+    memoTextarea.outerHTML = `<div id="cute-event-memo" class="cute-event-memo">${event.memo || '(没有写详细备忘哦~)'}</div>`;
+
+    // 2. 恢复按钮状态
+    saveBtn.textContent = '编辑';
+    saveBtn.id = 'cute-event-edit-btn';
+    closeBtn.textContent = '关闭';
+    document.getElementById('cute-event-meta').style.display = 'block';
+
+    // 3. 重新加载查看模式（调用 showCuteEventViewer 的核心逻辑部分）
+    showCuteEventViewer(event);
+
+    // 4. 清理 dataset
+    delete modal.dataset.editingId;
+    delete modal.dataset.editingDate;
+}
+
+// ▲▲▲ 粘贴结束 ▲▲▲
 
 // ▼▼▼ 【全新】将这些函数粘贴到你的JS功能函数定义区 ▼▼▼
 
@@ -17017,6 +17982,138 @@ if (sendBtn) {
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
+// ▼▼▼ 第4.3步：在 init() 中，用这整块【最终版】代码，替换所有旧的纪念日/日历相关事件绑定 ▼▼▼
+// === 【全新】纪念日与日历功能事件绑定 (切换+直觉交互版) ===
+
+// 1. 绑定底部导航栏的“纪念日”页签
+document.querySelector('.nav-item[data-view="memories-view"]').addEventListener('click', () => {
+    if (isFavoritesSelectionMode) { document.getElementById('favorites-edit-btn').click(); }
+    switchToChatListView('memories-view');
+    renderMemoriesScreen();
+});
+
+// 2. 绑定“我们的日子”页面的返回按钮
+document.getElementById('memories-back-btn').addEventListener('click', () => {
+    switchToChatListView('messages-view');
+});
+
+// 3. 【新】绑定AI切换器
+document.getElementById('memories-ai-switcher').addEventListener('change', (e) => {
+    currentMemoriesViewChatId = e.target.value;
+    renderMemoriesScreen(); // 切换后重绘整个页面
+});
+
+// 4. 【新】绑定头像点击事件，直接触发文件上传
+document.getElementById('anniversary-my-avatar').addEventListener('click', () => {
+    document.getElementById('anniversary-my-avatar-input-global').click();
+});
+document.getElementById('anniversary-ai-avatar').addEventListener('click', () => {
+    document.getElementById('anniversary-ai-avatar-input-global').click();
+});
+
+// 5. 【新】为隐藏的文件上传input绑定change事件
+document.getElementById('anniversary-my-avatar-input-global').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file && currentMemoriesViewChatId) {
+        const chat = state.chats[currentMemoriesViewChatId];
+        const reader = new FileReader();
+        reader.onload = async (re) => {
+            chat.settings.myAvatar = re.target.result; // 直接更新当前AI聊天里的“我的头像”
+            await db.chats.put(chat);
+            renderMemoriesScreen(); // 刷新显示
+        };
+        reader.readAsDataURL(file);
+    }
+    e.target.value = ''; // 清空以便下次能选择同名文件
+});
+document.getElementById('anniversary-ai-avatar-input-global').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file && currentMemoriesViewChatId) {
+        const chat = state.chats[currentMemoriesViewChatId];
+        const reader = new FileReader();
+        reader.onload = async (re) => {
+            chat.settings.aiAvatar = re.target.result;
+            await db.chats.put(chat);
+            renderMemoriesScreen();
+        };
+        reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+});
+
+// 6. 【新】绑定天数和日期，点击后设置起始日
+document.getElementById('anniversary-days').addEventListener('click', promptForAnniversaryDate);
+document.getElementById('anniversary-start-date').addEventListener('click', promptForAnniversaryDate);
+
+// 7. 绑定日历月份切换按钮 (逻辑不变)
+document.getElementById('calendar-prev-month').addEventListener('click', () => {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+});
+document.getElementById('calendar-next-month').addEventListener('click', () => {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+});
+
+// 8. 绑定备忘录弹窗的按钮 (逻辑不变)
+document.getElementById('cancel-event-btn').addEventListener('click', () => {
+    document.getElementById('calendar-event-modal').classList.remove('visible');
+});
+document.getElementById('save-event-btn').addEventListener('click', saveCalendarEvent);
+document.getElementById('delete-event-btn').addEventListener('click', deleteCalendarEvent);
+// ▲▲▲ 事件绑定替换结束 ▲▲▲
+
+// ▼▼▼ 在 init() 函数中，用这整块【全新逻辑】的代码替换旧的 calendar-grid 事件监听器 ▼▼▼
+
+// 【全新】绑定日历格子的智能点击事件
+document.getElementById('calendar-grid').addEventListener('click', async (e) => {
+    const dayEl = e.target.closest('.calendar-day');
+    if (dayEl && !dayEl.classList.contains('empty')) {
+        const dateString = dayEl.dataset.date;
+        const chatId = currentMemoriesViewChatId;
+        
+        // 1. 精确查询当天是否已有事件
+        const existingEvent = await db.calendarEvents
+            .where('[chatId+date]')
+            .equals([chatId, dateString])
+            .first();
+
+        if (existingEvent) {
+            // 2. 【核心】如果有事件，调用我们新的详情函数
+            showCuteEventViewer(existingEvent);
+        } else {
+            // 3. 如果没事件，才调用我们上一版创建的快速标注弹窗
+            const memoTitle = await showCalendarPrompt(dateString);
+            
+            // 4. 如果用户输入了内容并确认，就直接保存并刷新！
+            if (memoTitle !== null) { 
+                const finalTitle = memoTitle.trim() || `值得纪念的一天`;
+                
+                const newEvent = {
+                    chatId: chatId,
+                    date: dateString,
+                    title: finalTitle,
+                    memo: '', // 备忘录内容初始为空
+                    createdBy: 'user'
+                };
+                
+                await db.calendarEvents.add(newEvent);
+                
+                // 【关键】保存成功后，立刻刷新日历，让小红点显示出来
+                await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            }
+        }
+    }
+});
+
+// 8. 绑定备忘录弹窗的按钮
+document.getElementById('cancel-event-btn').addEventListener('click', () => {
+    document.getElementById('calendar-event-modal').classList.remove('visible');
+});
+document.getElementById('save-event-btn').addEventListener('click', saveCalendarEvent);
+document.getElementById('delete-event-btn').addEventListener('click', deleteCalendarEvent);
+// ▲▲▲ 替换结束 ▲▲▲
+
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
             // 绑定动态页和收藏页的返回按钮
@@ -17221,6 +18318,43 @@ document.getElementById('favorites-delete-selected-btn').addEventListener('click
         favoritesEditBtn.click(); // 模拟点击"完成"按钮来退出编辑模式
     }
 });
+
+// ▼▼▼ 【D】将这整块代码，粘贴到 init() 的事件监听器区域末尾 ▼▼▼
+
+// 使用事件委托，监听整个“可爱查看器”的点击
+document.getElementById('cute-event-viewer-modal').addEventListener('click', async (e) => {
+    const target = e.target;
+    const eventId = parseInt(target.dataset.eventId);
+
+    // 如果点击的是“关闭”按钮
+    if (target.id === 'close-cute-event-viewer-btn') {
+        target.closest('.modal').classList.remove('visible');
+    }
+    
+    // 如果点击的是“编辑”按钮
+    else if (target.id === 'cute-event-edit-btn' && eventId) {
+        const eventToEdit = await db.calendarEvents.get(eventId);
+        if (eventToEdit) {
+            // 1. 先关闭可爱的查看器
+            target.closest('.modal').classList.remove('visible');
+            // 2. 紧接着打开编辑器，并传入要编辑的事件数据
+            openEventEditor(eventToEdit.date, eventToEdit);
+        }
+    }
+
+    // 如果点击的是“删除”按钮
+    else if (target.id === 'cute-event-delete-btn' && eventId) {
+        const confirmed = await showCustomConfirm('删除备忘', '确定要删除这条备忘录吗？', { confirmButtonClass: 'btn-danger' });
+        if (confirmed) {
+            await db.calendarEvents.delete(eventId);
+            target.closest('.modal').classList.remove('visible');
+            await renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            alert('备忘已删除。');
+        }
+    }
+});
+
+// ▲▲▲ 添加结束 ▲▲▲
 
 // ▼▼▼ 在 init() 函数末尾添加 ▼▼▼
 if (state.globalSettings.enableBackgroundActivity) {
@@ -17511,59 +18645,7 @@ document.getElementById('user-speak-btn').addEventListener('click', async () => 
         triggerAiInCallAction(userInput.trim());
     }
 });
-// ▲▲▲ 替换结束 ▲▲▲
-
-// ▼▼▼ 【新增】回忆录相关事件绑定 ▼▼▼
-// 1. 将“回忆”页签和它的视图连接起来
-document.querySelector('.nav-item[data-view="memories-view"]').addEventListener('click', () => {
-    // 在切换前，确保"收藏"页面的编辑模式已关闭
-    if (isFavoritesSelectionMode) {
-        document.getElementById('favorites-edit-btn').click(); 
-    }
-    switchToChatListView('memories-view');
-    renderMemoriesScreen(); // 点击时渲染
-});
-
-// 2. 绑定回忆录界面的返回按钮
-document.getElementById('memories-back-btn').addEventListener('click', () => switchToChatListView('messages-view'));
-
-// ▲▲▲ 新增结束 ▲▲▲
-
-// 【全新】约定/倒计时功能事件绑定
-document.getElementById('add-countdown-btn').addEventListener('click', () => {
-    document.getElementById('create-countdown-modal').classList.add('visible');
-});
-document.getElementById('cancel-create-countdown-btn').addEventListener('click', () => {
-    document.getElementById('create-countdown-modal').classList.remove('visible');
-});
-document.getElementById('confirm-create-countdown-btn').addEventListener('click', async () => {
-    const title = document.getElementById('countdown-title-input').value.trim();
-    const dateValue = document.getElementById('countdown-date-input').value;
-    
-    if (!title || !dateValue) {
-        alert('请填写完整的约定标题和日期！');
-        return;
-    }
-
-    const targetDate = new Date(dateValue);
-    if (isNaN(targetDate) || targetDate <= new Date()) {
-        alert('请输入一个有效的、未来的日期！');
-        return;
-    }
-
-    const newCountdown = {
-        chatId: null, // 用户创建的，不属于任何特定AI
-        authorName: '我',
-        description: title,
-        timestamp: Date.now(),
-        type: 'countdown',
-        targetDate: targetDate.getTime()
-    };
-    
-    await db.memories.add(newCountdown);
-    document.getElementById('create-countdown-modal').classList.remove('visible');
-    renderMemoriesScreen();
-});
+// ▲▲▲ 替换结束 ▲▲
 
 // 【全新】拉黑功能事件绑定
 document.getElementById('block-chat-btn').addEventListener('click', async () => {
@@ -18088,6 +19170,32 @@ if (savedVinylCover) {
     document.getElementById('vinyl-album-art').src = savedVinylCover;
 }
 
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【C】用这个新版本，替换旧的 close-cute-event-viewer-btn 监听器 ▼▼▼
+document.getElementById('close-cute-event-viewer-btn').addEventListener('click', () => {
+    const modal = document.getElementById('cute-event-viewer-modal');
+    
+    if (modal.dataset.editingId) {
+        // 如果当前是编辑模式，点击“关闭”按钮就是“取消”操作
+        
+        // 1. 尝试获取原始事件（确保取消后能恢复到正确内容）
+        const eventId = parseInt(modal.dataset.editingId);
+        db.calendarEvents.get(eventId).then(originalEvent => {
+            if (originalEvent) {
+                // 2. 切换回查看模式
+                disableCuteViewerEditMode(originalEvent);
+            } else {
+                // 3. 如果找不到原始事件（可能刚被删除），直接关闭
+                modal.classList.remove('visible');
+                renderCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            }
+        });
+    } else {
+        // 如果不是编辑模式，直接关闭
+        modal.classList.remove('visible');
+    }
+});
 // ▲▲▲ 替换结束 ▲▲▲
 
 // 在 init() 的事件监听区域添加
