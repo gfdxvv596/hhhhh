@@ -1226,6 +1226,41 @@ label:has(input[value="green_black"])::before { background: linear-gradient(45de
 
 /* ▲▲▲ 粘贴到此结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】线下模式结束按钮文本化样式 ▼▼▼ */
+#end-offline-mode-btn {
+    /* 1. 覆盖掉圆形按钮的尺寸 */
+    width: auto; /* 宽度由内容自动决定 */
+    height: 50px; /* 高度可以小一点 */
+    border-radius: 25px; /* 圆角矩形（胶囊形状） */
+    background-color: #d7f0ff; /* 使用一个漂亮的蓝色作为背景 */
+
+    /* 2. 移除背景图标 */
+    background-image: none !important;
+
+    /* 3. 为文字添加内边距，让它不贴边 */
+    padding-left: 20px;
+    padding-right: 20px;
+
+    /* 4. 设置文字样式 */
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap; /* 强制不换行 */
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】线下模式图标美化 ▼▼▼ */
+
+/* 专门为线下模式的“行动”按钮设置新的图标和颜色 */
+#user-offline-action-btn {
+    background-color: #ffd7e6; /* 使用一个漂亮的蓝色作为背景 */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>');
+    background-size: 60%; /* 调整星星的大小 */
+    width: 40px; /* 宽度由内容自动决定 */
+    height: 40px; /* 高度可以小一点 */
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* --- 2. 状态栏 & 电池图标缩小 --- */
 
 /* 调整状态栏的字体和位置 */
@@ -5343,6 +5378,46 @@ input:checked + .slider:before {
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】线下模式界面样式 ▼▼▼ */
+#offline-mode-screen {
+    background-color: #f5f3ef; /* 一个温暖、有质感的米白色背景 */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#offline-mode-main {
+    background-color: rgba(255, 255, 255, 0.4); /* 半透明的白色背景，更有层次感 */
+    height: 65%; /* 留出更多空间给叙事 */
+    margin: 80px 15px 120px 15px; /* 调整边距 */
+}
+
+/* 线下模式中的叙事文本样式 */
+.offline-narrative-bubble {
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-width: 95%;
+    line-height: 1.7;
+    word-break: break-word;
+    white-space: pre-wrap;
+    font-size: 15px; /* 字体可以稍大一点，方便阅读 */
+    margin-bottom: 12px;
+}
+
+.offline-narrative-bubble.ai-narrative {
+    background-color: #ffffff; /* AI的旁白用纯白 */
+    align-self: flex-start;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.offline-narrative-bubble.user-narrative {
+    background-color: #e1f5fe; /* 用户的行动用淡淡的天蓝色 */
+    align-self: flex-end;
+    text-align: left;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 【全新】语音转文字功能样式 ▼▼▼ */
 
 /* 1. 语音文字内容的样式 */
@@ -6244,6 +6319,8 @@ input:checked + .slider:before {
 <button id="open-game-panel-btn" class="chat-action-icon-btn action-button" title="游戏">
     <img src="https://sharkpan.xyz/f/6mlKia/%E6%B8%B8%E6%88%8F%20%284%29.png" alt="游戏">
 </button>
+<button id="start-offline-mode-btn" class="chat-action-icon-btn action-button" title="线下模式">
+    <img src="https://i.postimg.cc/wvLQdKkB/Telegram_(Telegram).png" alt="线下模式">
     </button>
 </div>
 <!-- ▲▲▲ 替换到这里结束 ▲▲▲ -->
@@ -6588,6 +6665,26 @@ input:checked + .slider:before {
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 在这里粘贴全新的线下模式屏幕 ▼▼▼ -->
+<div id="offline-mode-screen" class="screen">
+    <!-- 1. 顶部栏 -->
+    <div class="video-call-top-bar">
+        <span>今日见面</span>
+        <span id="offline-mode-timer">00:00</span>
+    </div>
+    
+    <!-- 2. 剧情叙述区域 -->
+    <div id="offline-mode-main" class="video-call-main">
+        <!-- 线下剧情将由JS动态生成在这里 -->
+    </div>
+    
+    <!-- 3. 底部控制栏 -->
+    <div class="video-call-controls">
+        <button id="user-offline-action-btn" class="control-btn speak-btn" title="你的行动"></button>
+        <button id="end-offline-mode-btn" class="control-btn hangup-btn">结束今天的见面吧</button>    </div>
+</div>
+<!-- ▲▲▲ 新屏幕粘贴结束 ▲▲▲ -->
 
         </div>
     </div>
@@ -7852,6 +7949,200 @@ db.version(26).stores({ // <-- Increment the version number by 1 (e.g., from 23 
                 return `${year}-${month}-${day} ${hours}:${minutes}`;
             }
         }
+
+// ▼▼▼ 从这里开始，复制这整块代码 ▼▼▼
+
+/**
+ * 【总入口】用户点击“线下模式”按钮
+ */
+async function handleInitiateOfflineMode() {
+    if (!state.activeChatId || offlineModeState.isActive) return;
+
+    const confirmed = await showCustomConfirm(
+        '进入线下模式',
+        '你确定要切换到线下模式吗？在该模式下，你将以文字形式描述你的行动和对话，AI会以旁白形式回应。'
+    );
+
+    if (confirmed) {
+        startOfflineMode();
+    }
+}
+
+/**
+ * 开始线下模式
+ */
+async function startOfflineMode() {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+
+    offlineModeState.isActive = true;
+    offlineModeState.activeChatId = chat.id;
+    offlineModeState.startTime = Date.now();
+    offlineModeState.history = [];
+
+    // 抓取进入前的聊天上下文
+    const preOfflineHistory = chat.history.slice(-10);
+    offlineModeState.preOfflineContext = preOfflineHistory.map(msg => {
+        const sender = msg.role === 'user' ? (chat.settings.myNickname || '我') : (msg.senderName || chat.name);
+        return `${sender}: ${String(msg.content).substring(0, 50)}...`;
+    }).join('\n');
+
+    // 更新UI
+    document.getElementById('offline-mode-main').innerHTML = '';
+    showScreen('offline-mode-screen');
+
+    // 启动计时器
+    if (callTimerInterval) clearInterval(callTimerInterval);
+    callTimerInterval = setInterval(() => {
+        if (!offlineModeState.isActive) {
+            clearInterval(callTimerInterval);
+            return;
+        }
+        const elapsed = Math.floor((Date.now() - offlineModeState.startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('offline-mode-timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }, 1000);
+
+    // 创建一条对用户隐藏的系统消息，告知AI模式已切换
+    const systemInstruction = {
+        role: 'system',
+        content: `[系统指令：你们现在进入了线下模式。请你切换为第三人称旁白视角，描述场景和你的行动。]`,
+        timestamp: Date.now(),
+        isHidden: true
+    };
+    chat.history.push(systemInstruction);
+    await db.chats.put(chat);
+    
+    // 触发AI的第一条线下剧情
+    triggerAiInOfflineAction();
+}
+
+/**
+ * 结束线下模式
+ */
+async function endOfflineMode() {
+    if (!offlineModeState.isActive) return;
+
+    const chat = state.chats[offlineModeState.activeChatId];
+    
+    // 【核心】创建对用户隐藏的“线下模式总结”指令
+    const offlineSummaryForAI = offlineModeState.history.map(h => `${h.role === 'user' ? '我' : chat.name}: ${h.content}`).join('\n');
+    const hiddenReportInstruction = {
+        role: 'system',
+        content: `[系统指令：线下模式刚刚结束。这是你们在线下互动的完整记录：\n---线下记录开始---\n${offlineSummaryForAI}\n---线下记录结束---\n现在你们回到了线上聊天。请你根据线下发生的事情，主动给我发一条私信，可以是对线下事件的延续、感受的分享，或是提出新的话题。]`,
+        timestamp: Date.now() + 1,
+        isHidden: true
+    };
+    chat.history.push(hiddenReportInstruction);
+    await db.chats.put(chat);
+
+    // 重置状态并返回聊天界面
+    offlineModeState = { isActive: false, activeChatId: null, startTime: null, history: [], preOfflineContext: "" };
+    clearInterval(callTimerInterval);
+    callTimerInterval = null;
+
+    openChat(chat.id);
+    
+    // 【关键】触发AI，让它读取总结指令并发起私聊
+    triggerAiResponse();
+}
+
+/**
+ * 处理用户在线下模式中的输入
+ */
+async function handleUserOfflineInput() {
+    if (!offlineModeState.isActive) return;
+
+    const userInput = await showCustomPrompt('你的行动/对话', '请输入你想做的或想说的话...');
+    
+    if (userInput && userInput.trim()) {
+        const trimmedInput = userInput.trim();
+        
+        // 渲染并保存用户的行动
+        const userBubble = document.createElement('div');
+        userBubble.className = 'offline-narrative-bubble user-narrative';
+        userBubble.textContent = trimmedInput;
+        document.getElementById('offline-mode-main').appendChild(userBubble);
+        offlineModeState.history.push({ role: 'user', content: trimmedInput });
+        
+        // 触发AI的回应
+        triggerAiInOfflineAction();
+    }
+}
+
+/**
+ * 触发AI在线下模式中的叙述
+ */
+async function triggerAiInOfflineAction() {
+    if (!offlineModeState.isActive) return;
+
+    const chat = state.chats[offlineModeState.activeChatId];
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+    const feed = document.getElementById('offline-mode-main');
+
+    // 构建专门用于线下模式的System Prompt
+    const offlinePrompt = `
+# 你的任务
+你现在是一个场景描述引擎。你的任务是扮演 ${chat.name} (${chat.settings.aiPersona})，并以【第三人称旁观视角】来描述TA在线下场景中的所有动作、环境和语言。
+
+# 核心规则
+1.  **【【【视角铁律】】】**: 你的回复【绝对不能】使用第一人称“我”。必须使用第三人称，如“他”、“她”、或直接使用角色名“${chat.name}”。
+2.  **格式**: 你的回复【必须】是一段描述性的文本，不能是JSON。
+3.  **剧情连贯**: 你必须根据“进入线下前的聊天摘要”和“线下实时互动记录”来发展剧情。
+
+# 当前情景
+你正在和用户（人设: ${chat.settings.myPersona}）进行一场线下的、面对面的互动。
+**进入线下前的聊天摘要**:
+${offlineModeState.preOfflineContext}
+
+现在，请根据下面的【线下实时互动记录】，继续进行叙述。
+`;
+    const messagesForApi = [
+        { role: 'system', content: offlinePrompt },
+        ...offlineModeState.history.map(h => ({ role: h.role, content: h.content }))
+    ];
+
+    // 【核心修复】如果这是第一次互动（历史记录为空），我们需要给AI一个启动指令。
+if (messagesForApi.length === 0) {
+    messagesForApi.push({
+        role: 'user',
+        content: '我们刚刚进入线下模式，请你开始描述现在的场景。'
+    });
+}
+
+    try {
+        let isGemini = proxyUrl === GEMINI_API_URL;
+        let geminiConfig = toGeminiRequestData(model, apiKey, offlinePrompt, messagesForApi, isGemini);
+        const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) : await fetch(`${proxyUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+            body: JSON.stringify({ model: model, messages: messagesForApi, temperature: 0.85 })
+        });
+
+        if (!response.ok) throw new Error((await response.json()).error.message);
+
+        const data = await response.json();
+        const aiResponse = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+
+        // 渲染并保存AI的叙述
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'offline-narrative-bubble ai-narrative';
+        aiBubble.textContent = aiResponse;
+        feed.appendChild(aiBubble);
+        feed.scrollTop = feed.scrollHeight;
+        offlineModeState.history.push({ role: 'assistant', content: aiResponse });
+
+    } catch (error) {
+        const errorBubble = document.createElement('div');
+        errorBubble.className = 'offline-narrative-bubble ai-narrative';
+        errorBubble.style.color = '#ff8a80';
+        errorBubble.textContent = `[旁白出错了: ${error.message}]`;
+        feed.appendChild(errorBubble);
+        feed.scrollTop = feed.scrollHeight;
+    }
+}
+// ▲▲▲ 复制到这里结束 ▲▲▲
 
 // ▼▼▼ 请用这个【已添加删除按钮】的函数，完整替换掉你旧的 renderQzonePosts 函数 ▼▼▼
 async function renderQzonePosts() {
@@ -10289,7 +10580,7 @@ const membersList = chat.members.map(m => `- **${m.originalName}**: ${m.persona}
 -   **发送文本**: \`{"type": "text", "name": "角色名", "message": "文本内容"}\`
 -   **【【【全新】】】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "name": "角色名", "content": "你想让角色说出后立刻消失的话"}\`
 - **发送表情**: \`{"type": "sticker", "url": "https://...表情URL...", "meaning": "(可选)表情的含义"}\`
--   **发送图片**: \`{"type": "ai_image", "name": "角色名", "description": "图片的详细文字描述"}\`
+-   **发送图片**: \`{"type": "ai_image", "name": "角色名", "description": "图片的详细【中文】文字描述"}\`
 -   **发送语音**: \`{"type": "voice_message", "name": "角色名", "content": "语音的文字内容"}\`
 -   **发起外卖代付**: \`{"type": "waimai_request", "name": "角色名", "productInfo": "一杯奶茶", "amount": 18}\`
 -   **【新】发起群视频**: \`{"type": "group_call_request", "name": "你的角色名"}\`
@@ -10304,7 +10595,7 @@ const membersList = chat.members.map(m => `- **${m.originalName}**: ${m.persona}
 - **【全新】引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\` (提示：每条历史消息的开头都提供了 \`(Timestamp: ...)\`，请使用它！)
 
 # 如何区分图片与表情:
--   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
+-   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细【中文】文字描述..."}\`
 -   **表情 (sticker)**: 指的是【卡通或梗图】，用于表达情绪。
 
 # 如何处理群内的外卖代付请求:
@@ -10446,7 +10737,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   **【新增】创建约定/倒计时**: \`{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss"}\` (必须是未来的时间)
 - **发送文本**: \`{"type": "text", "content": "你好呀！"}\`
 - **发送表情**: \`{"type": "sticker", "url": "https://...表情URL...", "meaning": "(可选)表情的含义"}\`
-- **发送图片**: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
+- **发送图片**: \`{"type": "ai_image", "description": "图片的详细【中文】文字描述..."}\`
 - **发送语音**: \`{"type": "voice_message", "content": "语音的文字内容..."}\`
 - **发起转账**: \`{"type": "transfer", "amount": 5.20, "note": "一点心意"}\`
 - **发起外卖请求**: \`{"type": "waimai_request", "productInfo": "一杯咖啡", "amount": 25}\`
@@ -10474,7 +10765,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   这个操作是【秘密】的，用户不会立刻看到你记录了什么。
 
 # 如何区分图片与表情:
--   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
+-   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细【中文】文字描述..."}\`
 -   **表情 (sticker)**: 指的是【卡通或梗图】，用于表达情绪。
 
 # 如何正确使用“外卖代付”功能:
@@ -12221,6 +12512,33 @@ async function triggerInactiveAiAction(chatId) {
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 
+# 【【【全新美学升级铁律 V2 (风格融合版)】】】
+1.  **生图画风融合**: 你的核心任务是根据描述，将两种风格无缝融合在一张图中：
+    *   **人物/主要对象**: 必须是 P1 图中那种精致、清冷的韩漫/插画风格。
+    *   **动物/可爱元素**: 必须是 P2 图中那种梦幻、闪亮、有质感的蜡笔/粉彩风格。
+
+2.  **【【【指令格式铁律】】】**: 为了实现风格融合，你的prompt【必须】遵循“主体描述+主体风格, 环绕物描述+环绕物风格”的结构。
+    *   **错误示范 (风格会混乱)**: \`a handsome anime boy and a cute cat, manhwa style, crayon drawing\`
+    *   **正确示范 (实现风格融合)**: \`https://image.pollinations.ai/prompt/masterpiece, best quality, a cool handsome anime boy with black cat ears, clean line art, manhwa art style, surrounded by a floating kawaii cat and sparkles, cute crayon drawing aesthetic, soft pastel colors, glowing texture\`
+
+3.  **推荐使用的【画风/品质】关键词 (请根据需要混合使用)**:
+    *   **P1 人物风格 (必选)**:
+        *   **画风**: \`manhwa art style\` (韩漫), \`webtoon art\` (网络漫画), \`digital illustration\` (数字插画), \`clean line art\` (干净的线条)。
+        *   **品质**: \`masterpiece\` (杰作), \`best quality\` (最高质量), \`incredibly detailed eyes\` (惊人细节的眼睛), \`sharp focus\` (清晰对焦)。
+        *   **氛围**: \`cool tones\` (冷色调), \`cinematic lighting\` (电影光), \`dramatic lighting\` (戏剧性光照), \`rim light\` (轮廓光)。
+    *   **P2 可爱元素风格 (必选)**:
+        *   **画风**: \`crayon drawing aesthetic\` (蜡笔画美学), \`pastel chalk style\` (粉彩风格), \`textured brush\` (有质感的笔刷), \`kid's drawing\` (儿童画)。
+        *   **氛围**: \`cute kawaii aesthetic\` (可爱美学), \`sparkly\`, \`glitter\`, \`glowing texture\` (发光质感), \`dreamy\`, \`soft pastel colors\` (柔和的粉彩色)。
+
+4.  **禁止“代码感”模块**: **严禁**只使用简单的 \`<div>\` 搭配 \`border: 1px solid black;\` 和单调背景色来创建模块。这种外观看起来像未经设计的代码，必须避免。
+
+5.  **鼓励“设计感”模块**: 你应该积极使用以下CSS属性来创造更有趣、更贴近生活的视觉效果：
+    *   使用 \`border-radius\` 创建圆角，营造柔和感。
+    *   使用 \`box-shadow\` 创造悬浮、立体的效果。
+    *   使用 \`background: linear-gradient(...)\` 创造丰富的渐变背景。
+    *   使用 \`transform: rotate(-3deg);\` 等属性创造一种随手贴上的感觉。
+    *   **多尝试模拟**: 手写风便签、拍立得照片、可爱的对话气泡、撕纸效果等。
+
 # 供你决策的参考信息：
 -   **你的角色设定**: ${chat.settings.aiPersona}
 ${worldBookContent} // <--【核心】在这里注入世界书内容
@@ -13534,6 +13852,16 @@ let videoCallState = {
     callHistory: [], // 用于存储通话中的对话历史
     preCallContext: "" // 用于存储通话前的聊天摘要
 };
+
+// ▼▼▼ 在这里粘贴新的状态变量 ▼▼▼
+let offlineModeState = {
+    isActive: false,
+    activeChatId: null,
+    startTime: null,
+    history: [], // 用于存储线下互动的文字记录
+    preOfflineContext: "" // 用于存储进入线下模式前的聊天摘要
+};
+// ▲▲▲ 添加结束 ▲▲▲
 
 let callTimerInterval = null; // 用于存储计时器的ID
 
@@ -19002,6 +19330,13 @@ document.getElementById('close-ai-avatar-library-btn').addEventListener('click',
             }
         });
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
+
+// ▼▼▼ 在这里粘贴新的事件监听器 ▼▼▼
+// 线下模式事件绑定
+document.getElementById('start-offline-mode-btn').addEventListener('click', handleInitiateOfflineMode);
+document.getElementById('end-offline-mode-btn').addEventListener('click', endOfflineMode);
+document.getElementById('user-offline-action-btn').addEventListener('click', handleUserOfflineInput);
+// ▲▲▲ 添加结束 ▲▲▲
 
 // ▼▼▼ 在 init() 函数的末尾，粘贴这段【全新的事件监听器】 ▼▼▼
 
