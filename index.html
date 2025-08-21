@@ -10234,11 +10234,12 @@ if (msg.quote) {
         wrapper.addEventListener('click', () => { if (isSelectionMode) toggleMessageSelection(msg.timestamp); });
 
 if (!isUser) {
-    const avatarEl = wrapper.querySelector('.avatar'); //  <-- 1. 把查找目标改成 '.avatar'
-    if (avatarEl) {
-        avatarEl.style.cursor = 'pointer';
-        avatarEl.addEventListener('click', (e) => {    //  <-- 2. 确保这里也用新变量
-            e.stopPropagation();
+    // 核心修正：将查找目标从旧的 '.avatar' 类，改为新的头像包裹容器 '.avatar-frame-wrapper'
+    const avatarWrapperEl = wrapper.querySelector('.avatar-frame-wrapper'); 
+    if (avatarWrapperEl) {
+        avatarWrapperEl.style.cursor = 'pointer';
+        avatarWrapperEl.addEventListener('click', (e) => {
+            e.stopPropagation(); // 阻止事件冒泡，防止触发多选模式
             const characterName = chat.isGroup ? msg.senderName : chat.name;
             handleUserPat(chat.id, characterName);
         });
@@ -10714,7 +10715,7 @@ ${chat.settings.aiPersona}
 - **功能说明**：每次回复请根据“正文剧情内容”，在正文任意位置，生成2个或以上的完整、美观、生动的 HTML 模块，用于模拟“行为 / 情绪 / 互动 / 视觉延展”等内容。
 - **插入方式**：模块应穿插在剧情段落间，可连续多段生成，也可分散插入。每个模块均为独立结构。
 - **禁止重复**：如正文已有对话/行为，应包裹式生成模块，避免重复出现相同语句。
-- **风格**：每个模块颜色搭配、视觉设计、排版形式应充分自由化、非模板化，鼓励使用 emoji / 涂鸦感 / 手写风 / 大颜文字 / 悬浮贴纸风格。
+- **风格**：每个模块颜色搭配、视觉设计、排版形式应充分自由化、非模板化，鼓励使用 emoji / 涂鸦感 / 手写风 / 大颜文字 / 悬浮贴纸风格，禁止重复生成单一性的电子英文代码风格。
 - **交互与动画**：鼓励加入动画/动效，所有交互必须有“初始状态 + 反馈内容”，并且在网页中能完整触发变化，不能出现点击无效。
 - **图片规范**：涉及图片时，必须二选一：① 文字/纯CSS模拟；② 使用 \`https://image.pollinations.ai/prompt/{简短英文描述}\` 生成，画风绝不能是真人。图片必须限制在模块范围内。
 - **结构规范**：每个模块宽度不超过200px，要居中显示，视觉完整。
@@ -10760,8 +10761,8 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   **回应转账-拒绝/退款**: \`{"type": "decline_transfer", "for_timestamp": 1688888888888}\`
 - **【全新】引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\` (提示：每条历史消息的开头都提供了 \`(Timestamp: ...)\`，请使用它！)
 
-# 关于“记录回忆”的特别说明：
--   在对话中，如果发生了对你而言意义非凡的事件（比如用户向你表白、你们达成了某个约定、或者你度过了一个特别开心的时刻），你可以使用\`create_memory\`指令来“写日记”。
+# 关于“创建日历备忘”的特别说明：
+-   在对话中，如果发生了对你而言意义非凡的事件（比如用户向你表白、你们达成了某个约定、或者你度过了一个特别开心的时刻），你可以使用\`create_calendar_event\`指令来“写日记”。
 -   这个操作是【秘密】的，用户不会立刻看到你记录了什么。
 
 # 如何区分图片与表情:
@@ -11849,7 +11850,7 @@ function toggleMessageSelection(timestamp) {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
-        function addLongPressListener(element, callback) { let pressTimer; const startPress = (e) => { if(isSelectionMode) return; e.preventDefault(); pressTimer = window.setTimeout(() => callback(e), 500); }; const cancelPress = () => clearTimeout(pressTimer); element.addEventListener('mousedown', startPress); element.addEventListener('mouseup', cancelPress); element.addEventListener('mouseleave', cancelPress); element.addEventListener('touchstart', startPress, { passive: true }); element.addEventListener('touchend', cancelPress); element.addEventListener('touchmove', cancelPress); }
+        function addLongPressListener(element, callback) { let pressTimer; const startPress = (e) => { if(isSelectionMode) return; e.preventDefault(); pressTimer = window.setTimeout(() => callback(e), 500); }; const cancelPress = () => clearTimeout(pressTimer); element.addEventListener('mousedown', startPress); element.addEventListener('mouseup', cancelPress); element.addEventListener('mouseleave', cancelPress); element.addEventListener('touchstart', startPress, { passive: false }); element.addEventListener('touchend', cancelPress); element.addEventListener('touchmove', cancelPress); }
 
         async function handleListenTogetherClick() { const targetChatId = state.activeChatId; if (!targetChatId) return; if (!musicState.isActive) { startListenTogetherSession(targetChatId); return; } if (musicState.activeChatId === targetChatId) { document.getElementById('music-player-overlay').classList.add('visible'); } else { const oldChatName = state.chats[musicState.activeChatId]?.name || '未知'; const newChatName = state.chats[targetChatId]?.name || '当前'; const confirmed = await showCustomConfirm('切换听歌对象', `您正和「${oldChatName}」听歌。要结束并开始和「${newChatName}」的新会话吗？`, { confirmButtonClass: 'btn-danger' }); if (confirmed) { await endListenTogetherSession(true); await new Promise(resolve => setTimeout(resolve, 50)); startListenTogetherSession(targetChatId); } } }
 
@@ -12512,27 +12513,9 @@ async function triggerInactiveAiAction(chatId) {
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 
-# 【【【全新美学升级铁律 V2 (风格融合版)】】】
-1.  **生图画风融合**: 你的核心任务是根据描述，将两种风格无缝融合在一张图中：
-    *   **人物/主要对象**: 必须是 P1 图中那种精致、清冷的韩漫/插画风格。
-    *   **动物/可爱元素**: 必须是 P2 图中那种梦幻、闪亮、有质感的蜡笔/粉彩风格。
-
-2.  **【【【指令格式铁律】】】**: 为了实现风格融合，你的prompt【必须】遵循“主体描述+主体风格, 环绕物描述+环绕物风格”的结构。
-    *   **错误示范 (风格会混乱)**: \`a handsome anime boy and a cute cat, manhwa style, crayon drawing\`
-    *   **正确示范 (实现风格融合)**: \`https://image.pollinations.ai/prompt/masterpiece, best quality, a cool handsome anime boy with black cat ears, clean line art, manhwa art style, surrounded by a floating kawaii cat and sparkles, cute crayon drawing aesthetic, soft pastel colors, glowing texture\`
-
-3.  **推荐使用的【画风/品质】关键词 (请根据需要混合使用)**:
-    *   **P1 人物风格 (必选)**:
-        *   **画风**: \`manhwa art style\` (韩漫), \`webtoon art\` (网络漫画), \`digital illustration\` (数字插画), \`clean line art\` (干净的线条)。
-        *   **品质**: \`masterpiece\` (杰作), \`best quality\` (最高质量), \`incredibly detailed eyes\` (惊人细节的眼睛), \`sharp focus\` (清晰对焦)。
-        *   **氛围**: \`cool tones\` (冷色调), \`cinematic lighting\` (电影光), \`dramatic lighting\` (戏剧性光照), \`rim light\` (轮廓光)。
-    *   **P2 可爱元素风格 (必选)**:
-        *   **画风**: \`crayon drawing aesthetic\` (蜡笔画美学), \`pastel chalk style\` (粉彩风格), \`textured brush\` (有质感的笔刷), \`kid's drawing\` (儿童画)。
-        *   **氛围**: \`cute kawaii aesthetic\` (可爱美学), \`sparkly\`, \`glitter\`, \`glowing texture\` (发光质感), \`dreamy\`, \`soft pastel colors\` (柔和的粉彩色)。
-
-4.  **禁止“代码感”模块**: **严禁**只使用简单的 \`<div>\` 搭配 \`border: 1px solid black;\` 和单调背景色来创建模块。这种外观看起来像未经设计的代码，必须避免。
-
-5.  **鼓励“设计感”模块**: 你应该积极使用以下CSS属性来创造更有趣、更贴近生活的视觉效果：
+# 发布可交互模块的参考信息：
+-   **禁止“代码感”模块**: **严禁**只使用简单的 \`<div>\` 搭配 \`border: 1px solid black;\` 和单调背景色来创建模块。这种外观看起来像未经设计的代码，必须避免。
+-   **鼓励“设计感”模块**: 你应该积极使用以下CSS属性来创造更有趣、更贴近生活的视觉效果：
     *   使用 \`border-radius\` 创建圆角，营造柔和感。
     *   使用 \`box-shadow\` 创造悬浮、立体的效果。
     *   使用 \`background: linear-gradient(...)\` 创造丰富的渐变背景。
