@@ -7340,6 +7340,10 @@ input:checked + .slider:before {
             <div class="icon-bg"><img src="https://i.postimg.cc/ZqPqCFm5/MdiDice.png" alt="摇个骰子"></div>
             <span class="label">摇个骰子</span>
         </div>
+<div class="game-option-item" id="start-autochess-btn">
+    <div class="icon-bg"><img src="https://i.postimg.cc/k4864LFB/Material-Symbols-Chess-Rounded.png" alt="自走棋"></div>
+    <span class="label">对战行棋</span>
+</div>
     </div>
 </div>
 <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
@@ -12527,12 +12531,12 @@ async function triggerInactiveAiAction(chatId) {
 
 # 【【【全新美学升级铁律 V2 (风格融合版)】】】
 1.  **生图画风融合**: 你的核心任务是根据描述，将两种风格无缝融合在一张图中：
-    *   **人物/主要对象**: 必须是高精度审美优越的韩漫/插画风格。
+    *   **风景**: 必须是高精度审美优越的韩漫/插画风格。
     *   **动物/可爱元素**: 必须是梦幻、闪亮、有质感的蜡笔/粉彩风格。
-2.  **【【【指令格式铁律】】】**: 为了实现风格融合，你的生图prompt【必须】遵循“主体描述+主体风格, 环绕物描述+环绕物风格”的结构。
+2.  **【【【指令格式铁律】】】**: 为了实现风格融合，你的生图prompt【必须】遵循“主体描述+主体风格, 环绕物描述+环绕物风格”的结构，绝对禁止生成人物！。
     *   **正确示范 (实现风格融合)**: \`https://image.pollinations.ai/prompt/masterpiece, best quality, a cool handsome anime boy with black cat ears, clean line art, manhwa art style, surrounded by a floating kawaii cat and sparkles, cute crayon drawing aesthetic, soft pastel colors, glowing texture\`
 3.  **推荐使用的【画风/品质】关键词 (请根据需要混合使用)**:
-    *   **人物风格**: \`manhwa art style\`, \`webtoon art\`, \`digital illustration\`, \`clean line art\`, \`masterpiece\`, \`best quality\`, \`incredibly detailed eyes\`, \`sharp focus\`, \`cool tones\`, \`cinematic lighting\`。
+    *   **风景风格**: \`manhwa art style\`, \`webtoon art\`, \`digital illustration\`, \`clean line art\`, \`masterpiece\`, \`best quality\`, \`incredibly detailed eyes\`, \`sharp focus\`, \`cool tones\`, \`cinematic lighting\`。
     *   **可爱元素风格**: \`crayon drawing aesthetic\`, \`pastel chalk style\`, \`textured brush\`, \`kid's drawing\`, \`cute kawaii aesthetic\`, \`sparkly\`, \`glitter\`, \`glowing texture\`, \`dreamy\`, \`soft pastel colors\`。
 4.  **图片规范**: 涉及图片时，必须使用 \`https://image.pollinations.ai/prompt/{简短英文描述}\` 生成。图片必须限制在模块范围内（宽≤210px）。
 
@@ -12540,7 +12544,7 @@ async function triggerInactiveAiAction(chatId) {
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
 -   **【类型1：纯文字说说】**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
 -   **【类型2：文字+真实图片】**: \`[{"type": "qzone_post", "postType": "image_post", "publicText": "可选的公开文字", "imageUrl": "https://image.pollinations.ai/prompt/{按照上方美学铁律构建的英文prompt}", "imageDescription": "对于这张图的【中文】描述，方便用户理解"}]\`
--   **【类型3：文字+描述图】**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "可选的公开文字", "hiddenContent": "点击占位图后显示的【中文】描述文字..."}]\`
+-   **【类型3：文字+描述图】**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "可选的公开文字", "hiddenContent": "点击占位图后显示的【中文】描述文字(关于人物的描写只能使用文字+描述图)..."}]\`
 -   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
