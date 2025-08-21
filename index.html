@@ -12513,14 +12513,37 @@ async function triggerInactiveAiAction(chatId) {
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 
-# 发布可交互模块的参考信息：
--   **禁止“代码感”模块**: **严禁**只使用简单的 \`<div>\` 搭配 \`border: 1px solid black;\` 和单调背景色来创建模块。这种外观看起来像未经设计的代码，必须避免。
--   **鼓励“设计感”模块**: 你应该积极使用以下CSS属性来创造更有趣、更贴近生活的视觉效果：
-    *   使用 \`border-radius\` 创建圆角，营造柔和感。
-    *   使用 \`box-shadow\` 创造悬浮、立体的效果。
-    *   使用 \`background: linear-gradient(...)\` 创造丰富的渐变背景。
-    *   使用 \`transform: rotate(-3deg);\` 等属性创造一种随手贴上的感觉。
-    *   **多尝试模拟**: 手写风便签、拍立得照片、可爱的对话气泡、撕纸效果等。
+# 【【【全新】发布可交互模块/生图动态】】】
+-   **功能说明**: 这允许你在动态中发布一个和聊天时类似的、可交互的、视觉丰富的HTML模块，用于展示心情、小游戏或特殊事件。
+-   **指令格式**: \`{"type": "qzone_post", "postType": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\`
+
+## HTML模块生成规范
+-   **图片实现**: 必须二选一：
+    -   背景图: \`style="background:url(...); background-size:cover; background-position:center;"\`
+    -   图片标签: \`<img src="..." style="width:100%;">\`
+-   **尺寸限制**: 图片必须限制在模块范围内（宽≤210px），不可溢出。
+-   **禁止“代码感”模块**: **严禁**只使用简单的 \`<div>\` 搭配 \`border: 1px solid black;\` 和单调背景色。
+-   **鼓励“设计感”模块**: 积极使用 \`border-radius\`, \`box-shadow\`, \`linear-gradient\`, \`transform\` 等属性，模拟手写便签、拍立得、对话气泡、撕纸等效果。
+
+# 【【【全新美学升级铁律 V2 (风格融合版)】】】
+1.  **生图画风融合**: 你的核心任务是根据描述，将两种风格无缝融合在一张图中：
+    *   **人物/主要对象**: 必须是高精度审美优越的韩漫/插画风格。
+    *   **动物/可爱元素**: 必须是梦幻、闪亮、有质感的蜡笔/粉彩风格。
+2.  **【【【指令格式铁律】】】**: 为了实现风格融合，你的生图prompt【必须】遵循“主体描述+主体风格, 环绕物描述+环绕物风格”的结构。
+    *   **正确示范 (实现风格融合)**: \`https://image.pollinations.ai/prompt/masterpiece, best quality, a cool handsome anime boy with black cat ears, clean line art, manhwa art style, surrounded by a floating kawaii cat and sparkles, cute crayon drawing aesthetic, soft pastel colors, glowing texture\`
+3.  **推荐使用的【画风/品质】关键词 (请根据需要混合使用)**:
+    *   **人物风格**: \`manhwa art style\`, \`webtoon art\`, \`digital illustration\`, \`clean line art\`, \`masterpiece\`, \`best quality\`, \`incredibly detailed eyes\`, \`sharp focus\`, \`cool tones\`, \`cinematic lighting\`。
+    *   **可爱元素风格**: \`crayon drawing aesthetic\`, \`pastel chalk style\`, \`textured brush\`, \`kid's drawing\`, \`cute kawaii aesthetic\`, \`sparkly\`, \`glitter\`, \`glowing texture\`, \`dreamy\`, \`soft pastel colors\`。
+4.  **图片规范**: 涉及图片时，必须使用 \`https://image.pollinations.ai/prompt/{简短英文描述}\` 生成。图片必须限制在模块范围内（宽≤210px）。
+
+# 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
+-   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
+-   **【类型1：纯文字说说】**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
+-   **【类型2：文字+真实图片】**: \`[{"type": "qzone_post", "postType": "image_post", "publicText": "可选的公开文字", "imageUrl": "https://image.pollinations.ai/prompt/{按照上方美学铁律构建的英文prompt}", "imageDescription": "对于这张图的【中文】描述，方便用户理解"}]\`
+-   **【类型3：文字+描述图】**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "可选的公开文字", "hiddenContent": "点击占位图后显示的【中文】描述文字..."}]\`
+-   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
+-   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
+-   **打视频**: \`[{"type": "video_call_request"}]\`
 
 # 供你决策的参考信息：
 -   **你的角色设定**: ${chat.settings.aiPersona}
@@ -12623,6 +12646,8 @@ if (action.type === 'qzone_post') {
         content: action.content || '', 
         publicText: action.publicText || '', 
         hiddenContent: action.hiddenContent || '', 
+        imageUrl: action.imageUrl || '',
+        imageDescription: action.imageDescription || '',
         timestamp: Date.now(), 
         authorId: chatId, 
         authorGroupId: chat.groupId, // 【核心新增】记录作者的分组ID
