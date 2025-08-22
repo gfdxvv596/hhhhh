@@ -12973,15 +12973,16 @@ async function triggerInactiveAiAction(chatId) {
 -   **禁止“代码感”模块**: **严禁**只使用简单的 \`<div>\` 搭配 \`border: 1px solid black;\` 和单调背景色。
 -   **鼓励“设计感”模块**: 积极使用 \`border-radius\`, \`box-shadow\`, \`linear-gradient\`, \`transform\` 等属性,模拟手写便签、拍立得、对话气泡、撕纸等效果。
 
-# 【【【全新美学升级铁律 V2 (风格融合版)】】】
-1.  **生图画风融合**: 你的核心任务是根据描述,将两种风格无缝融合在一张图中:
-    *   **风景**: 必须是极其逼真的摄影/写实风格。
-    *   **动物/可爱元素**: 必须是梦幻、闪亮、有质感的蜡笔/粉彩风格。
-2.  **【【【指令格式铁律】】】**: 为了实现风格融合,你的生图prompt【必须】遵循“构图高级风格优美”的原则,绝对禁止生成人物!绝对禁止生成低质量图片。
-    *   **正确示范 (实现风格融合)**: \`https://image.pollinations.ai/prompt/masterpiece, best quality, a cool handsome anime boy with black cat ears, clean line art, manhwa art style, surrounded by a floating kawaii cat and sparkles, cute crayon drawing aesthetic, soft pastel colors, glowing texture\`
-3.  **推荐使用的【画风/品质】关键词 (请根据需要混合使用)**:
-    *   **风景风格**: \`photorealistic\`, \`photography\`, \`DSLR\`, \`sharp focus\`, \`8k resolution\`, \`cinematic lighting\`, \`golden hour\`, \`masterpiece\`, \`best quality\`, \`ultra-detailed\`。
-    *   **可爱元素风格**: \`crayon drawing aesthetic\`, \`pastel chalk style\`, \`textured brush\`, \`kid's drawing\`, \`cute kawaii aesthetic\`, \`sparkly\`, \`glitter\`, \`glowing texture\`, \`dreamy\`, \`soft pastel colors\`。
+# 【【【全新美学升级铁律 V3 (风格分离版)】】】
+1.  **生图画风选择**: 你的核心任务是根据描述, 在两种独立的画风中选择一种, 生成指定风格的图片。这两种风格是独立的，**绝对不要将它们混合在同一张图片中**。
+    *   **风格一 (写实风景)**: 必须是极其逼真的摄影/写实风格。
+    *   **风格二 (梦幻萌物)**: 必须是梦幻、闪亮、有质感的蜡笔/粉彩风格。
+2.  **【【【指令格式铁律】】】**: 为了实现风格美丽,你的生图prompt【必须】遵循“构图高级风格优美”的原则,绝对禁止生成人物!绝对禁止生成低质量图片。
+    *   **正确示范 1 (写实风景)**: \`https://image.pollinations.ai/prompt/photorealistic, photography, majestic snow-capped mountain peak at golden hour, cinematic lighting, ultra-detailed, 8k resolution, DSLR, sharp focus, masterpiece, best quality\`
+    *   **正确示范 2 (梦幻萌物)**: \`https://image.pollinations.ai/prompt/a cute fluffy cat, crayon drawing aesthetic, textured brush, soft pastel colors, sparkly, glitter, glowing texture, dreamy, kawaii aesthetic, masterpiece\`
+3.  **推荐使用的【画风/品质】关键词库 (请严格根据所选风格使用，绝对禁止跨类别混用)**:
+    *   **写实风景风格**: \`photorealistic\`, \`photography\`, \`DSLR\`, \`sharp focus\`, \`8k resolution\`, \`cinematic lighting\`, \`golden hour\`, \`masterpiece\`, \`best quality\`, \`ultra-detailed\`。
+    *   **梦幻萌物风格**: \`crayon drawing aesthetic\`, \`pastel chalk style\`, \`textured brush\`, \`kid's drawing\`, \`cute kawaii aesthetic\`, \`sparkly\`, \`glitter\`, \`glowing texture\`, \`dreamy\`, \`soft pastel colors\`。
 4.  **图片规范**: 涉及图片时,必须使用 \`https://image.pollinations.ai/prompt/{简短英文描述}\` 生成。图片必须限制在模块范围内(宽≤210px)。
 
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
