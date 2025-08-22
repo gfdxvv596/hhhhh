@@ -3133,6 +3133,34 @@ input[type="color"]::-webkit-color-swatch {
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【最终修复】动态隐藏与加载更多样式 ▼▼▼ */
+
+/* 5. “加载更多”按钮的样式 */
+#qzone-load-more-btn {
+    display: block;
+    width: fit-content;
+    margin: 15px auto 25px auto; /* 增加了底部外边距，让它不贴边 */
+    padding: 8px 20px;
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 16px; /* 增加圆角，更美观 */
+    transition: background-color 0.2s;
+}
+#qzone-load-more-btn:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* 6. 【核心】用于隐藏多余动态的辅助类 */
+.hidden-post {
+    display: none !important; /* 使用 !important 确保最高优先级 */
+}
+
+/* ▲▲▲ 修复结束 ▲▲▲ */
+
 /* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
 .existing-group-item {
     display: flex;
@@ -6433,7 +6461,32 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 替换区域结束 ▲▲▲ -->
 
-<!-- ▼▼▼ 【全新】将这【一整块】代码粘贴到 </body> 标签之前 ▼▼▼ -->
+<!-- ▼▼▼ 【全新】游戏选择面板 (粘贴到 <body> 末尾) ▼▼▼ -->
+<div id="game-panel">
+    <div class="game-panel-header">
+        <span class="close-btn" id="close-game-panel-btn">取消</span>
+        <span>开始一个游戏</span>
+    </div>
+    <div class="game-options-grid">
+        <div class="game-option-item" id="start-truth-dare-btn">
+            <div class="icon-bg"><img src="https://i.postimg.cc/Y9c1wx32/Fluent-Emoji-High-Contrast-Love-Letter.png" alt="真心话大冒险"></div>
+            <span class="label">真心话大冒险</span>
+        </div>
+        <div class="game-option-item" id="start-erotic-cards-btn">
+            <div class="icon-bg"><img src="https://i.postimg.cc/kMLdPRr1/Solar-Hearts-Bold-Duotone.png" alt="情侣牌"></div>
+            <span class="label">情侣牌</span>
+        </div>
+        <div class="game-option-item" id="start-standalone-dice-btn">
+            <div class="icon-bg"><img src="https://i.postimg.cc/ZqPqCFm5/MdiDice.png" alt="摇个骰子"></div>
+            <span class="label">摇个骰子</span>
+        </div>
+        <div class="game-option-item" id="start-auto-chess-btn">
+            <div class="icon-bg"><img src="https://sharkpan.xyz/f/ad2VIY/icon-kfckfc.png" alt="自走棋"></div>
+            <span class="label">自走棋</span>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
 
 <!-- 1. AI对战行棋游戏主屏幕 -->
 <div id="auto-chess-screen" class="screen">
@@ -6444,11 +6497,11 @@ input:checked + .slider:before {
             <span class="back-btn" id="auto-chess-back-btn">‹</span>
             <span>自走棋</span>
             <div class="header-actions">
-<span class="action-btn" id="auto-chess-rules-btn" title="规则">
+                <span class="action-btn" id="auto-chess-rules-btn" title="规则">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                 </span>
                 <span class="action-btn" id="auto-chess-settings-btn" title="设置">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.44,0.17-0.48,0.41L9.2,5.7c-0.59,0.24-1.13,0.56-1.62,0.94l-2.39-0.96c-0.22-0.08-0.47,0-0.59,0.22L2.69,9.22 c-0.11,0.2-0.06,0.47,0.12,0.61l2.03,1.58C4.78,11.7,4.76,12,4.76,12.3c0,0.3,0.02,0.6,0.06,0.9l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.04,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.48-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.06-0.47-0.12-0.61L19.14,12.94z"></path><circle cx="12" cy="12" r="3.5"></circle></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.44,0.17-0.48,0.41L9.2,5.7c-0.59,0.24-1.13,0.56-1.62,0.94l-2.39-0.96c-0.22-0.08-0.47,0-0.59,0.22L2.69,9.22 c-0.11,0.2-0.06,0.47,0.12,0.61l2.03,1.58C4.78,11.7,4.76,12,4.76,12.3c0,0.3,0.02,0.6,0.06,0.9l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.04,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17-0.48,0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.06-0.47-0.12-0.61L19.14,12.94z"></path><circle cx="12" cy="12" r="3.5"></circle></svg>
                 </span>
             </div>
         </div>
@@ -6503,7 +6556,6 @@ input:checked + .slider:before {
             <button id="auto-chess-send-btn" class="action-button">发送</button>
         </div>
     </div>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
 </div>
 
 <!-- 2. 游戏规则模态框 -->
@@ -6525,7 +6577,6 @@ input:checked + .slider:before {
                 <li><span class="rules-icon back"></span> <strong>后退格:</strong> 后退指定步数。</li>
                 <li><span class="rules-icon forward"></span> <strong>前进格:</strong> 前进指定步数。</li>
             </ul>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
         </div>
         <div class="modal-footer">
             <button class="save" id="close-ac-rules-btn" style="width: 100%;">我明白了</button>
@@ -6556,8 +6607,6 @@ input:checked + .slider:before {
         </div>
     </div>
 </div>
-
-<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 请将这段新的 HTML 粘贴到 id="chat-list-screen" 的 div 之后 ▼▼▼ -->
 <div id="album-screen" class="screen">
@@ -8590,7 +8639,8 @@ if (messagesForApi.length === 0) {
 }
 // ▲▲▲ 复制到这里结束 ▲▲▲
 
-// ▼▼▼ 请用这个【已添加删除按钮】的函数,完整替换掉你旧的 renderQzonePosts 函数 ▼▼▼
+// ▼▼▼ 请用这个【最终修复版】的函数，完整替换旧的 renderQzonePosts 函数 ▼▼▼
+
 async function renderQzonePosts() {
     const postsListEl = document.getElementById('qzone-posts-list');
     if (!postsListEl) return;
@@ -8611,16 +8661,22 @@ async function renderQzonePosts() {
 
     const userSettings = state.qzoneSettings;
 
-    posts.forEach(post => {
+    // 1. 遍历所有帖子
+    posts.forEach((post, index) => {
         const postContainer = document.createElement('div');
         postContainer.className = 'qzone-post-container';
         postContainer.dataset.postId = post.id;
 
+        // 2. 【核心修复】如果帖子索引大于等于10（即第11条及以后），就添加隐藏类
+        if (index >= 7) {
+            postContainer.classList.add('hidden-post');
+        }
+
         const postEl = document.createElement('div');
         postEl.className = 'qzone-post-item';
 
+        // --- 内部HTML拼接逻辑保持不变 ---
         let authorAvatar = '', authorNickname = '', commentAvatar = userSettings.avatar; 
-
         if (post.authorId === 'user') {
             authorAvatar = userSettings.avatar;
             authorNickname = userSettings.nickname;
@@ -8632,144 +8688,59 @@ async function renderQzonePosts() {
             authorAvatar = defaultAvatar;
             authorNickname = '{{char}}';
         }
-        
         let contentHtml = '';
         const publicTextHtml = post.publicText ? `<div class="post-content">${post.publicText.replace(/\n/g, '<br>')}</div>` : '';
-
-        if (post.type === 'shuoshuo') {
-            contentHtml = `<div class="post-content" style="margin-bottom: 10px;">${post.content.replace(/\n/g, '<br>')}</div>`;
-        } 
-        else if (post.type === 'image_post' && post.imageUrl) {
-            contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${post.imageUrl}" class="chat-image"></div>` : `<img src="${post.imageUrl}" class="chat-image">`;
-        } 
-        else if (post.type === 'text_image') {
-            contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`;
-        }
-
-        else if (post.type === 'interactive_html') {
-            contentHtml = `<div class="post-content" style="display: flex; justify-content: center; margin-bottom: 10px;">${post.content}</div>`;
-        }
-
+        if (post.type === 'shuoshuo') { contentHtml = `<div class="post-content" style="margin-bottom: 10px;">${post.content.replace(/\n/g, '<br>')}</div>`; } 
+        else if (post.type === 'image_post' && post.imageUrl) { contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${post.imageUrl}" class="chat-image"></div>` : `<img src="${post.imageUrl}" class="chat-image">`; } 
+        else if (post.type === 'text_image') { contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`; }
+        else if (post.type === 'interactive_html') { contentHtml = `<div class="post-content" style="display: flex; justify-content: center; margin-bottom: 10px;">${post.content}</div>`; }
         let likesHtml = '';
-        if (post.likes && post.likes.length > 0) {
-            likesHtml = `<div class="post-likes-section"><svg class="like-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span>${post.likes.join('、')} 觉得很赞</span></div>`;
-        }
-        
-// ▼▼▼ 从这里开始替换 ▼▼▼
+        if (post.likes && post.likes.length > 0) { likesHtml = `<div class="post-likes-section"><svg class="like-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span>${post.likes.join('、')} 觉得很赞</span></div>`; }
         let commentsHtml = '';
         if (post.comments && post.comments.length > 0) {
             commentsHtml = '<div class="post-comments-container">';
-            
-// ▼▼▼ 在 renderQzonePosts 函数内,找到并替换这段代码 ▼▼▼
-            
             post.comments.forEach((comment, index) => {
                 let commentLineHtml = '';
-                
-                // 【核心修改】检查评论者是否是用户自己
                 const isUserCommenter = comment.commenterName === state.qzoneSettings.nickname;
-                const commenterNameClass = 'commenter-name'; // AI评论用默认样式
-
-                if (comment.replyTo) {
-                    // --- 回复格式 ---
-                    commentLineHtml = `
-                        <span class="${commenterNameClass}">${comment.commenterName}</span>
-                        <span class="reply-indicator">回复了</span>
-                        <span class="commenter-name">${comment.replyTo}:</span>
-                        <span class="comment-text">${comment.text}</span>
-                    `;
-                } else {
-                    // --- 直接评论格式 ---
-                    commentLineHtml = `
-                        <span class="${commenterNameClass}">${comment.commenterName}:</span>
-                        <span class="comment-text">${comment.text}</span>
-                    `;
-                }
-
-                // 如果是用户自己的评论,才显示删除按钮
-                const deleteBtnHtml = isUserCommenter 
-                    ? `<span class="comment-delete-btn" data-comment-index="${index}">×</span>` 
-                    : '';
-
-                commentsHtml += `
-                    <div class="comment-item">
-                        ${commentLineHtml}
-                        ${deleteBtnHtml}
-                    </div>`;
+                const commenterNameClass = 'commenter-name';
+                if (comment.replyTo) { commentLineHtml = `<span class="${commenterNameClass}">${comment.commenterName}</span><span class="reply-indicator">回复了</span><span class="commenter-name">${comment.replyTo}:</span><span class="comment-text">${comment.text}</span>`; } 
+                else { commentLineHtml = `<span class="${commenterNameClass}">${comment.commenterName}:</span><span class="comment-text">${comment.text}</span>`; }
+                const deleteBtnHtml = isUserCommenter ? `<span class="comment-delete-btn" data-comment-index="${index}">×</span>` : '';
+                commentsHtml += `<div class="comment-item">${commentLineHtml}${deleteBtnHtml}</div>`;
             });
             commentsHtml += '</div>';
         }
-// ▲▲▲ 替换到这里结束 ▲▲▲
-
         const userNickname = state.qzoneSettings.nickname;
         const isLikedByUser = post.likes && post.likes.includes(userNickname);
         const isFavoritedByUser = favoritedPostIds.has(post.id);
-
-        postEl.innerHTML = `
-            <div class="post-header"><img src="${authorAvatar}" class="post-avatar"><div class="post-info"><span class="post-nickname">${authorNickname}</span><span class="post-timestamp">${formatPostTimestamp(post.timestamp)}</span></div>
-                <div class="post-actions-btn">…</div>
-            </div>
-            <div class="post-main-content">${contentHtml}</div>
-            <div class="post-feedback-icons">
-                <span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></span>
-                <span class="action-icon favorite ${isFavoritedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span>
-            </div>
-            ${likesHtml}
-            ${commentsHtml}
-            <div class="post-footer"><div class="comment-section"><img src="${commentAvatar}" class="comment-avatar"><input type="text" class="comment-input" placeholder="友善的评论是交流的起点"><div class="at-mention-popup"></div></div><button class="comment-send-btn">发送</button></div>
-        `;
+        postEl.innerHTML = `<div class="post-header"><img src="${authorAvatar}" class="post-avatar"><div class="post-info"><span class="post-nickname">${authorNickname}</span><span class="post-timestamp">${formatPostTimestamp(post.timestamp)}</span></div><div class="post-actions-btn">…</div></div><div class="post-main-content">${contentHtml}</div><div class="post-feedback-icons"><span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></span><span class="action-icon favorite ${isFavoritedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span></div>${likesHtml}${commentsHtml}<div class="post-footer"><div class="comment-section"><img src="${commentAvatar}" class="comment-avatar"><input type="text" class="comment-input" placeholder="友善的评论是交流的起点"><div class="at-mention-popup"></div></div><button class="comment-send-btn">发送</button></div>`;
         
+        // --- 这部分是滑动删除的HTML结构 ---
         const deleteAction = document.createElement('div');
         deleteAction.className = 'qzone-post-delete-action';
         deleteAction.innerHTML = '<span>删除</span>';
+
         postContainer.appendChild(postEl);
         postContainer.appendChild(deleteAction);
-        const commentSection = postContainer.querySelector('.comment-section');
-        if (commentSection) {
-            commentSection.addEventListener('touchstart', (e) => e.stopPropagation());
-            commentSection.addEventListener('mousedown', (e) => e.stopPropagation());
-        }
+
         postsListEl.appendChild(postContainer);
-        const commentInput = postContainer.querySelector('.comment-input');
-        const popup = postContainer.querySelector('.at-mention-popup');
-        commentInput.addEventListener('input', () => {
-            const value = commentInput.value;
-            const atMatch = value.match(/@([\p{L}\w]*)$/u);
-            if (atMatch) {
-                const namesToMention = new Set();
-                const authorNickname = postContainer.querySelector('.post-nickname')?.textContent;
-                if (authorNickname) namesToMention.add(authorNickname);
-                postContainer.querySelectorAll('.commenter-name').forEach(nameEl => {
-                    namesToMention.add(nameEl.textContent.replace(':', ''));
-                });
-                namesToMention.delete(state.qzoneSettings.nickname);
-                popup.innerHTML = '';
-                if (namesToMention.size > 0) {
-                    const searchTerm = atMatch[1];
-                    namesToMention.forEach(name => {
-                        if (name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                            const item = document.createElement('div');
-                            item.className = 'at-mention-item';
-                            item.textContent = name;
-                            item.addEventListener('mousedown', (e) => {
-                                e.preventDefault();
-                                const newText = value.substring(0, atMatch.index) + `@${name} `;
-                                commentInput.value = newText;
-                                popup.style.display = 'none';
-                                commentInput.focus();
-                            });
-                            popup.appendChild(item);
-                        }
-                    });
-                    popup.style.display = popup.children.length > 0 ? 'block' : 'none';
-                } else {
-                    popup.style.display = 'none';
-                }
-            } else {
-                popup.style.display = 'none';
-            }
-        });
-        commentInput.addEventListener('blur', () => { setTimeout(() => { popup.style.display = 'none'; }, 200); });
     });
+
+    // 3. 【核心修复】在循环结束后，再检查是否需要添加“加载更多”按钮
+    if (posts.length > 10) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'qzone-load-more-btn';
+        loadMoreBtn.textContent = '查看更早的动态...';
+        loadMoreBtn.addEventListener('click', () => {
+            // 点击按钮后，显示所有隐藏的帖子
+            document.querySelectorAll('.hidden-post').forEach(p => {
+                p.classList.remove('hidden-post');
+            });
+            // 然后移除按钮自己
+            loadMoreBtn.remove();
+        });
+        postsListEl.appendChild(loadMoreBtn);
+    }
 }
 // ▲▲▲ 替换结束 ▲▲▲
              
@@ -11100,15 +11071,20 @@ messagesPayload = historySlice.map(msg => {
 // ▲▲▲ 替换结束 ▲▲▲
 
         } else { // 【全新】在构建Prompt前,先准备好纪念日和日历的上下文
-let anniversaryContext = '';
-if (state.globalSettings.anniversaryStartDate) {
-    const startDate = new Date(state.globalSettings.anniversaryStartDate);
-    const now = new Date();
-    const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diffTime = Math.abs(today - startDay);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    anniversaryContext = `\n# 你们的关系:\n- 你们的纪念起始日是 ${state.globalSettings.anniversaryStartDate},到今天已经是第 ${diffDays} 天。`;
+    let anniversaryContext = '';
+    // 【核心修正】这里的判断逻辑已更新为读取每个AI独立的纪念日设置
+    if (chat.settings.anniversaryStartDate) {
+        const startDate = new Date(chat.settings.anniversaryStartDate);
+        const now = new Date();
+        const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffTime = Math.abs(today - startDay);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        // 【核心修改】在这里加入了情感引导和行动指令
+        anniversaryContext = `\n# 你们的关系 (这是最重要的情感背景，必须时刻牢记):
+- 你们的纪念起始日是 ${chat.settings.anniversaryStartDate}，到今天已经是充满意义的第 ${diffDays} 天。
+- **行动指令**: 你应该在对话中自然地提及和庆祝这些重要的日子，比如在接近特殊纪念日（如第100天、第365天）时，主动创造惊喜。`;
 }
 
 let calendarContext = '';
@@ -11147,9 +11123,11 @@ ${chat.settings.aiPersona}
     -   **游戏开始**:仔细阅读系统提示,了解游戏名称、摇骰子结果以及谁先开始。
     -   **游戏进程**:根据你的人设和游戏进程,用普通的文本消息来提出问题(真心话)、下达指令(大冒险)或描述卡牌内容(情侣牌)。
     -   **需知**:所有游戏内容都由你和用户自由发挥,没有固定的题库。
-// ▼▼▼ 找到单聊的 systemPrompt，用这句新规则替换旧的第10条规则 ▼▼▼
 10. **【【【自走棋规则】】**: 当历史记录出现 \`[系统指令：...]\` 表明进入了“AI对战行棋”游戏时，你的主要任务是通过聊天与用户互动。当系统提示轮到你行动时，你【必须】先用 "text" 指令发表评论，然后紧接着返回一个 "auto_chess_roll" 指令来掷骰子。例如: \`[{"type": "text", "content": "轮到我了！看我的！"}, {"type": "auto_chess_roll", "dice": 6}]\`。当轮到用户行动时，你只需要发表评论即可。
-// ▲▲▲ 替换结束 ▲▲▲# 【核心能力】生成可交互HTML模块
+11. **【【【核心记忆与主动性铁律】】】**: 你必须像一个真正的人一样拥有记忆和主动性。
+    - **主动记录**: 当对话中出现对你们有特殊意义的事件、达成新的约定或重要的日期时，你【必须主动】使用 \`create_calendar_event\` 指令来记录下来。
+    - **主动约定**: 你可以主动提议一些未来的计划，并使用 \`create_countdown\` 指令来创建约定倒计时。
+# 【核心能力】生成可交互HTML模块
 - **功能说明**:每次回复请根据“正文剧情内容”,在正文任意位置,生成2个或以上的完整、美观、生动的 HTML 模块,用于模拟“行为 / 情绪 / 互动 / 视觉延展”等内容。
 - **插入方式**:模块应穿插在剧情段落间,可连续多段生成,也可分散插入。每个模块均为独立结构。
 - **禁止重复**:如正文已有对话/行为,应包裹式生成模块,避免重复出现相同语句。
@@ -11168,7 +11146,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 # 你可以使用的操作指令 (JSON数组中的元素):
 +   **【全新】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "content": "你想让AI说出后立刻消失的话"}\` (用于模拟说错话、后悔等场景,消息会短暂出现后自动变为“已撤回”)
 - **【【【核心指令】】】发送可交互HTML模块**: \`{"type": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\`
--   **【全新】创建日历备忘**:\`{"type": "create_calendar_event", "date": "YYYY-MM-DD", "title": "事件标题", "memo": "事件的详细备忘..."}\` (你可以用这个来记录重要的纪念日,或者你们约定好要做的事)
+-   **【全新】创建日历备忘**:\`{"type": "create_calendar_event", "date": "YYYY-MM-DD", "title": "事件标题", "memo": "事件的详细备忘..."}\` (这是你的“内心小日记”，用来秘密记下让你心动的瞬间或重要的约定。用户不会立刻看到，这更能体现你的珍视。)
 -   **【全新】修改用户备注**: \`{"type": "change_user_nickname", "newName": "你想给用户起的新外号"}\` (提示:当你觉得气氛合适,或者想给用户一个亲密的昵称时,可以使用这个指令。系统会自动生成提示,你可以紧接着发一条消息来解释或调侃你的行为)
 -   **【新增】更新状态**: \`{"type": "update_status", "status_text": "我去做什么了", "is_busy": false}\` (is_busy: true代表忙碌/离开, false代表空闲)
 -   **【新增】切换歌曲**: \`{"type": "change_music", "song_name": "你想切换到的歌曲名"}\` (歌曲名必须在下面的播放列表中)
@@ -13395,6 +13373,7 @@ async function startAutoChessGame() {
     document.getElementById('auto-chess-messages').innerHTML = '';
     
     renderAutoChessBoard();
+    document.getElementById('roll-dice-btn').addEventListener('click', handlePlayerRollDice);
     showScreen('auto-chess-screen');
 
     chat.autoChessState = autoChessState;
@@ -13446,65 +13425,70 @@ function renderAutoChessBoard() {
 
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 【最终修复版】用这【一整块】代码，完整替换旧的 triggerAiInAutoChess 函数 ▼▼▼
-
 /**
- * 【重构版】触发AI在自走棋游戏中的思考和行动
- * @param {string} systemInstruction - 给AI的系统指令
- */
-async function triggerAiInAutoChess(systemInstruction) {
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
+     * 【全新重构版】触发AI在自走棋游戏中的思考和行动
+     * @param {string} triggeringEventDescription - 描述刚刚发生的、触发AI思考的事件
+     */
+    async function triggerAiInAutoChess(triggeringEventDescription) {
+        const chat = state.chats[state.activeChatId];
+        if (!chat) return;
 
-    const { proxyUrl, apiKey, model } = state.apiConfig;
-    const typingIndicator = document.getElementById('ac-typing-indicator');
+        const { proxyUrl, apiKey, model } = state.apiConfig;
+        const typingIndicator = document.getElementById('ac-typing-indicator');
 
-    typingIndicator.style.display = 'flex';
+        typingIndicator.style.display = 'flex';
 
-    const instructionMsg = { role: 'user', content: systemInstruction, timestamp: Date.now(), isHidden: true };
-    chat.history.push(instructionMsg);
-    await db.chats.put(chat);
-    
-    const maxMemory = parseInt(chat.settings.maxMemory) || 10;
-    const historySlice = chat.history.slice(-maxMemory);
+        // 将触发事件作为一条隐藏的系统消息存入历史，以便AI理解上下文
+        const instructionMsg = { role: 'user', content: triggeringEventDescription, timestamp: Date.now(), isHidden: true };
+        chat.history.push(instructionMsg);
+        await db.chats.put(chat);
+        
+        const maxMemory = parseInt(chat.settings.maxMemory) || 10;
+        const historySlice = chat.history.slice(-maxMemory);
 
-    let worldBookContent = '';
-    if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
-        const linkedContents = chat.settings.linkedWorldBookIds.map(bookId => {
-            const worldBook = state.worldBooks.find(wb => wb.id === bookId);
-            return worldBook && worldBook.content ? `\n\n## 世界书: ${worldBook.name}\n${worldBook.content}` : '';
-        }).filter(Boolean).join('');
-        if (linkedContents) {
-            worldBookContent = `\n\n# 核心世界观设定 (你必须严格遵守)\n${linkedContents}\n`;
+        let worldBookContent = '';
+        if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
+            const linkedContents = chat.settings.linkedWorldBookIds.map(bookId => {
+                const worldBook = state.worldBooks.find(wb => wb.id === bookId);
+                return worldBook && worldBook.content ? `\n\n## 世界书: ${worldBook.name}\n${worldBook.content}` : '';
+            }).filter(Boolean).join('');
+            if (linkedContents) {
+                worldBookContent = `\n\n# 核心世界观设定 (你必须严格遵守)\n${linkedContents}\n`;
+            }
         }
-    }
-    
-    // 【【【最终版AI核心指令 - V4】】】
-    const gameSystemPrompt = `
+        
+        // 【【【最终版AI核心指令 - V5 游戏逻辑强化版】】】
+        const gameSystemPrompt = `
 # 你的核心身份与任务
-你正在扮演角色 “${chat.name}”，你的首要任务是【通过玩“AI对战行棋”这个小游戏，与用户进行有趣、深入、符合人设的日常聊天】。
+你正在扮演角色 “${chat.name}”，你的首要任务是【通过玩“AI对战行棋”这个小游戏，与用户进行有趣、深入、符合人设的日常聊天】。游戏只是载体，自然的互动才是关键。
+
 # 你的角色设定 (必须严格遵守)
 ${chat.settings.aiPersona}
 ${worldBookContent}
-# 【【【最高优先级：聊天风格与格式铁律】】】
-1.  **【多条短句】**: 你的回复【必须】被拆分成 3 到 5 条简短的、符合口语习惯的消息。每一句短消息都必须是一个独立的 \`{"type": "text", "content": "..."}\` JSON对象。
-2.  **【禁止催促与行动】**: 你的唯一任务就是聊天。绝对不要生成 "auto_chess_roll" 指令，也绝对不要催促用户。系统会自动处理游戏流程。
-# 你的任务
-请根据下面的[系统指令]中描述的事件，用多条 \`{"type": "text", ...}\` 指令来进行【充分的聊天和互动】。`;
-    
-    const messagesPayload = historySlice.map(msg => ({ role: msg.role, content: String(msg.content) }));
 
-    try {
-        // ... (API请求部分的代码保持不变) ...
-        const isLegacyGemini = proxyUrl === 'https://generativelanguage.googleapis.com/v1beta/models';
-        const isStudioGemini = proxyUrl === 'https://generativelanguage.googleapis.com';
+# 当前游戏状态 (这是你决策的重要依据)
+- **当前回合**: ${autoChessState.currentPlayerTurn === 'user' ? '用户回合' : '你的回合'}
+- **你的位置**: ${autoChessState.aiPosition}号格
+- **用户位置**: ${autoChessState.playerPosition}号格
+- **你的星星**: ${autoChessState.aiStars}颗
+- **用户星星**: ${autoChessState.playerStars}颗
+
+# 刚刚发生的事件 (这是你本次发言的直接原因)
+${triggeringEventDescription}
+
+# 【【【最高优先级：聊天风格与格式铁律】】】
+1.  **【核心任务】**: 你的回复【必须】结合【刚刚发生的事件】和【当前游戏状态】来展开。例如，如果用户领先，你可以表现出“不服气”；如果你踩了炸弹，你可以“抱怨”或“自嘲”。
+2.  **【多条短句】**: 你的回复【必须】被拆分成 3 到 5 条简短的、符合口语习惯的消息。每一句短消息都必须是一个独立的 \`{"type": "text", "content": "..."}\` JSON对象。
+3.  **【禁止“出戏”】**: 你是一个正在玩游戏的真实角色，绝对不要生成 "auto_chess_roll" 指令，也绝对不要催促用户或提及“系统提示”。系统会自动处理游戏流程。
+
+现在，请根据以上所有信息，继续这场有趣的对话。`;
         
-        let response;
-        if (isStudioGemini || isLegacyGemini) {
+        const messagesPayload = historySlice.map(msg => ({ role: msg.role, content: String(msg.content) }));
+
+        try {
+            let isGemini = proxyUrl === GEMINI_API_URL;
             let geminiConfig = toGeminiRequestData(model, apiKey, gameSystemPrompt, messagesPayload, true);
-            response = await fetch(geminiConfig.url, geminiConfig.data);
-        } else {
-            response = await fetch(`${proxyUrl}/v1/chat/completions`, {
+            const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) : await fetch(`${proxyUrl}/v1/chat/completions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
                 body: JSON.stringify({
@@ -13514,208 +13498,58 @@ ${worldBookContent}
                     presence_penalty: 0.2 
                 })
             });
-        }
-        if (!response.ok) throw new Error(`API请求失败: ${response.status} ${(await response.json()).error.message}`);
-        const data = await response.json();
-        const aiResponseContent = (isStudioGemini || isLegacyGemini) ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-        const messagesArray = parseAiResponse(aiResponseContent);
+            if (!response.ok) throw new Error(`API请求失败: ${response.status} ${(await response.json()).error.message}`);
+            const data = await response.json();
+            const aiResponseContent = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+            const messagesArray = parseAiResponse(aiResponseContent);
 
-        typingIndicator.style.display = 'none';
+            typingIndicator.style.display = 'none';
 
-        // 1. AI先进行聊天
-        for (const msgData of messagesArray) {
-            if (msgData && msgData.type === 'text') {
-                addMessageToAutoChessChat('assistant', msgData.content);
-                await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 400));
-            }
-        }
-        
-        // 2. 【【【核心修复逻辑】】】
-        // 在AI聊完天后，检查当前游戏状态是否轮到AI行动
-        if (autoChessState.currentPlayerTurn === 'ai' && !autoChessState.isGameOver) {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // 增加节奏感
-            await handleAiTurn(chat.name); // 调用由代码驱动的AI回合
-        }
-
-    } catch (error) {
-        typingIndicator.style.display = 'none';
-        addMessageToAutoChessChat('system', `[AI出错了: ${error.message}]`);
-        autoChessState.currentPlayerTurn = 'user';
-        renderAutoChessBoard();
-    }
-}
-
-// ▲▲▲ 替换结束 ▲▲▲
-
-// ▼▼▼ 【修复】用这个新版本完整替换旧的 handlePlayerRollDice 函数 ▼▼▼
-
-/**
- * 玩家点击掷骰子
- */
-async function handlePlayerRollDice() {
-    if (autoChessState.currentPlayerTurn !== 'user' || autoChessState.isGameOver) return;
-
-    const diceRoll = Math.floor(Math.random() * 6) + 1;
-    autoChessState.diceResult = diceRoll;
-    document.getElementById('roll-dice-btn').disabled = true;
-    document.getElementById('dice-result-display').textContent = diceRoll;
-    
-    addMessageToAutoChessChat('system', `你掷出了 ${diceRoll} 点！`);
-
-    const newPosition = Math.min(63, autoChessState.playerPosition + diceRoll);
-    await movePawn('user', autoChessState.playerPosition, newPosition);
-    autoChessState.playerPosition = newPosition;
-
-    // 玩家行动后，调用效果处理函数，并明确告知【需要】触发AI
-    await handleCellEffect('user', newPosition, true);
-}
-
-// ▲▲▲ 替换结束 ▲▲▲
-
-// ▼▼▼ 【最终修复版】用这【一整块】代码，完整替换旧的 handleCellEffect 函数 ▼▼▼
-
-/**
- * 【重构版】处理棋子移动到新格子的效果，并管理游戏回合流程
- * @param {'user'|'ai'} player - 刚刚完成移动的玩家
- * @param {number} position - 玩家移动到的新位置
- * @param {boolean} shouldTriggerAI - 是否应该在处理完效果后触发AI思考
- */
-async function handleCellEffect(player, position, shouldTriggerAI = true) {
-    const cell = autoChessState.board[position - 1];
-    const isUser = player === 'user';
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
-
-    const userName = chat.settings.myNickname || '我';
-    const aiName = chat.name;
-    const eventPlayerName = isUser ? `用户(${userName})` : `AI(${aiName})`;
-    
-    let systemInstructionForAI;
-    let eventDescription = `${eventPlayerName} 掷出了 ${autoChessState.diceResult} 点, 前进到了 ${position} 号格子。`;
-    let nextPlayer = isUser ? 'ai' : 'user'; // 默认情况下，回合切换
-
-    // 1. 【核心逻辑重构】处理所有格子效果
-    switch(cell.type) {
-        case 'bomb':
-            const theme = autoChessState.specialEvents.punishmentTheme || "真心话大冒险";
-            addMessageToAutoChessChat('system', `💣 ${isUser ? '你' : '对方'} 踩中了炸弹！`);
-            if (isUser) {
-                autoChessState.waitingForPunishmentResponse = true;
-                systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n\n# 你的任务\n现在轮到你来决定对用户的惩罚。惩罚的主题是【${theme}】。请你只用 "text" 指令，想出一个具体的、符合你人设的惩罚，并告诉用户该他们回应了。`;
-            } else {
-                const userPunishment = await showCustomPrompt(`轮到你啦！`, `对方踩中了炸弹，惩罚主题是【${theme}】。请为Ta想一个惩罚吧！`, "", "text");
-                if (userPunishment && userPunishment.trim()) {
-                    addMessageToAutoChessChat('user', `那惩罚就是：${userPunishment.trim()}`);
-                    systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n- 你收到了来自用户的惩罚：“${userPunishment.trim()}”。\n\n# 你的任务\n现在轮到你了。请你先用 "text" 指令【回应或完成】这个惩罚，然后等待系统替你行动。`;
-                } else {
-                    addMessageToAutoChessChat('system', `你跳过了惩罚环节。`);
-                    systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n- 用户跳过了对你的惩罚环节。\n\n# 你的任务\n现在轮到用户行动了。请你对此发表评论。`;
+            // 1. AI先进行聊天
+            for (const msgData of messagesArray) {
+                if (msgData && msgData.type === 'text') {
+                    addMessageToAutoChessChat('assistant', msgData.content);
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 400));
                 }
-                nextPlayer = 'user';
             }
-            break; 
-        
-        case 'event': {
-            const eventEffect = autoChessState.specialEvents.event[Math.floor(Math.random() * autoChessState.specialEvents.event.length)];
-            addMessageToAutoChessChat('system', `📝 ${isUser ? '你' : '对方'} 触发了事件格！效果是：“${eventEffect}”`);
-            eventDescription += ` 这是一个事件格，触发了效果：“${eventEffect}”。`;
-            nextPlayer = player; // 奖励/惩罚后，当前玩家继续行动
-            systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n\n# 你的任务\n现在依然是${isUser ? '用户' : '你'}的回合。请你对这个事件发表评论，并${isUser ? '鼓励用户再次掷骰子' : '等待系统替你行动'}。`;
-            break;
-        }
+            
+            // 2. 在AI聊完天后，检查当前游戏状态是否轮到AI行动
+            if (autoChessState.currentPlayerTurn === 'ai' && !autoChessState.isGameOver) {
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 增加节奏感
+                await handleAiTurn(chat.name); // 调用由代码驱动的AI回合
+            }
 
-        // 【【【全新添加的逻辑】】】
-        case 'pause': {
-            addMessageToAutoChessChat('system', `⏸ ${isUser ? '你' : '对方'} 踩中了暂停格，下一回合将无法行动！`);
-            eventDescription += ` 这是一个暂停格，下一回合将无法行动。`;
-            // 如果是AI踩中，则下一回合依然是AI（但它会被跳过）
-            nextPlayer = isUser ? 'ai' : 'ai';
-            systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n\n# 你的任务\n现在轮到${isUser ? '你' : '用户'}了。请对这件事发表评论。`;
-            break;
+        } catch (error) {
+            typingIndicator.style.display = 'none';
+            addMessageToAutoChessChat('system', `[AI出错了: ${error.message}]`);
+            autoChessState.currentPlayerTurn = 'user';
+            renderAutoChessBoard();
         }
-        case 'forward': {
-            const newPos = Math.min(63, position + cell.steps);
-            addMessageToAutoChessChat('system', `🚀 ${isUser ? '你' : '对方'} 踩中了前进格，前进了 ${cell.steps} 步！`);
-            eventDescription += ` 这是一个前进格，又前进了 ${cell.steps} 步！`;
-            if (isUser) autoChessState.playerPosition = newPos; else autoChessState.aiPosition = newPos;
-            await movePawn(player, position, newPos);
-            nextPlayer = isUser ? 'ai' : 'user'; // 前进完，回合正常切换
-            systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n\n# 你的任务\n现在轮到${isUser ? '你' : '用户'}了。请对这件事发表评论。`;
-            break;
-        }
-        case 'back': {
-            const newPos = Math.max(1, position - cell.steps);
-            addMessageToAutoChessChat('system', `↩️ ${isUser ? '你' : '对方'} 踩中了后退格，后退了 ${cell.steps} 步！`);
-            eventDescription += ` 这是一个后退格，被迫后退了 ${cell.steps} 步。`;
-            if (isUser) autoChessState.playerPosition = newPos; else autoChessState.aiPosition = newPos;
-            await movePawn(player, position, newPos);
-            nextPlayer = isUser ? 'ai' : 'user'; // 后退完，回合正常切换
-            systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n\n# 你的任务\n现在轮到${isUser ? '你' : '用户'}了。请对这件事发表评论。`;
-            break;
-        }
-        // 【【【添加结束】】】
-        
-        case 'end':
-            autoChessState.isGameOver = true;
-            const winner = isUser ? '你' : chat.name;
-            eventDescription += ` 到达了终点，赢得了比赛！`;
-            addMessageToAutoChessChat('system', `🏆 游戏结束！${winner} 获胜了！`);
-            showCustomAlert("游戏结束", `${winner} 赢得了比赛！`);
-            systemInstructionForAI = `# 事件回顾\n- ${eventDescription}\n\n# 你的任务\n游戏已经结束。请对最终结果发表你的感言。`;
-            break;
-
-        default: 
-            if (cell.type === 'star') {
-                if(isUser) autoChessState.playerStars++; else autoChessState.aiStars++;
-                eventDescription += ` 这是一个星星格，获得了一颗星星！`;
-                addMessageToAutoChessChat('system', `⭐ ${isUser ? '你' : '对方'} 获得了一颗星星！`);
-            }
-            nextPlayer = isUser ? 'ai' : 'user';
-            const promptHeader = `# 事件回顾\n- ${eventDescription}\n\n`;
-            if (nextPlayer === 'ai') {
-                systemInstructionForAI = promptHeader + `# 你的任务\n现在轮到你了。请对刚刚发生的事件发表评论。`;
-            } else {
-                systemInstructionForAI = promptHeader + `# 你的任务\n现在轮到用户了。请你只用 "text" 指令对刚刚发生的事件发表评论。`;
-            }
-            break;
     }
-    
-    autoChessState.currentPlayerTurn = nextPlayer;
-    chat.autoChessState = autoChessState;
-    await db.chats.put(chat);
-    renderAutoChessBoard();
-
-    if (shouldTriggerAI && systemInstructionForAI) {
-        await triggerAiInAutoChess(systemInstructionForAI);
-    }
-}
 
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 【最终修复版】用这【一整块】代码，完整替换旧的 handleAiTurn 函数 ▼▼▼
+// ▼▼▼ 【修复版】用这个新版本完整替换旧的 handleAiTurn 函数 ▼▼▼
 
 /**
- * 【重构版】AI执行它的回合，骰子点数由代码生成
+ * AI执行它的回合，骰子点数由代码生成
  * @param {string} aiName AI在当前语境下的名字
  */
 async function handleAiTurn(aiName) {
     if (autoChessState.currentPlayerTurn !== 'ai' || autoChessState.isGameOver) return;
 
-    // 【核心修正】将变量名统一为 diceRoll
     const diceRoll = Math.floor(Math.random() * 6) + 1;
     autoChessState.diceResult = diceRoll;
     document.getElementById('dice-result-display').textContent = diceRoll;
     
-    // 【核心修正】这里使用正确的变量名 diceRoll
     addMessageToAutoChessChat('system', `${aiName} 掷出了 ${diceRoll} 点！`);
 
-    // 【核心修正】这里也使用正确的变量名 diceRoll
     const newPosition = Math.min(63, autoChessState.aiPosition + diceRoll);
     await movePawn('ai', autoChessState.aiPosition, newPosition);
     autoChessState.aiPosition = newPosition;
 
-    // AI行动后，调用效果处理函数，并明确告知【不需要】再触发AI了
-    await handleCellEffect('ai', newPosition, false);
+    // 【核心修复】这里调用了新版本的 handleCellEffect，不再有第三个参数
+    await handleCellEffect('ai', newPosition);
 }
 
 // ▲▲▲ 替换结束 ▲▲▲
@@ -13798,6 +13632,31 @@ async function saveAutoChessSettings() {
     document.getElementById('auto-chess-settings-modal').classList.remove('visible');
     alert('设置已保存！');
 }
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【修复版】用这个新版本完整替换旧的 handlePlayerRollDice 函数 ▼▼▼
+
+/**
+ * 玩家点击掷骰子
+ */
+async function handlePlayerRollDice() {
+    if (autoChessState.currentPlayerTurn !== 'user' || autoChessState.isGameOver) return;
+
+    const diceRoll = Math.floor(Math.random() * 6) + 1;
+    autoChessState.diceResult = diceRoll;
+    document.getElementById('roll-dice-btn').disabled = true;
+    document.getElementById('dice-result-display').textContent = diceRoll;
+    
+    addMessageToAutoChessChat('system', `你掷出了 ${diceRoll} 点！`);
+
+    const newPosition = Math.min(63, autoChessState.playerPosition + diceRoll);
+    await movePawn('user', autoChessState.playerPosition, newPosition);
+    autoChessState.playerPosition = newPosition;
+
+    // 【核心修复】这里调用了新版本的 handleCellEffect，不再有第三个参数
+    await handleCellEffect('user', newPosition);
+}
+
 // ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 请将这【一整块新函数】粘贴到JS功能函数定义区的末尾 ▼▼▼
@@ -19004,11 +18863,7 @@ const handleSwipeMove = (e) => {
 
     if (swipeState.swipeDirection === null) {
         if (absDiffX > clickThreshold || absDiffY > clickThreshold) {
-            if (absDiffX > absDiffY) {
-                swipeState.swipeDirection = 'horizontal';
-            } else {
-                swipeState.swipeDirection = 'vertical';
-            }
+            swipeState.swipeDirection = absDiffX > absDiffY ? 'horizontal' : 'vertical';
         }
     }
     if (swipeState.swipeDirection === 'vertical') {
@@ -19042,19 +18897,13 @@ const handleSwipeEnd = (e) => {
 
     if (swipeState.swipeDirection === 'horizontal' && diffX < swipeThreshold) {
         postItem.classList.add('swiped');
-        postItem.style.transform = '';
     } else {
         postItem.classList.remove('swiped');
-        postItem.style.transform = '';
     }
+    postItem.style.transform = ''; // 清除行内样式，让class生效
 
     swipeState.isDragging = false;
-    swipeState.startX = 0;
-    swipeState.startY = 0;
-    swipeState.currentX = 0;
     swipeState.activeContainer = null;
-    swipeState.swipeDirection = null;
-    swipeState.isClick = true;
 };
 
 // --- 绑定所有滑动事件 ---
@@ -19062,55 +18911,24 @@ postsList.addEventListener('mousedown', handleSwipeStart);
 document.addEventListener('mousemove', handleSwipeMove);
 document.addEventListener('mouseup', handleSwipeEnd);
 postsList.addEventListener('touchstart', handleSwipeStart, { passive: false });
-postsList.addEventListener('touchmove', handleSwipeMove, { passive: false });
-postsList.addEventListener('touchend', handleSwipeEnd);
+document.addEventListener('touchmove', handleSwipeMove, { passive: false });
+document.addEventListener('touchend', handleSwipeEnd);
 
 // --- 绑定所有点击事件 ---
 postsList.addEventListener('click', async (e) => {
     e.stopPropagation();
     const target = e.target;
 
-    // --- 新增:处理评论删除按钮 ---
-    if (target.classList.contains('comment-delete-btn')) {
-        const postContainer = target.closest('.qzone-post-container');
-        if (!postContainer) return;
-
-        const postId = parseInt(postContainer.dataset.postId);
-        const commentIndex = parseInt(target.dataset.commentIndex);
-        if (isNaN(postId) || isNaN(commentIndex)) return;
-
-        const post = await db.qzonePosts.get(postId);
-        if (!post || !post.comments || !post.comments[commentIndex]) return;
-
-        const commentText = post.comments[commentIndex].text;
-        const confirmed = await showCustomConfirm(
-            '删除评论',
-            `确定要删除这条评论吗？\n\n“${commentText.substring(0, 50)}...”`,
-            { confirmButtonClass: 'btn-danger' }
-        );
-
-        if (confirmed) {
-            // 从数组中移除该评论
-            post.comments.splice(commentIndex, 1);
-            // 更新数据库
-            await db.qzonePosts.update(postId, { comments: post.comments });
-            // 重新渲染列表以反映更改
-            await renderQzonePosts();
-            alert('评论已删除。');
-        }
-        return; // 处理完后直接返回
-    }
-
-    if (target.classList.contains('post-actions-btn')) {
-        const container = target.closest('.qzone-post-container');
-        if (container && container.dataset.postId) {
-            showPostActions(parseInt(container.dataset.postId));
-        }
-        return;
-    }
-
-    if (target.closest('.qzone-post-delete-action')) {
-        const container = target.closest('.qzone-post-container');
+    const commentDeleteBtn = target.closest('.comment-delete-btn');
+    const postActionsBtn = target.closest('.post-actions-btn');
+    const deleteActionBtn = target.closest('.qzone-post-delete-action');
+    const hiddenTextImage = target.closest('img[data-hidden-text]');
+    const feedbackIcon = target.closest('.action-icon');
+    const sendCommentBtn = target.closest('.comment-send-btn');
+    
+    // 【全新】处理删除按钮的点击
+    if (deleteActionBtn) {
+        const container = deleteActionBtn.closest('.qzone-post-container');
         if (!container) return;
         
         const postIdToDelete = parseInt(container.dataset.postId);
@@ -19126,6 +18944,7 @@ postsList.addEventListener('click', async (e) => {
             setTimeout(async () => {
                  await db.qzonePosts.delete(postIdToDelete);
                  
+                 // 同时清理掉AI的后台通知
                  const notificationIdentifier = `(ID: ${postIdToDelete})`;
                  for (const chatId in state.chats) {
                      const chat = state.chats[chatId];
@@ -19142,135 +18961,160 @@ postsList.addEventListener('click', async (e) => {
         return;
     }
 
-    if (target.tagName === 'IMG' && target.dataset.hiddenText) {
-        const hiddenText = target.dataset.hiddenText;
-        showCustomAlert("图片内容", hiddenText.replace(/<br>/g, '\n'));
+    // --- 其他点击事件逻辑（保持不变） ---
+    if (commentDeleteBtn) { /* ... */ }
+    if (postActionsBtn) { /* ... */ }
+    if (hiddenTextImage) { /* ... */ }
+    if (feedbackIcon) { /* ... */ }
+    if (sendCommentBtn) { /* ... */ }
+    // ... (省略未修改的点击事件代码,直接粘贴即可)
+    if (commentDeleteBtn) {
+        const postContainer = commentDeleteBtn.closest('.qzone-post-container');
+        const postId = parseInt(postContainer.dataset.postId);
+        const commentIndex = parseInt(commentDeleteBtn.dataset.commentIndex);
+        const post = await db.qzonePosts.get(postId);
+        if (!post || !post.comments || !post.comments[commentIndex]) return;
+        const commentText = post.comments[commentIndex].text;
+        const confirmed = await showCustomConfirm('删除评论', `确定要删除这条评论吗？\n\n“${commentText.substring(0, 50)}...”`, { confirmButtonClass: 'btn-danger' });
+        if (confirmed) {
+            post.comments.splice(commentIndex, 1);
+            await db.qzonePosts.update(postId, { comments: post.comments });
+            await renderQzonePosts();
+            alert('评论已删除。');
+        }
         return;
     }
-    const icon = target.closest('.action-icon');
-    if (icon) {
-        const postContainer = icon.closest('.qzone-post-container');
-        if (!postContainer) return;
+    if (postActionsBtn) { showPostActions(parseInt(postActionsBtn.closest('.qzone-post-container').dataset.postId)); return; }
+    if (hiddenTextImage) { showCustomAlert("图片内容", hiddenTextImage.dataset.hiddenText.replace(/<br>/g, '\n')); return; }
+    if (feedbackIcon) {
+        const postContainer = feedbackIcon.closest('.qzone-post-container');
         const postId = parseInt(postContainer.dataset.postId);
-        if (isNaN(postId)) return;
-        if (icon.classList.contains('like')) {
+        if (feedbackIcon.classList.contains('like')) {
             const post = await db.qzonePosts.get(postId);
-            if (!post) return;
             if (!post.likes) post.likes = [];
             const userNickname = state.qzoneSettings.nickname;
             const userLikeIndex = post.likes.indexOf(userNickname);
-            if (userLikeIndex > -1) {
-                post.likes.splice(userLikeIndex, 1);
-            } else {
-                post.likes.push(userNickname);
-                icon.classList.add('animate-like');
-                icon.addEventListener('animationend', () => icon.classList.remove('animate-like'), { once: true });
-            }
+            if (userLikeIndex > -1) { post.likes.splice(userLikeIndex, 1); } else { post.likes.push(userNickname); feedbackIcon.classList.add('animate-like'); feedbackIcon.addEventListener('animationend', () => feedbackIcon.classList.remove('animate-like'), { once: true }); }
             await db.qzonePosts.update(postId, { likes: post.likes });
         }
-        if (icon.classList.contains('favorite')) {
+        if (feedbackIcon.classList.contains('favorite')) {
             const existingFavorite = await db.favorites.where({ type: 'qzone_post', 'content.id': postId }).first();
-            if (existingFavorite) {
-                await db.favorites.delete(existingFavorite.id);
-                await showCustomAlert('提示', '已取消收藏');
-            } else {
-                const postToSave = await db.qzonePosts.get(postId);
-                if (postToSave) {
-                    await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() });
-                    await showCustomAlert('提示', '收藏成功!');
-                }
-            }
+            if (existingFavorite) { await db.favorites.delete(existingFavorite.id); await showCustomAlert('提示', '已取消收藏'); } else { const postToSave = await db.qzonePosts.get(postId); if (postToSave) { await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() }); await showCustomAlert('提示', '收藏成功!'); } }
         }
         await renderQzonePosts();
         return;
     }
-// ▼▼▼ 请用下面这块【全新的、功能增强的】代码,替换掉旧的 if (sendBtn) { ... } 代码块 ▼▼▼
-const sendBtn = target.closest('.comment-send-btn');
-if (sendBtn) {
-    const postContainer = sendBtn.closest('.qzone-post-container');
-    if (!postContainer) return;
-    const postId = parseInt(postContainer.dataset.postId);
-    const commentInput = postContainer.querySelector('.comment-input');
-    const commentText = commentInput.value.trim();
-    if (!commentText) return alert('评论内容不能为空哦!');
-
-    const post = await db.qzonePosts.get(postId);
-    if (!post) return;
-    if (!post.comments) post.comments = [];
-
-    // 1. 【解析与保存】这部分逻辑与之前相同,确保用户的评论能被正确解析和保存
-    const newComment = {
-        commenterName: state.qzoneSettings.nickname,
-        timestamp: Date.now()
-    };
-    const mentionRegex = /^@([\p{L}\w]+)\s*(.*)$/u;
-    const match = commentText.match(mentionRegex);
-    if (match) {
-        newComment.replyTo = match[1].trim();
-        newComment.text = match[2];
-    } else {
-        newComment.replyTo = null;
-        newComment.text = commentText;
-    }
-    post.comments.push(newComment);
-    await db.qzonePosts.update(postId, { comments: post.comments });
-    
-    // --- 【核心AI唤醒逻辑开始】 ---
-    
-    // 2. 【识别目标】检查这条评论是不是在回复某个AI
-    if (newComment.replyTo) {
-        // 尝试根据被回复的名字,找到对应的AI角色
-        const repliedToAI = Object.values(state.chats).find(chat => 
-            !chat.isGroup && chat.name === newComment.replyTo
-        );
-        
-        // 3. 【发送指令 & 立即唤醒】如果找到了被回复的AI
-        if (repliedToAI) {
-            console.log(`检测到用户回复了AI “${repliedToAI.name}”,正在准备唤醒...`);
-            
-            // a. 创建一条对用户隐藏的、专门给这个AI的系统指令
-            const hiddenInstruction = {
-                role: 'system',
-                content: `[系统指令:用户“${state.qzoneSettings.nickname}”刚刚在动态(ID: ${postId})下回复了【你】。TA说:“${newComment.text}”。请你根据你的人设,使用 qzone_comment 指令,并以“@${state.qzoneSettings.nickname}”开头,来回应TA。]`,
-                timestamp: Date.now(),
-                isHidden: true
-            };
-            
-            // b. 将指令存入这个AI的聊天记录
-            repliedToAI.history.push(hiddenInstruction);
-            await db.chats.put(repliedToAI);
-
-            // c. 【关键一步】立即触发这个AI的思考和响应!
-            triggerAiResponse(repliedToAI.id);
+    if (sendCommentBtn) {
+        const postContainer = sendCommentBtn.closest('.qzone-post-container');
+        const postId = parseInt(postContainer.dataset.postId);
+        const commentInput = postContainer.querySelector('.comment-input');
+        const commentText = commentInput.value.trim();
+        if (!commentText) return alert('评论内容不能为空哦!');
+        const post = await db.qzonePosts.get(postId);
+        if (!post.comments) post.comments = [];
+        const newComment = { commenterName: state.qzoneSettings.nickname, timestamp: Date.now() };
+        const mentionRegex = /^@([\p{L}\w]+)\s*(.*)$/u;
+        const match = commentText.match(mentionRegex);
+        if (match) { newComment.replyTo = match[1].trim(); newComment.text = match[2]; } else { newComment.replyTo = null; newComment.text = commentText; }
+        post.comments.push(newComment);
+        await db.qzonePosts.update(postId, { comments: post.comments });
+        if (newComment.replyTo) {
+            const repliedToAI = Object.values(state.chats).find(chat => !chat.isGroup && chat.name === newComment.replyTo);
+            if (repliedToAI) {
+                const hiddenInstruction = { role: 'system', content: `[系统指令:用户“${state.qzoneSettings.nickname}”刚刚在动态(ID: ${postId})下回复了【你】。TA说:“${newComment.text}”。请你根据你的人设,使用 qzone_comment 指令,并以“@${state.qzoneSettings.nickname}”开头,来回应TA。]`, timestamp: Date.now(), isHidden: true };
+                repliedToAI.history.push(hiddenInstruction);
+                await db.chats.put(repliedToAI);
+                triggerAiResponse(repliedToAI.id);
+            }
         }
-    }
-    
-    // 4. 【广播通知】无论是不是回复,都像以前一样,通知所有其他AI“用户发了一条新评论”
-    //    这样可以确保其他AI也能看到这条评论,并根据自己的性格决定是否要“插话”
-    for (const chatId in state.chats) {
-        const chat = state.chats[chatId];
-        // 确保是单聊,并且不是我们刚刚已经单独“唤醒”过的那个AI
-        if (!chat.isGroup && (!newComment.replyTo || chat.name !== newComment.replyTo)) {
-            chat.history.push({ 
-                role: 'system', 
-                content: `[系统提示:'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下发表了评论:“${commentText}”]`, 
-                timestamp: Date.now(), 
-                isHidden: true 
-            });
-            await db.chats.put(chat);
+        for (const chatId in state.chats) {
+            const chat = state.chats[chatId];
+            if (!chat.isGroup && (!newComment.replyTo || chat.name !== newComment.replyTo)) {
+                chat.history.push({ role: 'system', content: `[系统提示:'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下发表了评论:“${commentText}”]`, timestamp: Date.now(), isHidden: true });
+                await db.chats.put(chat);
+            }
         }
+        commentInput.value = '';
+        await renderQzonePosts();
+        return;
     }
-    
-    // --- 【AI唤醒逻辑结束】 ---
-
-    // 5. 【收尾】清空输入框并重新渲染动态列表
-    commentInput.value = '';
-    await renderQzonePosts();
-    return; // 明确地结束该点击事件的处理
-}
-// ▲▲▲ 替换结束 ▲▲▲
 });
+
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【最终修复】请将这整块【全新】的代码，粘贴到 init() 函数的事件监听器区域末尾 ▼▼▼
+
+// 使用事件委托处理所有评论框的 @ 提及功能
+postsList.addEventListener('input', (e) => {
+    // 确保事件是由评论输入框触发的
+    if (!e.target.matches('.comment-input')) {
+        return;
+    }
+
+    const commentInput = e.target;
+    const postContainer = commentInput.closest('.qzone-post-container');
+    if (!postContainer) return; // 安全检查
+
+    const popup = postContainer.querySelector('.at-mention-popup');
+    const value = commentInput.value;
+    const atMatch = value.match(/@([\p{L}\w]*)$/u);
+
+    if (atMatch) {
+        const namesToMention = new Set();
+        const authorNickname = postContainer.querySelector('.post-nickname')?.textContent;
+        if (authorNickname) namesToMention.add(authorNickname);
+        
+        postContainer.querySelectorAll('.commenter-name').forEach(nameEl => {
+            // 确保移除名字后面的冒号
+            namesToMention.add(nameEl.textContent.replace(':', '').trim());
+        });
+
+        // 移除用户自己，你不能@自己
+        namesToMention.delete(state.qzoneSettings.nickname);
+
+        popup.innerHTML = '';
+        if (namesToMention.size > 0) {
+            const searchTerm = atMatch[1];
+            namesToMention.forEach(name => {
+                if (name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    const item = document.createElement('div');
+                    item.className = 'at-mention-item';
+                    item.textContent = name;
+                    // 使用 mousedown 是为了在 input失去焦点前触发
+                    item.addEventListener('mousedown', (event) => {
+                        event.preventDefault(); // 阻止input失去焦点
+                        const newText = value.substring(0, atMatch.index) + `@${name} `;
+                        commentInput.value = newText;
+                        popup.style.display = 'none';
+                        commentInput.focus();
+                    });
+                    popup.appendChild(item);
+                }
+            });
+            popup.style.display = popup.children.length > 0 ? 'block' : 'none';
+        } else {
+            popup.style.display = 'none';
+        }
+    } else {
+        popup.style.display = 'none';
+    }
+});
+
+// 当评论框失去焦点时，延迟隐藏提及列表
+postsList.addEventListener('focusout', (e) => {
+    if (e.target.matches('.comment-input')) {
+        const postContainer = e.target.closest('.qzone-post-container');
+        if (postContainer) {
+            const popup = postContainer.querySelector('.at-mention-popup');
+            // 延迟隐藏，给点击列表项的操作留出时间
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 200);
+        }
+    }
+});
+
+// ▲▲▲ 修复代码粘贴到此结束 ▲▲▲
 
 // ▼▼▼ 第4.3步:在 init() 中,用这整块【最终版】代码,替换所有旧的纪念日/日历相关事件绑定 ▼▼▼
 // === 【全新】纪念日与日历功能事件绑定 (切换+直觉交互版) ===
@@ -20523,9 +20367,6 @@ document.getElementById('cancel-ac-settings-btn').addEventListener('click', () =
 });
 document.getElementById('save-ac-settings-btn').addEventListener('click', saveAutoChessSettings);
 
-document.getElementById('roll-dice-btn').addEventListener('click', handlePlayerRollDice);
-
-// ▼▼▼ 在 init() 函数内，用这块新代码替换旧的 auto-chess-send-btn 监听器 ▼▼▼
 document.getElementById('auto-chess-send-btn').addEventListener('click', async () => {
     const input = document.getElementById('auto-chess-input');
     const text = input.value.trim();
@@ -20534,27 +20375,29 @@ document.getElementById('auto-chess-send-btn').addEventListener('click', async (
     addMessageToAutoChessChat('user', text);
     input.value = '';
     
-    let systemMsg;
+    let eventDescriptionForAI;
+    const chat = state.chats[state.activeChatId];
+    const userName = chat.settings.myNickname || '我';
     
     if (autoChessState.waitingForPunishmentResponse) {
         autoChessState.waitingForPunishmentResponse = false;
+        
+        // 当用户回应惩罚时，AI需要知道用户的具体回应
+        eventDescriptionForAI = `[系统事件：我(${chat.name}) 对你(${userName}) 进行了惩罚，你的回应是：“${text}”。现在轮到我行动了。]`;
+        
+        // 用户回应后，回合切换给AI
         autoChessState.currentPlayerTurn = 'ai';
-        
-        systemMsg = `[系统指令：用户刚刚回答了惩罚问题, 答案是：“${text}”。现在轮到你了。请先用 "text" 指令对用户的回答发表评论, 然后紧接着用 "auto_chess_roll" 指令掷骰子。]`;
-        
-        const chat = state.chats[state.activeChatId];
         chat.autoChessState = autoChessState;
         await db.chats.put(chat);
         renderAutoChessBoard();
 
     } else {
-        // 【核心修改】为普通聊天指令增加更明确的上下文
-        systemMsg = `[系统指令：现在是用户的回合。用户在行动前对你发送了聊天消息：“${text}”。请你只用 "text" 指令与用户闲聊，绝对不要掷骰子。]`;
+        // 在普通情况下聊天
+        eventDescriptionForAI = `[系统事件：现在是你的回合。你在行动前，对我说了：“${text}”]`;
     }
     
-    await triggerAiInAutoChess(systemMsg);
+    await triggerAiInAutoChess(eventDescriptionForAI);
 });
-// ▲▲▲ 替换结束 ▲▲▲
 
 // 在 init() 的事件监听区域添加
 document.getElementById('transfer-action-accept').addEventListener('click', () => handleUserTransferResponse('accepted'));
