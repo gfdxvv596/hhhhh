@@ -1111,7 +1111,7 @@ body.bordered-mode #status-bar {
 
 /* ▲▲▲ 粘贴到此结束 ▲▲▲ */
 
-/* ▼▼▼ 【全新】为自走棋添加“正在输入”样式 (粘贴到 <style> 末尾) ▼▼▼ */
+/* ▼▼▼ 【全新】为五字棋添加“正在输入”样式 (粘贴到 <style> 末尾) ▼▼▼ */
 #ac-typing-indicator {
     display: flex;
     align-items: center;
@@ -3226,168 +3226,315 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
-/* ▼▼▼ 【全新】AI对战行棋游戏样式 (粘贴到 <style> 末尾) ▼▼▼ */
+/* ▼▼▼ 【全新】五子棋(Gomoku)游戏界面美化样式 (V5 - 扁平蓝粉版) ▼▼▼ */
 
-/* 1. 游戏主屏幕布局 */
-#auto-chess-screen {
-    background-color: #fcefee; /* 参考图片的淡粉色背景 */
-    flex-direction: column;
+/* --- 1. 定义全新的莫兰迪蓝粉配色方案 (扁平化) --- */
+:root {
+    --gomoku-bg: #f9f9f9;             /* 纯净的浅灰色背景 */
+    --gomoku-board-area-bg: #ffffff;  /* 棋盘区域的纯白背景 */
+    --gomoku-board-bg: #fbfaf8;       /* 【核心】极浅的米白色棋盘 */
+    --gomoku-line-color: #eae8e3;     /* 非常浅的棋盘线条 */
+    --gomoku-star-point-color: #dcd9d3;/* 星位点颜色 */
+
+    /* 【核心修改】棋子颜色变为莫兰迪浅蓝浅粉 */
+    --gomoku-ai-piece: #87a99c;        /* 莫兰迪浅蓝 (AI) */
+    --gomoku-user-piece: #cde0d8;      /* 莫兰迪浅粉 (User) */
+
+    --gomoku-accent-color: #f3f3f3;    /* 极浅的灰色高亮 */
+    --gomoku-timer-bg: #f0f0f0;        /* 计时器背景 */
+    --gomoku-text-primary: #5a5a5a;
+    --gomoku-text-secondary: #b0b0b0;
+    
+    --gomoku-user-bubble-bg: #e1f5fe;
+    --gomoku-ai-bubble-bg: #f1f1f1;
 }
 
-/* 2. 上半部分 - 游戏区 */
-#auto-chess-board-area {
-    height: 65%;
+/* --- 2. 游戏主屏幕布局 (保持不变) --- */
+#gomoku-screen {
+    background-color: var(--gomoku-bg);
+    flex-direction: column;
+}
+#gomoku-board-area {
+    height: 60%;
     flex-shrink: 0;
-    background-color: #ffffff;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background-color: var(--gomoku-board-area-bg);
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04); /* 阴影非常非常淡 */
     display: flex;
     flex-direction: column;
-    padding-bottom: 15px;
-}
-#phone-screen.dark-mode #auto-chess-board-area {
-    background-color: #1c1c1e;
+    padding: 0 15px 15px 15px;
+    box-sizing: border-box;
 }
 
-/* 3. 玩家信息栏 */
-.player-info-bar {
+/* --- 3. 玩家信息栏与计时器 (扁平化) --- */
+#gomoku-screen .player-info-bar {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
+    padding: 10px 5px;
     flex-shrink: 0;
 }
-.player-card, .dice-card {
-    background-color: #f7f8fa;
+#gomoku-screen .player-card {
+    background-color: transparent;
     border-radius: 12px;
-    padding: 10px;
-    min-width: 90px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-#phone-screen.dark-mode .player-card,
-#phone-screen.dark-mode .dice-card {
-    background-color: #2c2c2e;
-}
-
-.player-card {
+    padding: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    transition: background-color 0.3s ease-in-out;
+    border: none;
+    box-shadow: none;
 }
-.player-avatar {
-    width: 36px;
-    height: 36px;
+#gomoku-screen .player-card.current-player {
+    background-color: var(--gomoku-accent-color);
+}
+#gomoku-screen .player-avatar {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.player-details {
+#gomoku-screen .player-details {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
-.player-name {
+#gomoku-screen .player-name {
     font-weight: 600;
     font-size: 14px;
+    color: var(--gomoku-text-primary);
 }
-.player-stats {
-    font-size: 13px;
-    color: #f59e0b;
+/* 【核心修改】棋子预览颜色与样式更新 */
+#gomoku-screen .player-piece {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-top: 4px;
+    box-shadow: none; /* 移除阴影 */
 }
-.dice-card {
+#gomoku-screen .player-piece.black { background-color: var(--gomoku-ai-piece); }
+#gomoku-screen .player-piece.white { background-color: var(--gomoku-user-piece); }
+
+#gomoku-screen .turn-timer {
+    width: 60px;
+    height: 60px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 5px;
-    background-color: #fff1f0;
 }
-#phone-screen.dark-mode .dice-card {
-    background-color: #4a2c2c;
-}
-
-#roll-dice-btn {
-    background: none;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    color: #d9534f;
-    cursor: pointer;
-}
-#phone-screen.dark-mode #roll-dice-btn {
-    color: #ff8a80;
-}
-#roll-dice-btn:disabled {
-    color: #aaa;
-    cursor: not-allowed;
-}
-#dice-result-display {
-    font-size: 24px;
-    font-weight: bold;
-    min-height: 29px;
-}
-
-/* 4. 棋盘网格 */
-#auto-chess-grid {
-    flex-grow: 1;
-    padding: 10px 15px;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(9, 1fr);
-    gap: 6px;
-}
-.chess-cell {
-    background-color: #f7f8fa;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 500;
-    color: #999;
-    position: relative;
+#gomoku-screen .timer-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--gomoku-timer-bg);
+    color: var(--gomoku-text-primary);
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding: 4px;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: none; /* 移除阴影 */
 }
-#phone-screen.dark-mode .chess-cell {
-    background-color: #2c2c2e;
+
+/* --- 4. 棋盘网格与线条 (美化) --- */
+#gomoku-grid-wrapper {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
-/* ▼▼▼ 用这【一整块】新代码，替换旧的 .cell-icon 及相关样式 ▼▼▼ */
-.chess-cell .cell-icon {
+#gomoku-grid {
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 1 / 1;
+    background-color: var(--gomoku-board-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 10px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    position: relative;
+}
+.gomoku-cell {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.gomoku-cell::before, .gomoku-cell::after {
+    content: '';
     position: absolute;
+    background-color: var(--gomoku-line-color);
+    z-index: 1;
+}
+.gomoku-cell::before { width: 100%; height: 1px; top: 50%; left: 0; }
+.gomoku-cell::after { width: 1px; height: 100%; top: 0; left: 50%; }
+.gomoku-cell.star-point::after {
+    content: '';
+    position: absolute;
+    width: 5px; /* 星位点也小一点 */
+    height: 5px;
+    background-color: var(--gomoku-star-point-color);
+    border-radius: 50%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 14px; /* 设定一个统一的图标宽度 */
-    height: 14px; /* 设定一个统一的图标高度 */
-    background-size: contain; /* 确保图片完整显示 */
-    background-repeat: no-repeat;
-    background-position: center;
+    z-index: 2;
 }
 
-/* 为不同的格子类型设置不同的背景图片 */
-.chess-cell.star .cell-icon { background-image: url('https://sharkpan.xyz/f/2dlzHQ/%E6%98%9F%E6%98%9F.png'); }
-.chess-cell.bomb .cell-icon { background-image: url('https://sharkpan.xyz/f/LzXnC7/%E6%81%B6%E9%AD%94.png'); }
-.chess-cell.event .cell-icon { background-image: url('https://sharkpan.xyz/f/qODGC3/%E9%97%AE%E5%8F%B7.png'); }
-.chess-cell.pause .cell-icon { background-image: url('https://sharkpan.xyz/f/gwm5sw/%E6%9A%82%E5%81%9C.png'); }
-.chess-cell.back .cell-icon { background-image: url('https://sharkpan.xyz/f/XDxqsW/%E8%BF%94%E5%9B%9E.png'); }
-.chess-cell.forward .cell-icon { background-image: url('https://sharkpan.xyz/f/JZLLFg/%E5%89%8D%E8%BF%9B.png'); }
-.chess-cell.end .cell-icon { background-image: url('https://sharkpan.xyz/f/OwJNuy/%E7%8E%8B%E5%86%A0.png'); }
-
-/* 棋子样式 */
-.player-pawn {
+/* --- 5. 棋子样式与动画 (核心扁平化) --- */
+.piece {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 20px;
-    height: 20px;
+    width: 90%;
+    height: 90%;
     border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    transition: all 0.3s ease-in-out;
+    z-index: 3;
+    box-shadow: none; /* 【核心】移除所有阴影和高光 */
+    transform: scale(0);
+    animation: place-piece 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-.player-pawn.user-pawn { background-color: #007bff; }
-.player-pawn.ai-pawn { background-color: #dc3545; }
+@keyframes place-piece {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+/* 【核心修改】棋子颜色变为纯色 */
+.piece.black-piece {
+    background-color: var(--gomoku-ai-piece);
+}
+.piece.white-piece {
+    background-color: var(--gomoku-user-piece);
+}
+
+.last-move-marker {
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8); /* 使用半透明白色小点作为标记 */
+    border: none;
+}
+/* 移除 last-move-marker 的动画 */
+@keyframes pulse-marker {} 
+
+/* --- 6. 游戏开始遮罩层 (美化) --- */
+#gomoku-start-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(251, 250, 248, 0.8); /* 匹配棋盘色的半透明 */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+#gomoku-start-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+#gomoku-start-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gomoku-text-primary);
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+#gomoku-start-btn:active {
+    transform: scale(0.95);
+}
+
+/* --- 7. 游戏聊天区气泡样式 (保持不变) --- */
+#auto-chess-messages .message-wrapper {
+    max-width: 85%;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+#auto-chess-messages .message-wrapper.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+#auto-chess-messages .message-wrapper.ai {
+    align-self: flex-start;
+}
+#auto-chess-messages .message-bubble.system-bubble {
+    align-self: center;
+    margin: 8px 0;
+    font-size: 12px;
+}
+#auto-chess-messages .avatar-frame-wrapper {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+}
+#auto-chess-messages .avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+#auto-chess-messages .message-bubble .content {
+    padding: 10px 14px;
+    border-radius: 18px;
+    line-height: 1.5;
+    font-size: 15px;
+    word-break: break-word;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+#auto-chess-messages .message-wrapper.user .content {
+    background-color: var(--gomoku-user-bubble-bg);
+    color: var(--gomoku-text-primary);
+    border-bottom-right-radius: 5px;
+}
+#auto-chess-messages .message-wrapper.ai .content {
+    background-color: var(--gomoku-ai-bubble-bg);
+    color: var(--gomoku-text-primary);
+    border-bottom-left-radius: 5px;
+}
+
+/* --- 8. 夜间模式适配 (扁平化) --- */
+#phone-screen.dark-mode #gomoku-screen {
+    --gomoku-bg: #1e1e1e;
+    --gomoku-board-area-bg: #2a2a2a;
+    --gomoku-board-bg: #333333;
+    --gomoku-line-color: #404040;
+    --gomoku-star-point-color: #555555;
+    
+    --gomoku-ai-piece: #5a7b8c;  /* 夜间模式的深蓝 */
+    --gomoku-user-piece: #8c6b73; /* 夜间模式的暗粉 */
+
+    --gomoku-accent-color: #383838;
+    --gomoku-timer-bg: #444444;
+    --gomoku-text-primary: #e0e0e0;
+    --gomoku-text-secondary: #8d8d92;
+    --gomoku-user-bubble-bg: #26428b;
+    --gomoku-ai-bubble-bg: #3e3e42;
+}
+#phone-screen.dark-mode #gomoku-screen .player-card.current-player {
+    background-color: #383838;
+}
+#phone-screen.dark-mode #gomoku-start-overlay {
+    background-color: rgba(42, 42, 42, 0.7);
+}
+
+/* ▲▲▲ 全新五子棋样式到此结束 ▲▲▲ */
 
 /* 5. 下半部分 - 聊天区 */
 #auto-chess-chat-area {
@@ -6481,71 +6628,73 @@ input:checked + .slider:before {
             <span class="label">摇个骰子</span>
         </div>
         <div class="game-option-item" id="start-auto-chess-btn">
-            <div class="icon-bg"><img src="https://sharkpan.xyz/f/ad2VIY/icon-kfckfc.png" alt="自走棋"></div>
-            <span class="label">自走棋</span>
+            <div class="icon-bg"><img src="https://sharkpan.xyz/f/ad2VIY/icon-kfckfc.png" alt="五子棋"></div>
+            <span class="label">五子棋</span>
         </div>
     </div>
 </div>
 <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
 
-<!-- 1. AI对战行棋游戏主屏幕 -->
-<div id="auto-chess-screen" class="screen">
+<!-- ▼▼▼ 用下面这【一整块】全新的代码，完整替换掉旧的 id="auto-chess-screen" ▼▼▼ -->
+
+<!-- 1. 全新的五子棋游戏主屏幕 -->
+<div id="gomoku-screen" class="screen">
     <!-- 游戏区域 (上半部分) -->
-    <div id="auto-chess-board-area">
+    <div id="gomoku-board-area">
         <!-- 游戏头部 -->
         <div class="header">
-            <span class="back-btn" id="auto-chess-back-btn">‹</span>
-            <span>自走棋</span>
+            <span class="back-btn" id="gomoku-back-btn">‹</span>
+            <span>五子棋</span>
             <div class="header-actions">
-                <span class="action-btn" id="auto-chess-rules-btn" title="规则">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                </span>
-                <span class="action-btn" id="auto-chess-settings-btn" title="设置">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.44,0.17-0.48,0.41L9.2,5.7c-0.59,0.24-1.13,0.56-1.62,0.94l-2.39-0.96c-0.22-0.08-0.47,0-0.59,0.22L2.69,9.22 c-0.11,0.2-0.06,0.47,0.12,0.61l2.03,1.58C4.78,11.7,4.76,12,4.76,12.3c0,0.3,0.02,0.6,0.06,0.9l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.04,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17-0.48,0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.06-0.47-0.12-0.61L19.14,12.94z"></path><circle cx="12" cy="12" r="3.5"></circle></svg>
+                <!-- 全新的悔棋按钮 -->
+                <span class="action-btn" id="gomoku-undo-btn" title="悔棋">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v6h6"></path><path d="M3.4 13A9 9 0 1 0 21 12a9.75 9.75 0 0 0-2.3-5.8"></path>
+                    </svg>
                 </span>
             </div>
         </div>
         <!-- 玩家信息栏 -->
         <div class="player-info-bar">
             <!-- 你的信息卡片 -->
-            <div class="player-card user">
-                <img id="ac-user-avatar" src="" class="player-avatar">
+            <div class="player-card user current-player">
+                <img id="gomoku-user-avatar" src="" class="player-avatar">
                 <div class="player-details">
-                    <span id="ac-user-name" class="player-name">你</span>
-                    <div class="player-stats">
-                        <span class="star-icon">★</span>
-                        <span id="ac-user-stars" class="star-count">0</span>
-                    </div>
+                    <span id="gomoku-user-name" class="player-name">你</span>
+                    <span class="player-piece white"></span>
                 </div>
             </div>
-            <!-- 掷骰子按钮 -->
-            <div class="dice-card">
-                <button id="roll-dice-btn">掷骰子</button>
-                <span id="dice-result-display"></span>
+            <!-- 中间的倒计时器 -->
+            <div class="turn-timer">
+                <div class="timer-circle">
+                    <span id="gomoku-timer-display">30</span>
+                </div>
             </div>
             <!-- AI的信息卡片 -->
             <div class="player-card ai">
-                <img id="ac-ai-avatar" src="" class="player-avatar">
+                <img id="gomoku-ai-avatar" src="" class="player-avatar">
                 <div class="player-details">
-                    <span id="ac-ai-name" class="player-name">对方</span>
-                    <div class="player-stats">
-                        <span class="star-icon">★</span>
-                        <span id="ac-ai-stars" class="star-count">0</span>
-                    </div>
+                    <span id="gomoku-ai-name" class="player-name">对方</span>
+                    <span class="player-piece black"></span>
                 </div>
             </div>
         </div>
-        <!-- 棋盘网格 -->
-        <div id="auto-chess-grid">
-            <!-- 棋盘格子将由JS动态生成 -->
+        <!-- 棋盘容器 -->
+        <div id="gomoku-grid-wrapper">
+            <div id="gomoku-grid">
+                <!-- 棋盘格子将由JS动态生成 -->
+            </div>
+            <!-- 游戏开始前的遮罩层 -->
+            <div id="gomoku-start-overlay" class="visible">
+                <button id="gomoku-start-btn">开始游戏</button>
+            </div>
         </div>
     </div>
-    <!-- 聊天区域 (下半部分) -->
+    <!-- 聊天区域 (下半部分) - 这部分结构保持不变 -->
     <div id="auto-chess-chat-area">
         <div id="auto-chess-messages">
             <!-- 游戏内聊天消息 -->
         </div>
-      <!-- 【【【全新添加】】】对方正在输入的提示 -->
         <div id="ac-typing-indicator" style="display: none;">
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
@@ -6558,55 +6707,7 @@ input:checked + .slider:before {
     </div>
 </div>
 
-<!-- 2. 游戏规则模态框 -->
-<div id="auto-chess-rules-modal" class="modal">
-    <div class="modal-content" style="height: 70%;">
-        <div class="modal-header">
-            <span>游戏规则</span>
-        </div>
-        <div class="modal-body" style="text-align: left; font-size: 14px; line-height: 1.8;">
-            <p><strong>目标：</strong>最先到达终点(格子63)的玩家获胜！</p>
-            <p><strong>流程：</strong>玩家轮流掷骰子，根据点数前进相应的步数，并触发所在格子的特殊效果。</p>
-            <hr>
-            <p><strong>格子效果说明：</strong></p>
-            <ul>
-                <li><span class="rules-icon star"></span> <strong>星星格:</strong> 获得一颗星星。</li>
-                <li><span class="rules-icon bomb"></span> <strong>炸弹格:</strong> 遭遇随机惩罚事件。</li>
-                <li><span class="rules-icon event"></span> <strong>事件格:</strong> 触发随机的正面或负面事件。</li>
-                <li><span class="rules-icon pause"></span> <strong>暂停格:</strong> 暂停一回合，无法行动。</li>
-                <li><span class="rules-icon back"></span> <strong>后退格:</strong> 后退指定步数。</li>
-                <li><span class="rules-icon forward"></span> <strong>前进格:</strong> 前进指定步数。</li>
-            </ul>
-        </div>
-        <div class="modal-footer">
-            <button class="save" id="close-ac-rules-btn" style="width: 100%;">我明白了</button>
-        </div>
-    </div>
-</div>
-
-<!-- 3. 游戏设置模态框 (用于自定义惩罚) -->
-<div id="auto-chess-settings-modal" class="modal">
-    <div class="modal-content" style="height: 80%;">
-        <div class="modal-header">
-            <span>自定义惩罚/事件</span>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>💣 惩罚主题 (游戏开始前设置)</label>
-                <input type="text" id="ac-punishment-theme" placeholder="例如：真心话大冒险、情侣问答、角色扮演指令...">
-            </div>
-            <div class="form-group">
-                <label>📝 事件格效果 (每行一个)</label>
-                <textarea id="ac-event-events" rows="5" placeholder="例如：好运：前进3格。&#10;厄运：后退2格，并失去一颗星。"></textarea>
-            </div>
-            <p style="font-size: 12px; color: #888;">提示：留空则使用默认设置。你可以随时在游戏中修改。</p>
-        </div>
-        <div class="modal-footer">
-            <button class="cancel" id="cancel-ac-settings-btn">取消</button>
-            <button class="save" id="save-ac-settings-btn">保存</button>
-        </div>
-    </div>
-</div>
+<!-- ▲▲▲ HTML 替换与删除操作到此结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 请将这段新的 HTML 粘贴到 id="chat-list-screen" 的 div 之后 ▼▼▼ -->
 <div id="album-screen" class="screen">
@@ -7830,8 +7931,8 @@ input:checked + .slider:before {
             <span class="label">摇个骰子</span>
         </div>
         <div class="game-option-item" id="start-auto-chess-btn">
-            <div class="icon-bg"><img src="https://sharkpan.xyz/f/ad2VIY/icon-kfckfc.png" alt="自走棋"></div>
-            <span class="label">自走棋</span>
+            <div class="icon-bg"><img src="https://sharkpan.xyz/f/ad2VIY/icon-kfckfc.png" alt="五子棋"></div>
+            <span class="label">五子棋</span>
         </div>
 </div>
     </div>
@@ -8300,7 +8401,7 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
 
 // ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
 db.version(26).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
-    chats: '&id, isGroup, groupId, autoChessState',
+    chats: '&id, isGroup, groupId',
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
     globalSettings: '&id', 
@@ -9083,12 +9184,6 @@ async function loadAllDataFromDB() {
             console.log(`为角色 "${chat.name}" 迁移了旧的全局纪念日设置。`);
             db.chats.put(chat); // 别忘了存回数据库
         }
-
-                // ▼▼▼ 在这里粘贴 ▼▼▼
-        if (!chat.autoChessState) {
-            chat.autoChessState = JSON.parse(JSON.stringify(DEFAULT_AUTO_CHESS_STATE));
-        }
-        // ▲▲▲ 粘贴结束 ▲▲▲
         
         // --- 后续的其他兼容性代码保持不变 ---
         if (typeof chat.unreadCount === 'undefined') chat.unreadCount = 0;
@@ -11123,7 +11218,6 @@ ${chat.settings.aiPersona}
     -   **游戏开始**:仔细阅读系统提示,了解游戏名称、摇骰子结果以及谁先开始。
     -   **游戏进程**:根据你的人设和游戏进程,用普通的文本消息来提出问题(真心话)、下达指令(大冒险)或描述卡牌内容(情侣牌)。
     -   **需知**:所有游戏内容都由你和用户自由发挥,没有固定的题库。
-10. **【【【自走棋规则】】**: 当历史记录出现 \`[系统指令：...]\` 表明进入了“AI对战行棋”游戏时，你的主要任务是通过聊天与用户互动。当系统提示轮到你行动时，你【必须】先用 "text" 指令发表评论，然后紧接着返回一个 "auto_chess_roll" 指令来掷骰子。例如: \`[{"type": "text", "content": "轮到我了！看我的！"}, {"type": "auto_chess_roll", "dice": 6}]\`。当轮到用户行动时，你只需要发表评论即可。
 11. **【【【核心记忆与主动性铁律】】】**: 你必须像一个真正的人一样拥有记忆和主动性。
     - **主动记录**: 当对话中出现对你们有特殊意义的事件、达成新的约定或重要的日期时，你【必须主动】使用 \`create_calendar_event\` 指令来记录下来。
     - **主动约定**: 你可以主动提议一些未来的计划，并使用 \`create_countdown\` 指令来创建约定倒计时。
@@ -11164,7 +11258,6 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **【新】回应视频通话-接受**: \`{"type": "video_call_response", "decision": "accept"}\`
 - **【新】回应视频通话-拒绝**: \`{"type": "video_call_response", "decision": "reject"}\`
 - **发布说说**: \`{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}\`
--   **【【【全新】】】自走棋掷骰子**: \`{"type": "auto_chess_roll", "dice": (一个1到6的随机整数)}\`
 - **发布文字图**: \`{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}\`
 -   **【【【全新】】】发布可交互模块**: \`{"type": "qzone_post", "postType": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\` (这允许你在动态中发布一个和聊天时类似的、可交互的、视觉丰富的HTML模块,用于展示心情、小游戏或特殊事件。请遵守和聊天时一样的HTML模块生成规范。)
 - **评论动态**: \`{"type": "qzone_comment", "postId": 123, "commentText": "@作者名 这太有趣了!"}\`
@@ -11488,14 +11581,6 @@ if (chat.isGroup && !msgData.name) {
             const baseMessage = { role: 'assistant', senderName: msgData.name || chat.name, timestamp: messageTimestamp++ };
 
             switch (msgData.type) {
-
-                                // ▼▼▼ 在这里粘贴 ▼▼▼
-                case 'auto_chess_roll':
-                    if (autoChessState.isActive && autoChessState.activeChatId === chatId) {
-                        handleAiTurn(msgData.dice);
-                    }
-                    continue; // 这是一个游戏指令，处理完就继续循环
-                // ▲▲▲ 粘贴结束 ▲▲▲
 
                 case 'waimai_response':
                     const requestMessageIndex = chat.history.findIndex(m => m.timestamp === msgData.for_timestamp);
@@ -13299,363 +13384,455 @@ async function deleteGroup(groupId) {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
-// ▼▼▼ 【全新】将这【一整块】代码粘贴到JS功能函数定义区 ▼▼▼
+// ▼▼▼ 请将这【一整块】全新的五子棋游戏逻辑代码，粘贴到您的JS功能函数定义区 ▼▼▼
 
-// --- 1. 游戏状态和默认设置 ---
-let autoChessState = {};
+// --- 1. 五子棋游戏状态管理 ---
+let gomokuState = {};
 
-const DEFAULT_AUTO_CHESS_STATE = {
+const DEFAULT_GOMOKU_STATE = {
     isActive: false,
-    board: [],
-    playerPosition: 1,
-    aiPosition: 1,
-    playerStars: 0,
-    aiStars: 0,
-    currentPlayerTurn: 'user',
-    diceResult: 0,
-    isGameOver: false,
-    waitingForPunishmentResponse: false, // <-- 【全新添加】这个属性
-    specialEvents: {
-        punishmentTheme: "真心话大冒险", // 【核心修改】
-        event: [
-            "好运：天降鸿福，前进2格！",
-            "厄运：乐极生悲，后退1格。",
-            "机遇：获得一颗星星 ★",
-            "挑战：失去一颗星星 ★"
-        ]
-    }
+    isGameStarted: false,
+    boardState: [], // 15x15 的二维数组, 0: empty, 1: user, 2: ai
+    currentPlayer: 'user', // 'user' 或 'ai'
+    moveHistory: [], // 存储 {row, col, player}
+    winner: null,
+    turnTimerId: null,
+    turnTimeLeft: 30
 };
-// ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 用这个【全新版本】，完整替换旧的 BOARD_CONFIG 常量 ▼▼▼
-const BOARD_CONFIG = {
-    63: { type: 'end' },
-    4: { type: 'star' }, 13: { type: 'star' }, 20: { type: 'star' }, 28: { type: 'star' }, 30: { type: 'star' }, 34: { type: 'star' }, 42: { type: 'star' }, 43: { type: 'star' },
-    7: { type: 'bomb' }, 9: { type: 'bomb' }, 16: { type: 'bomb' }, 35: { type: 'bomb' }, 40: { type: 'bomb' }, 52: { type: 'bomb' }, 57: { type: 'bomb' },
-    11: { type: 'event' }, 17: { type: 'event' }, 21: { type: 'event' }, 38: { type: 'event' }, 45: { type: 'event' }, 55: { type: 'event' },
-    25: { type: 'pause' }, 39: { type: 'pause' }, 48: { type: 'pause' },
-    // 【核心修改】移除了 49 和 50 号的 swap 格
-    19: { type: 'back', steps: 2 }, 31: { type: 'back', steps: 3 },
-    // 【【【全新添加】】】在这里加入前进格
-    5: { type: 'forward', steps: 3 },
-    26: { type: 'forward', steps: 2 },
-    50: { type: 'forward', steps: 4 }
-};
-// ▲▲▲ 替换结束 ▲▲▲
-
-// ▼▼▼ 【核心重构】用这【一整块】代码，替换从 startAutoChessGame 到 saveAutoChessSettings 的所有旧函数 ▼▼▼
+// --- 2. 游戏核心功能函数 ---
 
 /**
- * 开始一局新的自走棋游戏
+ * 初始化并开始一局新的五子棋游戏
  */
-async function startAutoChessGame() {
+async function startGomokuGame() {
     if (!state.activeChatId) return;
-    closeGamePanel();
     const chat = state.chats[state.activeChatId];
     
-    autoChessState = JSON.parse(JSON.stringify(DEFAULT_AUTO_CHESS_STATE)); 
-    autoChessState.isActive = true;
-    autoChessState.activeChatId = chat.id; // 关联当前聊天
-
-    if (chat.settings.autoChessEvents) {
-        if (chat.settings.autoChessEvents.bomb) autoChessState.specialEvents.bomb = chat.settings.autoChessEvents.bomb;
-        if (chat.settings.autoChessEvents.event) autoChessState.specialEvents.event = chat.settings.autoChessEvents.event;
-    }
+    // 初始化游戏状态
+    gomokuState = JSON.parse(JSON.stringify(DEFAULT_GOMOKU_STATE));
+    gomokuState.isActive = true;
+    gomokuState.isGameStarted = true;
     
-    for (let i = 1; i <= 63; i++) {
-        autoChessState.board.push({ number: i, ...BOARD_CONFIG[i] });
-    }
-
-    document.getElementById('ac-user-avatar').src = chat.settings.myAvatar || defaultAvatar;
-    document.getElementById('ac-ai-avatar').src = chat.settings.aiAvatar || defaultAvatar;
-    document.getElementById('ac-user-name').textContent = chat.settings.myNickname || '我';
-    document.getElementById('ac-ai-name').textContent = chat.name;
-    document.getElementById('auto-chess-messages').innerHTML = '';
+    // 创建15x15的棋盘数据
+    gomokuState.boardState = Array(15).fill(null).map(() => Array(15).fill(0));
     
-    renderAutoChessBoard();
-    document.getElementById('roll-dice-btn').addEventListener('click', handlePlayerRollDice);
-    showScreen('auto-chess-screen');
-
-    chat.autoChessState = autoChessState;
-    await db.chats.put(chat);
+    // 隐藏开始按钮
+    document.getElementById('gomoku-start-overlay').classList.remove('visible');
     
-    addMessageToAutoChessChat('system', '游戏开始！请掷骰子。');
+    // 渲染棋盘
+    renderGomokuBoard();
+    
+    // 发送游戏开始的系统消息
+    addMessageToAutoChessChat('system', '游戏开始！你执白棋，请先落子。');
+    
+    // 启动第一回合的计时器
+    startTurnTimer();
 }
 
-// ▼▼▼ 【最终修复版】用这【一整块】代码，完整替换旧的 renderAutoChessBoard 函数 ▼▼▼
-
 /**
- * 【重构版】渲染整个棋盘和玩家状态
+ * 渲染五子棋棋盘和棋子
  */
-function renderAutoChessBoard() {
-    const gridEl = document.getElementById('auto-chess-grid');
-    gridEl.innerHTML = '';
+function renderGomokuBoard() {
+    const gridEl = document.getElementById('gomoku-grid');
+    gridEl.innerHTML = ''; // 清空棋盘
 
-    // 渲染格子
-    autoChessState.board.forEach(cellData => {
-        const cell = document.createElement('div');
-        cell.className = `chess-cell ${cellData.type || ''}`;
-        cell.id = `cell-${cellData.number}`;
-        
-        // 【【【核心修复就在这里！】】】
-        // 我们彻底移除了所有用于生成Emoji的 switch 语句。
-        // 现在，JS只会生成一个空的图标容器，剩下的工作完全交给CSS来完成。
-        cell.innerHTML = `
-            <span class="cell-number">${cellData.number}</span>
-            <span class="cell-icon"></span> 
-        `;
-        gridEl.appendChild(cell);
-    });
+    for (let r = 0; r < 15; r++) {
+        for (let c = 0; c < 15; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'gomoku-cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
 
-    // 渲染棋子 (这部分逻辑保持不变)
-    const userPawn = document.createElement('div');
-    userPawn.className = 'player-pawn user-pawn';
-    document.getElementById(`cell-${autoChessState.playerPosition}`).appendChild(userPawn);
-    
-    const aiPawn = document.createElement('div');
-    aiPawn.className = 'player-pawn ai-pawn';
-    document.getElementById(`cell-${autoChessState.aiPosition}`).appendChild(aiPawn);
-
-    // 更新玩家状态 (这部分逻辑保持不变)
-    document.getElementById('ac-user-stars').textContent = autoChessState.playerStars;
-    document.getElementById('ac-ai-stars').textContent = autoChessState.aiStars;
-    document.getElementById('roll-dice-btn').disabled = autoChessState.currentPlayerTurn !== 'user' || autoChessState.isGameOver;
-    document.getElementById('dice-result-display').textContent = autoChessState.diceResult > 0 ? autoChessState.diceResult : '';
-}
-
-// ▲▲▲ 替换结束 ▲▲▲
-
-/**
-     * 【全新重构版】触发AI在自走棋游戏中的思考和行动
-     * @param {string} triggeringEventDescription - 描述刚刚发生的、触发AI思考的事件
-     */
-    async function triggerAiInAutoChess(triggeringEventDescription) {
-        const chat = state.chats[state.activeChatId];
-        if (!chat) return;
-
-        const { proxyUrl, apiKey, model } = state.apiConfig;
-        const typingIndicator = document.getElementById('ac-typing-indicator');
-
-        typingIndicator.style.display = 'flex';
-
-        // 将触发事件作为一条隐藏的系统消息存入历史，以便AI理解上下文
-        const instructionMsg = { role: 'user', content: triggeringEventDescription, timestamp: Date.now(), isHidden: true };
-        chat.history.push(instructionMsg);
-        await db.chats.put(chat);
-        
-        const maxMemory = parseInt(chat.settings.maxMemory) || 10;
-        const historySlice = chat.history.slice(-maxMemory);
-
-        let worldBookContent = '';
-        if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
-            const linkedContents = chat.settings.linkedWorldBookIds.map(bookId => {
-                const worldBook = state.worldBooks.find(wb => wb.id === bookId);
-                return worldBook && worldBook.content ? `\n\n## 世界书: ${worldBook.name}\n${worldBook.content}` : '';
-            }).filter(Boolean).join('');
-            if (linkedContents) {
-                worldBookContent = `\n\n# 核心世界观设定 (你必须严格遵守)\n${linkedContents}\n`;
-            }
-        }
-        
-        // 【【【最终版AI核心指令 - V5 游戏逻辑强化版】】】
-        const gameSystemPrompt = `
-# 你的核心身份与任务
-你正在扮演角色 “${chat.name}”，你的首要任务是【通过玩“AI对战行棋”这个小游戏，与用户进行有趣、深入、符合人设的日常聊天】。游戏只是载体，自然的互动才是关键。
-
-# 你的角色设定 (必须严格遵守)
-${chat.settings.aiPersona}
-${worldBookContent}
-
-# 当前游戏状态 (这是你决策的重要依据)
-- **当前回合**: ${autoChessState.currentPlayerTurn === 'user' ? '用户回合' : '你的回合'}
-- **你的位置**: ${autoChessState.aiPosition}号格
-- **用户位置**: ${autoChessState.playerPosition}号格
-- **你的星星**: ${autoChessState.aiStars}颗
-- **用户星星**: ${autoChessState.playerStars}颗
-
-# 刚刚发生的事件 (这是你本次发言的直接原因)
-${triggeringEventDescription}
-
-# 【【【最高优先级：聊天风格与格式铁律】】】
-1.  **【核心任务】**: 你的回复【必须】结合【刚刚发生的事件】和【当前游戏状态】来展开。例如，如果用户领先，你可以表现出“不服气”；如果你踩了炸弹，你可以“抱怨”或“自嘲”。
-2.  **【多条短句】**: 你的回复【必须】被拆分成 3 到 5 条简短的、符合口语习惯的消息。每一句短消息都必须是一个独立的 \`{"type": "text", "content": "..."}\` JSON对象。
-3.  **【禁止“出戏”】**: 你是一个正在玩游戏的真实角色，绝对不要生成 "auto_chess_roll" 指令，也绝对不要催促用户或提及“系统提示”。系统会自动处理游戏流程。
-
-现在，请根据以上所有信息，继续这场有趣的对话。`;
-        
-        const messagesPayload = historySlice.map(msg => ({ role: msg.role, content: String(msg.content) }));
-
-        try {
-            let isGemini = proxyUrl === GEMINI_API_URL;
-            let geminiConfig = toGeminiRequestData(model, apiKey, gameSystemPrompt, messagesPayload, true);
-            const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) : await fetch(`${proxyUrl}/v1/chat/completions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({
-                    model: model,
-                    messages: [ { role: 'system', content: gameSystemPrompt }, ...messagesPayload ],
-                    temperature: 0.9,
-                    presence_penalty: 0.2 
-                })
-            });
-            if (!response.ok) throw new Error(`API请求失败: ${response.status} ${(await response.json()).error.message}`);
-            const data = await response.json();
-            const aiResponseContent = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-            const messagesArray = parseAiResponse(aiResponseContent);
-
-            typingIndicator.style.display = 'none';
-
-            // 1. AI先进行聊天
-            for (const msgData of messagesArray) {
-                if (msgData && msgData.type === 'text') {
-                    addMessageToAutoChessChat('assistant', msgData.content);
-                    await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 400));
-                }
+            // 标记星位
+            if ((r === 3 || r === 11) && (c === 3 || c === 11) || (r === 7 && c === 7)) {
+                cell.classList.add('star-point');
             }
             
-            // 2. 在AI聊完天后，检查当前游戏状态是否轮到AI行动
-            if (autoChessState.currentPlayerTurn === 'ai' && !autoChessState.isGameOver) {
-                await new Promise(resolve => setTimeout(resolve, 1000)); // 增加节奏感
-                await handleAiTurn(chat.name); // 调用由代码驱动的AI回合
+            // 放置棋子
+            if (gomokuState.boardState[r][c] !== 0) {
+                const piece = document.createElement('div');
+                piece.className = 'piece';
+                if (gomokuState.boardState[r][c] === 1) {
+                    piece.classList.add('white-piece'); // 用户是白棋
+                } else {
+                    piece.classList.add('black-piece'); // AI是黑棋
+                }
+                cell.appendChild(piece);
             }
+            gridEl.appendChild(cell);
+        }
+    }
+    
+    // 标记上一步落子
+    if (gomokuState.moveHistory.length > 0) {
+        const lastMove = gomokuState.moveHistory[gomokuState.moveHistory.length - 1];
+        const lastMoveCell = gridEl.querySelector(`.gomoku-cell[data-row='${lastMove.row}'][data-col='${lastMove.col}']`);
+        if (lastMoveCell) {
+            const marker = document.createElement('div');
+            marker.className = 'last-move-marker';
+            lastMoveCell.appendChild(marker);
+        }
+    }
+    
+    // 更新当前玩家高亮
+    document.querySelector('#gomoku-screen .player-card.user').classList.toggle('current-player', gomokuState.currentPlayer === 'user');
+    document.querySelector('#gomoku-screen .player-card.ai').classList.toggle('current-player', gomokuState.currentPlayer === 'ai');
+}
 
-        } catch (error) {
-            typingIndicator.style.display = 'none';
-            addMessageToAutoChessChat('system', `[AI出错了: ${error.message}]`);
-            autoChessState.currentPlayerTurn = 'user';
-            renderAutoChessBoard();
+/**
+ * 处理用户点击棋盘格子的事件
+ * @param {number} row - 点击的行
+ * @param {number} col - 点击的列
+ */
+async function handleCellClick(row, col) {
+    if (gomokuState.winner || gomokuState.currentPlayer !== 'user' || gomokuState.boardState[row][col] !== 0) {
+        return; // 游戏结束、不是你的回合、或该位置已有棋子
+    }
+
+    // 1. 玩家落子
+    gomokuState.boardState[row][col] = 1; // 1代表用户(白棋)
+    gomokuState.moveHistory.push({ row, col, player: 'user' });
+    
+    // 2. 重新渲染棋盘
+    renderGomokuBoard();
+    
+    // 3. 检查是否获胜
+    if (checkForWin(row, col)) {
+        endGomokuGame('user');
+        return;
+    }
+    
+    // 4. 切换回合
+    switchTurn();
+}
+
+/**
+ * 检查在(row, col)落子后是否产生胜利者
+ * @param {number} row - 刚落子的行
+ * @param {number} col - 刚落子的列
+ * @returns {boolean} - 是否胜利
+ */
+function checkForWin(row, col) {
+    const player = gomokuState.boardState[row][col];
+    if (player === 0) return false;
+
+    const directions = [
+        [1, 0],  // 水平
+        [0, 1],  // 垂直
+        [1, 1],  // 右下斜
+        [1, -1]  // 右上斜
+    ];
+
+    for (const [dr, dc] of directions) {
+        let count = 1;
+        // 向一个方向检查
+        for (let i = 1; i < 5; i++) {
+            const r = row + i * dr;
+            const c = col + i * dc;
+            if (r >= 0 && r < 15 && c >= 0 && c < 15 && gomokuState.boardState[r][c] === player) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        // 向相反方向检查
+        for (let i = 1; i < 5; i++) {
+            const r = row - i * dr;
+            const c = col - i * dc;
+            if (r >= 0 && r < 15 && c >= 0 && c < 15 && gomokuState.boardState[r][c] === player) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        if (count >= 5) return true;
+    }
+    return false;
+}
+
+
+/**
+ * 切换玩家回合
+ */
+function switchTurn() {
+    gomokuState.currentPlayer = gomokuState.currentPlayer === 'user' ? 'ai' : 'user';
+    startTurnTimer(); // 重置并启动新回合的计时器
+    
+    if (gomokuState.currentPlayer === 'ai') {
+        // 延迟一小段时间，模拟AI思考
+        setTimeout(handleAiTurn, 1000 + Math.random() * 1500);
+    }
+}
+
+/**
+ * 启动回合倒计时
+ */
+function startTurnTimer() {
+    if (gomokuState.turnTimerId) {
+        clearInterval(gomokuState.turnTimerId);
+    }
+    gomokuState.turnTimeLeft = 30;
+    const timerDisplay = document.getElementById('gomoku-timer-display');
+    timerDisplay.textContent = gomokuState.turnTimeLeft;
+    
+    gomokuState.turnTimerId = setInterval(() => {
+        gomokuState.turnTimeLeft--;
+        timerDisplay.textContent = gomokuState.turnTimeLeft;
+        if (gomokuState.turnTimeLeft <= 0) {
+            clearInterval(gomokuState.turnTimerId);
+            addMessageToAutoChessChat('system', `${gomokuState.currentPlayer === 'user' ? '你' : '对方'} 超时，回合自动跳过。`);
+            switchTurn();
+        }
+    }, 1000);
+}
+
+
+// ▼▼▼ 请用下面这【一整块全新的AI逻辑代码】，完整替换掉旧的 handleAiTurn 函数 ▼▼▼
+
+/**
+ * 【AI大脑 - 主函数】处理AI的回合逻辑 (V2 - 评分决策版)
+ * AI会评估所有可落子点，选择分数最高的点。
+ */
+async function handleAiTurn() {
+    if (gomokuState.winner || gomokuState.currentPlayer !== 'ai') return;
+    
+    // 模拟思考延迟
+    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1000));
+
+    let bestMove = { row: -1, col: -1 };
+    let maxScore = -1;
+
+    // 遍历棋盘上所有空点
+    for (let r = 0; r < 15; r++) {
+        for (let c = 0; c < 15; c++) {
+            if (gomokuState.boardState[r][c] === 0) {
+                // 计算在该点落子的分数
+                const score = calculateScoreForCell(r, c);
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestMove = { row: r, col: c };
+                }
+            }
         }
     }
 
-// ▲▲▲ 替换结束 ▲▲▲
-
-// ▼▼▼ 【修复版】用这个新版本完整替换旧的 handleAiTurn 函数 ▼▼▼
-
-/**
- * AI执行它的回合，骰子点数由代码生成
- * @param {string} aiName AI在当前语境下的名字
- */
-async function handleAiTurn(aiName) {
-    if (autoChessState.currentPlayerTurn !== 'ai' || autoChessState.isGameOver) return;
-
-    const diceRoll = Math.floor(Math.random() * 6) + 1;
-    autoChessState.diceResult = diceRoll;
-    document.getElementById('dice-result-display').textContent = diceRoll;
+    // AI落子
+    const { row, col } = bestMove;
+    gomokuState.boardState[row][col] = 2; // 2代表AI(黑棋)
+    gomokuState.moveHistory.push({ row, col, player: 'ai' });
     
-    addMessageToAutoChessChat('system', `${aiName} 掷出了 ${diceRoll} 点！`);
-
-    const newPosition = Math.min(63, autoChessState.aiPosition + diceRoll);
-    await movePawn('ai', autoChessState.aiPosition, newPosition);
-    autoChessState.aiPosition = newPosition;
-
-    // 【核心修复】这里调用了新版本的 handleCellEffect，不再有第三个参数
-    await handleCellEffect('ai', newPosition);
+    renderGomokuBoard();
+    
+    if (checkForWin(row, col)) {
+        endGomokuGame('ai');
+        return;
+    }
+    
+    switchTurn();
 }
 
-// ▲▲▲ 替换结束 ▲▲▲
+/**
+ * 【AI大脑 - 评估模块】计算在指定位置落子的总分
+ * 分数 = AI 在此落子的进攻分数 + 玩家在此落子的防守分数
+ * @param {number} row - 评估的行
+ * @param {number} col - 评估的列
+ * @returns {number} - 该位置的总分
+ */
+function calculateScoreForCell(row, col) {
+    // 1. 计算AI在此处落子的进攻分数
+    gomokuState.boardState[row][col] = 2; // 假设AI落子
+    const aiScore = evaluateAllDirections(row, col, 2);
+    
+    // 2. 计算玩家在此处落子的防守分数 (堵住玩家)
+    gomokuState.boardState[row][col] = 1; // 假设玩家落子
+    const userScore = evaluateAllDirections(row, col, 1);
+    
+    // 3. 恢复棋盘
+    gomokuState.boardState[row][col] = 0;
+    
+    // 返回总分，防守分权重略高，让AI更倾向于防守
+    return aiScore + userScore * 1.1;
+}
 
 /**
- * 动画化棋子移动
+ * 【AI大脑 - 核心算子】评估一个子在四个方向上形成的棋型并给出分数
+ * @param {number} row - 棋子行
+ * @param {number} col - 棋子列
+ * @param {number} player - 1 for user, 2 for AI
+ * @returns {number} - 该棋子在所有方向上的总分
  */
-function movePawn(player, from, to) {
-    return new Promise(resolve => {
-        const pawnSelector = player === 'user' ? '.user-pawn' : '.ai-pawn';
-        const pawn = document.querySelector(pawnSelector);
-        if (pawn) {
-            const newCell = document.getElementById(`cell-${to}`);
-            if (newCell) newCell.appendChild(pawn);
+function evaluateAllDirections(row, col, player) {
+    const scores = {
+        FIVE: 100000,      // 连五，必胜
+        LIVE_FOUR: 10000,  // 活四
+        DEAD_FOUR: 1000,   // 冲四
+        LIVE_THREE: 1000,  // 活三
+        DEAD_THREE: 100,   // 眠三
+        LIVE_TWO: 100,     // 活二
+        DEAD_TWO: 10,      // 眠二
+        LIVE_ONE: 10,      // 活一
+        DEAD_ONE: 1        // 眠一
+    };
+
+    let totalScore = 0;
+    const directions = [[1, 0], [0, 1], [1, 1], [1, -1]]; // 水平, 垂直, 右下斜, 右上斜
+
+    for (const [dr, dc] of directions) {
+        let consecutive = 1;
+        let openEnds = 0;
+
+        // 向正方向搜索
+        for (let i = 1; i < 5; i++) {
+            const r = row + i * dr;
+            const c = col + i * dc;
+            if (r >= 0 && r < 15 && c >= 0 && c < 15 && gomokuState.boardState[r][c] === player) {
+                consecutive++;
+            } else {
+                if (r >= 0 && r < 15 && c >= 0 && c < 15 && gomokuState.boardState[r][c] === 0) {
+                    openEnds++;
+                }
+                break;
+            }
         }
-        setTimeout(resolve, 300); 
-    });
+
+        // 向反方向搜索
+        for (let i = 1; i < 5; i++) {
+            const r = row - i * dr;
+            const c = col - i * dc;
+            if (r >= 0 && r < 15 && c >= 0 && c < 15 && gomokuState.boardState[r][c] === player) {
+                consecutive++;
+            } else {
+                if (r >= 0 && r < 15 && c >= 0 && c < 15 && gomokuState.boardState[r][c] === 0) {
+                    openEnds++;
+                }
+                break;
+            }
+        }
+        
+        if (consecutive >= 5) totalScore += scores.FIVE;
+        else if (consecutive === 4) {
+            totalScore += (openEnds === 2) ? scores.LIVE_FOUR : (openEnds === 1 ? scores.DEAD_FOUR : 0);
+        } else if (consecutive === 3) {
+            totalScore += (openEnds === 2) ? scores.LIVE_THREE : (openEnds === 1 ? scores.DEAD_THREE : 0);
+        } else if (consecutive === 2) {
+            totalScore += (openEnds === 2) ? scores.LIVE_TWO : (openEnds === 1 ? scores.DEAD_TWO : 0);
+        } else if (consecutive === 1) {
+            totalScore += (openEnds === 2) ? scores.LIVE_ONE : (openEnds === 1 ? scores.DEAD_ONE : 0);
+        }
+    }
+    return totalScore;
+}
+
+// ▲▲▲ 全新AI逻辑代码替换到此结束 ▲▲▲
+
+/**
+ * 悔棋操作
+ */
+async function handleUndo() {
+    if (gomokuState.moveHistory.length === 0 || gomokuState.winner) return;
+
+    // 允许悔掉最后一步棋
+    const lastMove = gomokuState.moveHistory.pop();
+    gomokuState.boardState[lastMove.row][lastMove.col] = 0;
+    
+    // 切换回上一步的玩家
+    gomokuState.currentPlayer = lastMove.player;
+    
+    renderGomokuBoard();
+    startTurnTimer(); // 重启计时器
+    addMessageToAutoChessChat('system', '悔棋成功！');
 }
 
 /**
- * 在游戏内聊天框添加消息
+ * 结束游戏
+ * @param {string|null} winner - 'user', 'ai', 或 null (平局)
  */
-function addMessageToAutoChessChat(role, text) {
-    const messagesEl = document.getElementById('auto-chess-messages');
-    const msgWrapper = document.createElement('div');
-    const bubble = document.createElement('div');
+function endGomokuGame(winner) {
+    clearInterval(gomokuState.turnTimerId);
+    gomokuState.winner = winner;
     
-    if (role === 'system') {
-        msgWrapper.className = 'message-wrapper system-pat';
-        bubble.className = 'message-bubble system-bubble';
-        bubble.textContent = text;
+    let message = '';
+    if (winner === 'user') {
+        message = '恭喜你，你赢了！';
+    } else if (winner === 'ai') {
+        message = '真遗憾，你输了。';
     } else {
-        msgWrapper.className = `message-wrapper ${role === 'user' ? 'user' : 'ai'}`;
-        bubble.className = `message-bubble ${role === 'user' ? 'user' : 'ai'}`;
-        const chat = state.chats[state.activeChatId];
-        const avatarSrc = role === 'user' ? (chat.settings.myAvatar || defaultAvatar) : (chat.settings.aiAvatar || defaultAvatar);
-        // 【修复】使用正确的头像框包裹
-        bubble.innerHTML = `
-            <div class="avatar-frame-wrapper">
-                <img src="${avatarSrc}" class="avatar-img">
-            </div>
-            <div class="content">${text}</div>
-        `;
+        message = '平局！';
     }
     
-    msgWrapper.appendChild(bubble);
-    messagesEl.appendChild(msgWrapper);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    setTimeout(async () => {
+        await showCustomAlert('游戏结束', message);
+        document.getElementById('gomoku-start-overlay').classList.add('visible'); // 显示重新开始按钮
+    }, 500);
 }
 
-// ▼▼▼ 用这个【新版本】替换旧的 openAutoChessSettings 函数 ▼▼▼
 /**
- * 打开自走棋设置模态框
+ * 处理拍一拍头像的互动
+ * @param {string} target - 'user' 或 'ai'
  */
-function openAutoChessSettings() {
+function handleAvatarPat(target) {
     const chat = state.chats[state.activeChatId];
-    // 【核心修改】读取惩罚主题
-    document.getElementById('ac-punishment-theme').value = chat.autoChessState.specialEvents.punishmentTheme || "真心话大冒险";
-    document.getElementById('ac-event-events').value = chat.autoChessState.specialEvents.event.join('\n');
-    document.getElementById('auto-chess-settings-modal').classList.add('visible');
+    const myNickname = chat.settings.myNickname || '我';
+    const aiName = chat.name;
+    
+    let patMessage = '';
+    if (target === 'ai') {
+        patMessage = `${myNickname} 拍了拍 ${aiName}`;
+    } else {
+        patMessage = `${aiName} 拍了拍 ${myNickname}`;
+    }
+    
+    addMessageToAutoChessChat('system', `[${patMessage}]`);
+
+    // 拍对方时，可以触发AI回应
+    if (target === 'ai') {
+        triggerAiInAutoChess(`[系统事件：你被用户拍了拍。]`);
+    }
 }
-// ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 用这个【新版本】替换旧的 saveAutoChessSettings 函数 ▼▼▼
-/**
- * 保存自走棋的自定义设置
- */
-async function saveAutoChessSettings() {
-    // 【核心修改】保存惩罚主题
-    const punishmentTheme = document.getElementById('ac-punishment-theme').value.trim();
-    const eventEvents = document.getElementById('ac-event-events').value.trim().split('\n').filter(Boolean);
-
-    if (punishmentTheme) autoChessState.specialEvents.punishmentTheme = punishmentTheme;
-    if (eventEvents.length > 0) autoChessState.specialEvents.event = eventEvents;
-
+// 这是一个新的触发AI思考的函数，专用于五子棋游戏
+async function triggerAiInAutoChess(triggeringEventDescription) {
+    // 这个函数基本可以复用您旧的 triggerAiInAutoChess, 但需要修改System Prompt
+    // 为简化起见，我们在这里只实现一个简单的版本
     const chat = state.chats[state.activeChatId];
-    chat.autoChessState = autoChessState;
-    await db.chats.put(chat);
-    
-    document.getElementById('auto-chess-settings-modal').classList.remove('visible');
-    alert('设置已保存！');
+    if (!chat) return;
+
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+    const typingIndicator = document.getElementById('ac-typing-indicator');
+    typingIndicator.style.display = 'flex';
+
+    // 简单的聊天触发
+    const simplePrompt = `你正在和用户玩五子棋。刚刚发生了事件: "${triggeringEventDescription}"。请根据你的人设(${chat.settings.aiPersona})对此发表一些评论。`;
+    const messagesForApi = [
+        { role: 'system', content: simplePrompt },
+        { role: 'user', content: triggeringEventDescription }
+    ];
+
+    try {
+        let isGemini = proxyUrl === GEMINI_API_URL;
+        let geminiConfig = toGeminiRequestData(model, apiKey, simplePrompt, messagesForApi, isGemini);
+        const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) : await fetch(`${proxyUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+            body: JSON.stringify({ model: model, messages: messagesForApi, temperature: 0.8 })
+        });
+
+        if (!response.ok) throw new Error((await response.json()).error.message);
+        
+        const data = await response.json();
+        const aiResponse = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+        addMessageToAutoChessChat('assistant', aiResponse);
+
+    } catch (error) {
+        addMessageToAutoChessChat('system', `[AI出错了: ${error.message}]`);
+    } finally {
+        typingIndicator.style.display = 'none';
+    }
 }
-// ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 【修复版】用这个新版本完整替换旧的 handlePlayerRollDice 函数 ▼▼▼
 
-/**
- * 玩家点击掷骰子
- */
-async function handlePlayerRollDice() {
-    if (autoChessState.currentPlayerTurn !== 'user' || autoChessState.isGameOver) return;
-
-    const diceRoll = Math.floor(Math.random() * 6) + 1;
-    autoChessState.diceResult = diceRoll;
-    document.getElementById('roll-dice-btn').disabled = true;
-    document.getElementById('dice-result-display').textContent = diceRoll;
-    
-    addMessageToAutoChessChat('system', `你掷出了 ${diceRoll} 点！`);
-
-    const newPosition = Math.min(63, autoChessState.playerPosition + diceRoll);
-    await movePawn('user', autoChessState.playerPosition, newPosition);
-    autoChessState.playerPosition = newPosition;
-
-    // 【核心修复】这里调用了新版本的 handleCellEffect，不再有第三个参数
-    await handleCellEffect('user', newPosition);
-}
+// ▲▲▲ 全新五子棋JS逻辑到此结束 ▲▲▲
 
 // ▲▲▲ 替换结束 ▲▲▲
 
@@ -16436,6 +16613,37 @@ function cancelReplyMode() {
 }
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
+
+/**
+ * 在游戏内聊天框添加消息
+ */
+function addMessageToAutoChessChat(role, text) {
+    const messagesEl = document.getElementById('auto-chess-messages');
+    const msgWrapper = document.createElement('div');
+    const bubble = document.createElement('div');
+    
+    if (role === 'system') {
+        msgWrapper.className = 'message-wrapper system-pat';
+        bubble.className = 'message-bubble system-bubble';
+        bubble.textContent = text;
+    } else {
+        msgWrapper.className = `message-wrapper ${role === 'user' ? 'user' : 'ai'}`;
+        bubble.className = `message-bubble ${role === 'user' ? 'user' : 'ai'}`;
+        const chat = state.chats[state.activeChatId];
+        const avatarSrc = role === 'user' ? (chat.settings.myAvatar || defaultAvatar) : (chat.settings.aiAvatar || defaultAvatar);
+        // 使用正确的头像框包裹
+        bubble.innerHTML = `
+            <div class="avatar-frame-wrapper">
+                <img src="${avatarSrc}" class="avatar-img">
+            </div>
+            <div class="content">${text}</div>
+        `;
+    }
+    
+    msgWrapper.appendChild(bubble);
+    messagesEl.appendChild(msgWrapper);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
 
 // ▼▼▼ 第4.2步:用这整块【全新重构版】代码,替换从 renderMemoriesScreen 到 handleAnniversaryAvatarUpload 的所有旧函数 ▼▼▼
 
@@ -19556,6 +19764,54 @@ document.querySelectorAll('input[name="visibility"]').forEach(radio => {
 });
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
 
+// ▼▼▼ 在 init() 的事件监听器区域，粘贴这整块全新的五子棋事件绑定代码 ▼▼▼
+
+// 游戏面板的五子棋启动按钮
+document.getElementById('start-auto-chess-btn').addEventListener('click', () => {
+    // 这个按钮现在负责打开五子棋屏幕，而不是直接开始游戏
+    closeGamePanel();
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+    
+    // 初始化UI，但不开始游戏
+    document.getElementById('gomoku-user-avatar').src = chat.settings.myAvatar || defaultAvatar;
+    document.getElementById('gomoku-ai-avatar').src = chat.settings.aiAvatar || defaultAvatar;
+    document.getElementById('gomoku-user-name').textContent = chat.settings.myNickname || '我';
+    document.getElementById('gomoku-ai-name').textContent = chat.name;
+    document.getElementById('gomoku-start-overlay').classList.add('visible'); // 确保开始按钮可见
+    document.getElementById('auto-chess-messages').innerHTML = ''; // 清空聊天记录
+
+    showScreen('gomoku-screen');
+});
+
+// 五子棋屏幕内的“开始游戏”按钮
+document.getElementById('gomoku-start-btn').addEventListener('click', startGomokuGame);
+
+// 返回按钮
+document.getElementById('gomoku-back-btn').addEventListener('click', () => {
+    // 退出游戏时，重置状态并返回聊天界面
+    if (gomokuState.turnTimerId) clearInterval(gomokuState.turnTimerId);
+    gomokuState = {};
+    openChat(state.activeChatId);
+});
+
+// 悔棋按钮
+document.getElementById('gomoku-undo-btn').addEventListener('click', handleUndo);
+
+// 棋盘点击事件 (使用事件委托)
+document.getElementById('gomoku-grid').addEventListener('click', (e) => {
+    const cell = e.target.closest('.gomoku-cell');
+    if (cell && cell.dataset.row && cell.dataset.col) {
+        handleCellClick(parseInt(cell.dataset.row), parseInt(cell.dataset.col));
+    }
+});
+
+// 拍一拍头像互动
+document.getElementById('gomoku-user-avatar').addEventListener('click', () => handleAvatarPat('user'));
+document.getElementById('gomoku-ai-avatar').addEventListener('click', () => handleAvatarPat('ai'));
+
+// ▲▲▲ 五子棋事件绑定结束 ▲▲▲
+
 // ▼▼▼ 请将这段【新代码】粘贴到 init() 的事件监听器区域末尾 ▼▼▼
 document.getElementById('manage-groups-btn').addEventListener('click', openGroupManager);
 document.getElementById('close-group-manager-btn').addEventListener('click', () => {
@@ -20339,65 +20595,27 @@ document.getElementById('close-cute-event-viewer-btn').addEventListener('click',
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 在 init() 的事件监听器区域末尾，粘贴这整块新代码 ▼▼▼
-
-// --- AI对战行棋 功能事件绑定 ---
-document.getElementById('start-auto-chess-btn').addEventListener('click', startAutoChessGame);
-
-document.getElementById('auto-chess-back-btn').addEventListener('click', async () => {
-    // 退出游戏时，保存状态并返回聊天界面
-    const chat = state.chats[state.activeChatId];
-    if (chat && autoChessState.isActive) {
-        chat.autoChessState.isActive = false; // 标记为非活动状态
-        await db.chats.put(chat);
-    }
-    openChat(state.activeChatId);
-});
-
-document.getElementById('auto-chess-rules-btn').addEventListener('click', () => {
-    document.getElementById('auto-chess-rules-modal').classList.add('visible');
-});
-document.getElementById('close-ac-rules-btn').addEventListener('click', () => {
-    document.getElementById('auto-chess-rules-modal').classList.remove('visible');
-});
-
-document.getElementById('auto-chess-settings-btn').addEventListener('click', openAutoChessSettings);
-document.getElementById('cancel-ac-settings-btn').addEventListener('click', () => {
-    document.getElementById('auto-chess-settings-modal').classList.remove('visible');
-});
-document.getElementById('save-ac-settings-btn').addEventListener('click', saveAutoChessSettings);
+// ▼▼▼ 【核心修复】为五子棋聊天界面的发送按钮绑定事件 ▼▼▼
 
 document.getElementById('auto-chess-send-btn').addEventListener('click', async () => {
     const input = document.getElementById('auto-chess-input');
     const text = input.value.trim();
-    if (!text || !state.activeChatId || !autoChessState.isActive) return;
+    
+    // 1. 检查输入是否为空
+    if (!text || !state.activeChatId || !gomokuState.isActive) return;
 
+    // 2. 将用户的消息添加到聊天框
     addMessageToAutoChessChat('user', text);
+    
+    // 3. 清空输入框
     input.value = '';
     
-    let eventDescriptionForAI;
-    const chat = state.chats[state.activeChatId];
-    const userName = chat.settings.myNickname || '我';
-    
-    if (autoChessState.waitingForPunishmentResponse) {
-        autoChessState.waitingForPunishmentResponse = false;
-        
-        // 当用户回应惩罚时，AI需要知道用户的具体回应
-        eventDescriptionForAI = `[系统事件：我(${chat.name}) 对你(${userName}) 进行了惩罚，你的回应是：“${text}”。现在轮到我行动了。]`;
-        
-        // 用户回应后，回合切换给AI
-        autoChessState.currentPlayerTurn = 'ai';
-        chat.autoChessState = autoChessState;
-        await db.chats.put(chat);
-        renderAutoChessBoard();
-
-    } else {
-        // 在普通情况下聊天
-        eventDescriptionForAI = `[系统事件：现在是你的回合。你在行动前，对我说了：“${text}”]`;
-    }
-    
+    // 4. 构建一个清晰的事件描述，触发AI回应
+    const eventDescriptionForAI = `[系统事件：用户在聊天框发送了消息：“${text}”]`;
     await triggerAiInAutoChess(eventDescriptionForAI);
 });
+
+// ▲▲▲ 修复代码粘贴结束 ▲▲▲
 
 // 在 init() 的事件监听区域添加
 document.getElementById('transfer-action-accept').addEventListener('click', () => handleUserTransferResponse('accepted'));
