@@ -7308,6 +7308,17 @@ input:checked + .slider:before {
             <div class="form-group" id="ai-persona-group"><label for="ai-persona">对方人设 (AI Persona)</label><textarea id="ai-persona" rows="3"></textarea></div><div class="form-group" id="ai-avatar-group"><label>对方头像</label><div class="avatar-upload"><div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
     <img id="ai-avatar-preview" class="avatar-img">
 </div><button onclick="document.getElementById('ai-avatar-input').click()">上传对方头像</button><button id="manage-ai-avatar-library-btn">管理头像库</button>
+<!-- ▼▼▼ 在 "ai-avatar-group" 的 div 之后，粘贴下面这段全新的HTML ▼▼▼ -->
+
+<div class="form-group" id="weather-settings-group">
+    <label>天气设置 (让AI感知环境)</label>
+    <input type="text" id="weather-city-name-input" placeholder="真实城市名 (如: beijing)">
+    <input type="text" id="weather-city-alias-input" placeholder="城市代称 (如: C市)">
+    <p style="font-size: 11px; color: #8a8a8a; margin-top: 5px;">
+        提示: AI会使用“城市代称”在聊天中提及天气。请使用城市拼音或英文名。
+    </p>
+</div>
+
 <input type="file" id="ai-avatar-input" accept="image/*"></div></div><div class="form-group" id="my-persona-group"><label for="my-persona">我的人设 (My Persona)</label><textarea id="my-persona" rows="3"></textarea></div><div class="form-group" id="my-avatar-group"><label>我的头像</label><div class="avatar-upload"><div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
     <img id="my-avatar-preview" class="avatar-img">
 </div><button onclick="document.getElementById('my-avatar-input').click()">上传我的头像</button><button id="open-persona-library-btn">预设</button><button id="open-avatar-frame-library-btn">头像框</button><input type="file" id="my-avatar-input" accept="image/*"></div></div><div class="form-group" id="group-members-group"><label>群成员人设</label><div id="group-members-settings"></div>
@@ -7543,6 +7554,8 @@ input:checked + .slider:before {
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 请将这段新HTML粘贴到所有模态框的末尾 ▼▼▼ -->
 <div id="post-actions-modal" class="modal">
@@ -8239,6 +8252,9 @@ if(Array.isArray(res) && res.length > 1) {
         // 1. 所有变量和常量定义
         // ===================================================================
 const db = new Dexie('GeminiChatDB');
+// ... 其他全局变量 ...
+let weatherCache = { data: null, timestamp: 0, city: '' }; // 用于缓存天气数据
+// ...
 let isStickerEditMode = false;
 let selectedStickers = new Set();
 let currentMemoriesViewChatId = null;
@@ -9172,6 +9188,10 @@ async function loadAllDataFromDB() {
     const oldGlobalAnniversaryDate = globalSettings ? globalSettings.anniversaryStartDate : null;
 
     state.chats = chatsArr.reduce((acc, chat) => {
+        if (!chat.history) {
+            console.warn(`为旧聊天 "${chat.name}" 初始化了 history 数组。`);
+            chat.history = [];
+        }
         // --- 下面是为所有旧数据进行兼容性补全的代码 ---
         if (!chat.settings) chat.settings = {};
         if (typeof chat.settings.anniversaryStartDate === 'undefined') {
@@ -11165,7 +11185,14 @@ messagesPayload = historySlice.map(msg => {
 }).filter(Boolean);
 // ▲▲▲ 替换结束 ▲▲▲
 
-        } else { // 【全新】在构建Prompt前,先准备好纪念日和日历的上下文
+// 【全新】在构建Prompt前,先准备好所有上下文信息
+} else {const weatherInfo = await getWeatherForChat(chat);
+let weatherContext = '';
+if (weatherInfo) {
+    const cityAlias = chat.settings.weatherCityAlias || chat.settings.weatherCityName;
+    weatherContext = `\n# 当前环境信息\n- **当前天气 (${cityAlias})**: ${weatherInfo}`;
+}
+     // 【全新】在构建Prompt前,先准备好纪念日和日历的上下文
     let anniversaryContext = '';
     // 【核心修正】这里的判断逻辑已更新为读取每个AI独立的纪念日设置
     if (chat.settings.anniversaryStartDate) {
@@ -11221,6 +11248,8 @@ ${chat.settings.aiPersona}
 11. **【【【核心记忆与主动性铁律】】】**: 你必须像一个真正的人一样拥有记忆和主动性。
     - **主动记录**: 当对话中出现对你们有特殊意义的事件、达成新的约定或重要的日期时，你【必须主动】使用 \`create_calendar_event\` 指令来记录下来。
     - **主动约定**: 你可以主动提议一些未来的计划，并使用 \`create_countdown\` 指令来创建约定倒计时。
+12.  **【【【全新】】】环境互动**: 你可以根据当前的天气信息,自然地开启话题或发表评论。例如,如果天气很好,可以提议“今天天气这么好,真想出去玩啊!”;如果下雨,可以关心对方“下雨了,你带伞了吗?”。
+
 # 【核心能力】生成可交互HTML模块
 - **功能说明**:每次回复请根据“正文剧情内容”,在正文任意位置,生成2个或以上的完整、美观、生动的 HTML 模块,用于模拟“行为 / 情绪 / 互动 / 视觉延展”等内容。
 - **插入方式**:模块应穿插在剧情段落间,可连续多段生成,也可分散插入。每个模块均为独立结构。
@@ -16092,6 +16121,69 @@ async function sendPoll() {
     document.getElementById('create-poll-modal').classList.remove('visible');
 }
 
+// ▼▼▼ 将这个【全新】的函数粘贴到JS功能函数定义区 ▼▼▼
+
+/**
+ * 【核心】获取指定聊天的天气信息,并进行缓存
+ * @param {object} chat - 聊天对象
+ * @returns {Promise<string|null>} - 格式化后的天气字符串或null
+ */
+async function getWeatherForChat(chat) {
+    // 1. 检查是否是单聊,并且设置了真实城市名
+    if (chat.isGroup || !chat.settings.weatherCityName) {
+        return null;
+    }
+
+    const realCity = chat.settings.weatherCityName.trim();
+    const now = Date.now();
+    const ONE_HOUR = 60 * 60 * 1000;
+
+    // 2. 检查缓存是否有效 (同一城市且未超过1小时)
+    if (weatherCache.city === realCity && (now - weatherCache.timestamp < ONE_HOUR)) {
+        console.log(`天气信息来自缓存: ${realCity}`);
+        return weatherCache.data;
+    }
+
+    // 3. 如果缓存无效,则调用API
+    console.log(`正在为城市 ${realCity} 查询实时天气...`);
+    try {
+        // 使用 wttr.in 的JSON API,无需Key
+        const response = await fetch(`https://wttr.in/${encodeURIComponent(realCity)}?format=j1`);
+        if (!response.ok) {
+            throw new Error(`天气服务器响应错误: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // 4. 解析并格式化天气数据
+        const current = data.current_condition[0];
+        const weatherDesc = current.weatherDesc[0].value;
+        const temp = current.temp_C;
+        const feelsLike = current.FeelsLikeC;
+        const weatherString = `${weatherDesc}, 温度 ${temp}°C, 体感温度 ${feelsLike}°C。`;
+
+        // 5. 更新缓存
+        weatherCache = {
+            data: weatherString,
+            timestamp: now,
+            city: realCity
+        };
+        
+        return weatherString;
+
+    } catch (error) {
+        console.error("查询天气失败:", error);
+        // 即使失败也缓存一个结果,防止短时间内重复请求失败的地址
+        weatherCache = {
+            data: "(天气查询失败)",
+            timestamp: now,
+            city: realCity
+        };
+        return weatherCache.data;
+    }
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
 // ▼▼▼ 用这个【已修复重复点击问题】的版本替换 handleUserVote 函数 ▼▼▼
 /**
  * 处理用户投票,并将事件作为隐藏消息存入历史记录
@@ -18200,6 +18292,8 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     document.getElementById('chat-settings-modal').classList.add('visible');
     // 【核心修改1】根据是否为群聊,显示或隐藏“好友分组”区域
     document.getElementById('assign-group-section').style.display = isGroup ? 'none' : 'block';
+    // 【核心新增】根据是否为单聊,显示或隐藏天气设置区域
+    document.getElementById('weather-settings-group').style.display = isGroup ? 'none' : 'block';
     
     // --- 加载表单数据 ---
     document.getElementById('chat-name-input').value = chat.name;
@@ -18257,6 +18351,10 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     } else {
         document.getElementById('ai-persona').value = chat.settings.aiPersona;
         document.getElementById('ai-avatar-preview').src = chat.settings.aiAvatar || defaultAvatar;
+
+        // 【核心新增】加载天气设置
+        document.getElementById('weather-city-name-input').value = chat.settings.weatherCityName || '';
+        document.getElementById('weather-city-alias-input').value = chat.settings.weatherCityAlias || '';
         
         // 【核心修改2】如果是单聊,就加载分组列表到下拉框
         const select = document.getElementById('assign-group-select');
@@ -18451,6 +18549,7 @@ function openMemberEditor(memberId) {
             document.getElementById('reset-theme-btn').addEventListener('click', () => { document.getElementById('theme-default').checked = true; });
             document.getElementById('cancel-chat-settings-btn').addEventListener('click', () => { chatSettingsModal.classList.remove('visible'); });
 
+// ▼▼▼ 用这段【已更新】的代码,完整替换旧的 save-chat-settings-btn 点击事件监听器 ▼▼▼
 document.getElementById('save-chat-settings-btn').addEventListener('click', async () => {
     if (!state.activeChatId) return;
     const chat = state.chats[state.activeChatId];
@@ -18459,13 +18558,11 @@ document.getElementById('save-chat-settings-btn').addEventListener('click', asyn
     chat.name = newName;
     const selectedThemeRadio = document.querySelector('input[name="theme-select"]:checked');
     chat.settings.theme = selectedThemeRadio ? selectedThemeRadio.value : 'default';
-
     chat.settings.fontSize = parseInt(document.getElementById('font-size-slider').value);
     chat.settings.customCss = document.getElementById('custom-css-input').value.trim();
-
     chat.settings.myPersona = document.getElementById('my-persona').value;
     chat.settings.myAvatar = document.getElementById('my-avatar-preview').src;
-const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container input.wb-book-checkbox:checked');
+    const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container input.wb-book-checkbox:checked');
     chat.settings.linkedWorldBookIds = Array.from(checkedBooks).map(cb => cb.value);
 
     if (chat.isGroup) {
@@ -18476,17 +18573,21 @@ const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container
         chat.settings.aiAvatar = document.getElementById('ai-avatar-preview').src;
         const selectedGroupId = document.getElementById('assign-group-select').value;
         chat.groupId = selectedGroupId ? parseInt(selectedGroupId) : null;
+        
+        // 【核心新增】保存天气设置
+        chat.settings.weatherCityName = document.getElementById('weather-city-name-input').value.trim();
+        chat.settings.weatherCityAlias = document.getElementById('weather-city-alias-input').value.trim();
     }
 
     chat.settings.maxMemory = parseInt(document.getElementById('max-memory').value) || 10;
     await db.chats.put(chat);
-
     applyScopedCss(chat.settings.customCss, '#chat-messages', 'custom-bubble-style');
     
     chatSettingsModal.classList.remove('visible');
     renderChatInterface(state.activeChatId);
     renderChatList();
 });
+// ▲▲▲ 替换结束 ▲▲▲
             document.getElementById('clear-chat-btn').addEventListener('click', async () => { if (!state.activeChatId) return; const chat = state.chats[state.activeChatId]; const confirmed = await showCustomConfirm('清空聊天记录', '此操作将永久删除此聊天的所有消息,无法恢复。确定要清空吗？', { confirmButtonClass: 'btn-danger' }); if (confirmed) { chat.history = []; await db.chats.put(chat); renderChatInterface(state.activeChatId); renderChatList(); chatSettingsModal.classList.remove('visible'); } });
             
             const setupFileUpload = (inputId, callback) => { document.getElementById(inputId).addEventListener('change', async (event) => { const file = event.target.files[0]; if (file) { const dataUrl = await new Promise((res, rej) => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.onerror = () => rej(reader.error); reader.readAsDataURL(file); }); callback(dataUrl); event.target.value = null; } }); };
