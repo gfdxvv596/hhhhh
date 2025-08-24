@@ -479,9 +479,32 @@ body.bordered-mode #status-bar {
         #typing-indicator { align-self: flex-start; display: none; margin: 0 10px 10px; color: var(--text-secondary); }
         #chat-input-area { flex-shrink: 0; padding: 8px; background-color: rgba(247, 247, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 5px; }
         #chat-input-main-row { display: flex; align-items: flex-end; gap: 8px; width: 100%; }
-        #chat-input { flex-grow: 1; border: none; padding: 10px 15px; border-radius: 20px; background-color: var(--secondary-bg); font-size: 16px; max-height: 100px; resize: none; }
-        .action-button { border: none; color: white; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; flex-shrink: 0; }
-        #send-btn { background-color: var(--accent-color); height: 40px; padding: 0 15px;}
+#chat-input {
+  width: 100%;
+  padding: 10px 15px;
+  padding-right: 45px; /* 语音按钮预留空间 */
+  border-radius: 20px;
+  border: none;
+  background-color: var(--secondary-bg);
+  font-size: 16px;
+  max-height: 100px;
+  resize: none;
+  /* --- 核心修正 --- */
+  min-height: 40px;      /* 设置一个与发送按钮等高的最小高度 */
+  box-sizing: border-box; /* 确保 padding 和 border 被计算在高度之内 */
+}        
+.action-button { border: none; color: white; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+#send-btn {
+  background-color: #f0f0f0; /* 1. 将背景色从主题蓝色改为浅灰色 */
+  /* 2. 移除了旧的 color 和 svg 样式,因为现在是图片了 */
+}
+
+/* 3. 【新增】为发送按钮内的图片设置合适的尺寸 */
+#send-btn img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain; /* 保证图标比例正确 */
+}        
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; }
         .modal.visible { display: flex; }
         .modal-content { width: 90%; max-height: 90%; background-color: white; border-radius: 15px; display: flex; flex-direction: column; }
@@ -5249,6 +5272,199 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ============================
+   🌀 聊天输入区 (融合版)
+   - 外层布局来自【段2】
+   - 内部细节来自【段1】
+   ============================ */
+
+/* 主容器 */
+#chat-input-area {
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  border-radius: 0;
+  padding: 0; /* 移除容器自身的内边距,确保其背景能撑满整个宽度 */
+
+}
+
+/* 输入行 */
+#chat-input-main-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+  background-color: rgba(247, 247, 247, 0.8);
+  padding: 8px 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  padding-left: calc(8px + env(safe-area-inset-left));
+  padding-right: calc(8px + env(safe-area-inset-right));
+  box-sizing: border-box;
+}
+
+/* 加号/关闭按钮 */
+#open-actions-btn {
+  width: 36px;
+  height: 36px;
+  padding: 6px; /* 调整内边距让图标居中 */
+  box-sizing: border-box; /* 确保内边距不影响总尺寸 */
+  background: none;
+  border: none;
+  cursor: pointer; /* 确保鼠标悬停时是小手形状 */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 【新增】为新图标图片设置样式 */
+#open-actions-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+#open-actions-btn.active {
+  transform: rotate(135deg); /* 优化版旋转 */
+}
+
+/* 输入框容器 */
+.input-wrapper {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+#chat-input {
+  width: 100%;
+  padding: 10px 15px;
+  padding-right: 45px; /* 语音按钮预留空间 */
+  border-radius: 20px;
+  border: none;
+  background-color: var(--secondary-bg);
+  font-size: 16px;
+  max-height: 100px;
+  resize: none;
+}
+
+/* 语音按钮 */
+#voice-message-btn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  z-index: 5;
+}
+#voice-message-btn img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 发送 & 等待按钮 */
+#wait-reply-btn,
+#send-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--secondary-bg);
+  border: none;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+#wait-reply-btn img {
+  height: 24px;
+  width: 24px;
+}
+#send-btn {
+  background-color: var(--accent-color);
+  color: white;
+}
+#send-btn svg {
+  stroke: white;
+}
+
+/* 底部功能面板 */
+#chat-actions-panel {
+  height: 0; /* 优化版的平滑展开 */
+  overflow: hidden;
+  transition: height 0.3s ease-in-out;
+  background-color: #f7f8fa;
+  padding-top: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+#phone-screen.dark-mode #chat-actions-panel {
+  background-color: #1c1c1e;
+}
+#chat-actions-panel.visible {
+  height: 220px;
+  padding-top: 20px;
+}
+
+/* 横向滚动容器 */
+.actions-panel-scroll-wrapper {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 15px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+.actions-panel-scroll-wrapper::-webkit-scrollbar {
+  display: none; 
+}
+
+/* 单页图标网格 */
+.actions-page {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 15px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* 功能图标 */
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.action-icon-bg {
+  width: 35px;
+  height: 35px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+#phone-screen.dark-mode .action-icon-bg {
+  background-color: #3e3e42;
+}
+.action-icon-bg img, .action-icon-bg svg {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  fill: currentColor;
+  stroke: currentColor;
+}
+.action-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 隐藏旧的顶部操作栏 */
+#chat-input-actions-top {
+  display: none !important;
+}
+
 /* === 【全新】夜间模式样式 === */
 
 /* 核心:当 #phone-screen 拥有 .dark-mode 类时,激活以下所有样式 */
@@ -6868,59 +7084,81 @@ input:checked + .slider:before {
     <!-- 聊天消息区域 (保持不变) -->
     <div id="chat-messages"><div id="typing-indicator">对方正在输入...</div></div>
 
-    <!-- 输入区域 (保持不变) -->
-    <div id="chat-input-area">
-<div id="reply-preview-bar">
-    <div class="reply-preview-content">
-        <div class="sender">回复 xxx:</div>
-        <div class="text">被引用的消息内容...</div>
-    </div>
-    <span id="cancel-reply-btn">×</span>
-</div>
-<!-- ▼▼▼ 从这里开始替换 ▼▼▼ -->
-<div id="chat-input-actions-top">
-    <button id="open-sticker-panel-btn" class="chat-action-icon-btn action-button" title="表情面板">
-        <img src="https://sharkpan.xyz/f/JZxJFg/%E5%9C%86%E6%B7%BB%E5%8A%A0.png" alt="表情面板">
-    </button>
-    <button id="send-photo-btn" class="chat-action-icon-btn action-button" title="发送照片">
-        <img src="https://sharkpan.xyz/f/OwdjUy/%E7%9B%B8%E6%9C%BA.png" alt="发送照片">
-    </button>
-    <button id="upload-image-btn" class="chat-action-icon-btn action-button" title="上传图片">
-        <img src="https://sharkpan.xyz/f/6mYgIa/%E5%9B%BE%E7%89%87%20%281%29.png" alt="上传图片">
-    </button>
-    <button id="transfer-btn" class="chat-action-icon-btn action-button" title="转账">
-        <img src="https://sharkpan.xyz/f/nQe7tl/%E9%92%B1%E5%8C%85.png" alt="转账">
-    </button>
-    <button id="voice-message-btn" class="chat-action-icon-btn action-button" title="发送语音">
-        <img src="https://sharkpan.xyz/f/mQGeuW/%E8%AF%AD%E9%9F%B3.png" alt="发送语音">
-    </button>
-    <button id="send-waimai-request-btn" class="chat-action-icon-btn action-button" title="发起外卖请求">
-        <img src="https://sharkpan.xyz/f/B7wWsa/%E8%AE%A2%E5%8D%95.png" alt="发起外卖请求">
-    </button>
-    <button id="video-call-btn" class="chat-action-icon-btn action-button" title="视频通话">
-        <img src="https://sharkpan.xyz/f/4mAqCj/%E6%91%84%E5%83%8F%E6%9C%BA.png" alt="视频通话">
-    </button>
-    <!-- 下面这两个图标您没有提供,暂时保留原样 -->
-    <button id="group-video-call-btn" class="chat-action-icon-btn action-button" title="群视频通话"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
-    <button id="send-poll-btn" class="chat-action-icon-btn action-button" title="发起投票"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h10"/><path d="M6 6h.01"/><path d="M8 12h10"/><path d="M6 12h.01"/><path d="M8 18h10"/><path d="M6 18h.01"/></svg></button>
-    <button id="share-link-btn" class="chat-action-icon-btn action-button" title="分享链接">
-        <img src="https://sharkpan.xyz/f/Nzx2Cv/%E8%BF%9E%E6%8E%A5.png" alt="分享链接">
-</button>
-<button id="open-game-panel-btn" class="chat-action-icon-btn action-button" title="游戏">
-    <img src="https://sharkpan.xyz/f/6mlKia/%E6%B8%B8%E6%88%8F%20%284%29.png" alt="游戏">
-</button>
-<button id="start-offline-mode-btn" class="chat-action-icon-btn action-button" title="线下模式">
-    <img src="https://i.postimg.cc/wvLQdKkB/Telegram_(Telegram).png" alt="线下模式">
-    </button>
-</div>
-<!-- ▲▲▲ 替换到这里结束 ▲▲▲ -->
-        <div id="chat-input-main-row">
-            <textarea id="chat-input" rows="1" placeholder="输入消息..."></textarea>
-            <div id="input-actions-wrapper">
-                <button id="wait-reply-btn" title="等待回复"><img src="https://i.postimg.cc/q72zq80N/ECE92-BBC-BE57-48-E9-BB2-C-345-B6019-C4-B2.png" alt="等待回复"></button>
-                <button id="send-btn" class="action-button">发送</button>
-            </div>
+<!-- ▼▼▼ 用下面这【一整块】全新的代码，完整替换掉旧的 id="chat-input-area" 及其所有内容 ▼▼▼ -->
+<div id="chat-input-area">
+    <!-- 回复预览栏 (保持不变) -->
+    <div id="reply-preview-bar">
+        <div class="reply-preview-content">
+            <div class="sender">回复 xxx:</div>
+            <div class="text">被引用的消息内容...</div>
         </div>
+        <span id="cancel-reply-btn">×</span>
+    </div>
+
+    <!-- 主输入行 (全新结构) -->
+    <div id="chat-input-main-row">
+        <!-- 1. 加号/关闭按钮 -->
+<!-- 1. 加号/关闭按钮 -->
+<button id="open-actions-btn" class="chat-action-icon-btn action-button">
+    <img src="https://sharkpan.xyz/f/Qr6Of6/%E5%A2%9E%E5%8A%A0.png" alt="打开操作面板">
+</button>        
+        <!-- 2. 输入框和语音按钮的容器 -->
+        <div class="input-wrapper">
+            <textarea id="chat-input" rows="1" placeholder="输入消息..."></textarea>
+            <!-- 语音按钮现在位于输入框内部 -->
+            <button id="voice-message-btn" class="chat-action-icon-btn action-button" title="发送语音">
+                <img src="https://sharkpan.xyz/f/mQGeuW/%E8%AF%AD%E9%9F%B3.png" alt="发送语音">
+            </button>
+        </div>
+        
+        <!-- 3. 等待回复和发送按钮 -->
+        <div id="input-actions-wrapper">
+            <button id="wait-reply-btn" title="等待回复"><img src="https://i.postimg.cc/q72zq80N/ECE92-BBC-BE57-48-E9-BB2-C-345-B6019-C4-B2.png" alt="等待回复"></button>
+<button id="send-btn" class="action-button"><img src="https://sharkpan.xyz/f/ZqlriW/%E5%8F%91%E9%80%81%202.png" alt="发送"></button>        </div>
+    </div>
+
+    <!-- 4. 【核心】可展开的功能面板 -->
+    <div id="chat-actions-panel">
+        <!-- JS会自动在这里生成可滑动的功能图标页面 -->
+    </div>
+
+    <!-- (保持不变) 这是原有的、隐藏的按钮容器，JS会读取它来生成新面板 -->
+    <div id="chat-input-actions-top" style="display: none !important;">
+        <!-- 单聊和群聊都显示的图标 -->
+        <button id="upload-image-btn" class="chat-action-icon-btn action-button" title="相册">
+            <img src="https://sharkpan.xyz/f/6mYgIa/%E5%9B%BE%E7%89%87%20%281%29.png" alt="相册">
+        </button>
+        <button id="send-photo-btn" class="chat-action-icon-btn action-button" title="拍摄">
+            <img src="https://sharkpan.xyz/f/OwdjUy/%E7%9B%B8%E6%9C%BA.png" alt="拍摄">
+        </button>
+        <button id="transfer-btn" class="chat-action-icon-btn action-button" title="转账/红包">
+            <img src="https://sharkpan.xyz/f/nQe7tl/%E9%92%B1%E5%8C%85.png" alt="转账/红包">
+        </button>
+        <button id="open-sticker-panel-btn" class="chat-action-icon-btn action-button" title="表情">
+            <img src="https://sharkpan.xyz/f/JZxJFg/%E5%9C%86%E6%B7%BB%E5%8A%A0.png" alt="表情">
+        </button>
+        <button id="send-waimai-request-btn" class="chat-action-icon-btn action-button" title="外卖">
+            <img src="https://sharkpan.xyz/f/B7wWsa/%E8%AE%A2%E5%8D%95.png" alt="外卖">
+        </button>
+        <button id="video-call-btn" class="chat-action-icon-btn action-button" title="视频通话">
+            <img src="https://sharkpan.xyz/f/4mAqCj/%E6%91%84%E5%83%8F%E6%9C%BA.png" alt="视频通话">
+        </button>
+        <button id="share-link-btn" class="chat-action-icon-btn action-button" title="链接">
+            <img src="https://sharkpan.xyz/f/Nzx2Cv/%E8%BF%9E%E6%8E%A5.png" alt="分享链接">
+        </button>
+        <button id="open-game-panel-btn" class="chat-action-icon-btn action-button" title="游戏">
+            <img src="https://sharkpan.xyz/f/6mlKia/%E6%B8%B8%E6%88%8F%20%284%29.png" alt="游戏">
+        </button>
+        <button id="start-offline-mode-btn" class="chat-action-icon-btn action-button" title="线下模式">
+            <img src="https://i.postimg.cc/wvLQdKkB/Telegram_(Telegram).png" alt="线下模式">
+        </button>
+
+        <!-- 仅群聊显示的图标 -->
+        <button id="group-video-call-btn" class="chat-action-icon-btn action-button" title="群视频"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
+        <button id="send-poll-btn" class="chat-action-icon-btn action-button" title="投票"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h10"/><path d="M6 6h.01"/><path d="M8 12h10"/><path d="M6 12h.01"/><path d="M8 18h10"/><path d="M6 18h.01"/></svg></button>
+    </div>
+</div>
+<!-- ▲▲▲ HTML 替换结束 ▲▲▲ -->
     </div>
 
 <!-- ▼▼▼ 在这里新增 ▼▼▼ -->
@@ -16184,6 +16422,61 @@ async function getWeatherForChat(chat) {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
+/**
+ * 【全新】根据隐藏的按钮列表，动态生成可滑动的功能面板
+ */
+function renderChatActionPanel() {
+    const panelContainer = document.getElementById('chat-actions-panel');
+    if (!panelContainer) return;
+
+    // 1. 创建横向滚动容器
+    const scrollWrapper = document.createElement('div');
+    scrollWrapper.className = 'actions-panel-scroll-wrapper';
+    
+    // 2. 从隐藏的原始容器中获取所有功能按钮
+    const sourceButtons = document.querySelectorAll('#chat-input-actions-top > button');
+    const buttons = Array.from(sourceButtons);
+
+    const ITEMS_PER_PAGE = 8;
+    let currentPage;
+
+    // 3. 遍历按钮，每8个为一页进行分组
+    buttons.forEach((btn, index) => {
+        if (index % ITEMS_PER_PAGE === 0) {
+            // 创建新的一页
+            currentPage = document.createElement('div');
+            currentPage.className = 'actions-page';
+            scrollWrapper.appendChild(currentPage);
+        }
+        
+        // 4. 为每个按钮创建一个新的、符合UI规范的DOM元素
+        const actionItem = document.createElement('div');
+        actionItem.className = 'action-item';
+        
+        // 提取图标和文字
+        const iconHtml = btn.innerHTML;
+        const labelText = btn.title;
+        
+        actionItem.innerHTML = `
+            <div class="action-icon-bg">${iconHtml}</div>
+            <div class="action-label">${labelText}</div>
+        `;
+        
+        // 5. 【核心】将原始按钮的点击事件绑定到新创建的图标上
+        actionItem.addEventListener('click', () => {
+            btn.click(); // 模拟点击原始按钮
+            // 点击后自动关闭面板
+            document.getElementById('open-actions-btn').click();
+        });
+        
+        currentPage.appendChild(actionItem);
+    });
+
+    // 6. 将生成好的滚动容器放入面板
+    panelContainer.innerHTML = ''; // 清空旧内容
+    panelContainer.appendChild(scrollWrapper);
+}
+
 // ▼▼▼ 用这个【已修复重复点击问题】的版本替换 handleUserVote 函数 ▼▼▼
 /**
  * 处理用户投票,并将事件作为隐藏消息存入历史记录
@@ -19424,6 +19717,36 @@ postsList.addEventListener('focusout', (e) => {
 });
 
 // ▲▲▲ 修复代码粘贴到此结束 ▲▲▲
+
+// ▼▼▼ 在 init() 函数的事件监听器区域，粘贴或替换为这段新代码 ▼▼▼
+
+// 渲染一次功能面板 (在页面加载时就准备好)
+renderChatActionPanel();
+
+const openActionsBtn = document.getElementById('open-actions-btn');
+const actionsPanel = document.getElementById('chat-actions-panel');
+const chatMessages = document.getElementById('chat-messages');
+
+openActionsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    actionsPanel.classList.toggle('visible');
+    openActionsBtn.classList.toggle('active');
+
+    // 重新计算并滚动到底部，以适应面板高度变化
+    setTimeout(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 300); // 延迟时间与CSS动画时间匹配
+});
+
+// 点击页面其他任何地方，如果面板是打开的，就关闭它
+window.addEventListener('click', (e) => {
+    if (actionsPanel.classList.contains('visible') && !actionsPanel.contains(e.target) && !openActionsBtn.contains(e.target)) {
+        actionsPanel.classList.remove('visible');
+        openActionsBtn.classList.remove('active');
+    }
+});
+
+// ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 第4.3步:在 init() 中,用这整块【最终版】代码,替换所有旧的纪念日/日历相关事件绑定 ▼▼▼
 // === 【全新】纪念日与日历功能事件绑定 (切换+直觉交互版) ===
