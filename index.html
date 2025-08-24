@@ -11698,13 +11698,6 @@ messagesPayload = historySlice.map(msg => {
 }).filter(Boolean);
 // ▲▲▲ 替换结束 ▲▲▲
 
-// 【全新】在构建Prompt前,先准备好所有上下文信息
-} else {const weatherInfo = await getWeatherForChat(chat);
-let weatherContext = '';
-if (weatherInfo) {
-    const cityAlias = chat.settings.weatherCityAlias || chat.settings.weatherCityName;
-    weatherContext = `\n# 当前环境信息\n- **当前天气 (${cityAlias})**: ${weatherInfo}`;
-}
      // 【全新】在构建Prompt前,先准备好纪念日和日历的上下文
     let anniversaryContext = '';
     // 【核心修正】这里的判断逻辑已更新为读取每个AI独立的纪念日设置
