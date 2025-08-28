@@ -3732,6 +3732,10 @@ input[type="color"]::-webkit-color-swatch {
     font-weight: 500;
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+/* 【最终修复】只在聊天界面隐藏状态栏 */
+#phone-screen:has(#chat-interface-screen.active) #status-bar {
+    display: none !important;
+}
 
 /* === 【新增】全屏聊天设置页面的内容区样式 === */
 #chat-settings-screen .form-container {
