@@ -8323,6 +8323,9 @@ input:checked + .slider:before {
         let state = { chats: {}, activeChatId: null, globalSettings: {}, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [], qzoneSettings: {}, activeAlbumId: null };
         // --- 修正结束 ---
 
+        let isAiGenerating = false; // 用于跟踪AI是否正在生成内容
+        let abortController = null; // 用于存储和调用fetch的中断控制器
+
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
             function toGeminiRequestData(model, apiKey, systemPrompt, messages, isGemini) {
         // 这个函数用于构建对 Gemini API 的请求
@@ -11136,6 +11139,10 @@ async function openChat(chatId) {
 // ▲▲▲ 替换结束 ▲▲▲
 
 async function triggerAiResponse() {
+// 【修改点1】在函数开始时，立即设置状态并更新UI
+    isAiGenerating = true;
+    abortController = new AbortController(); // 创建新的中断控制器
+    updateWaitButtonUI(true); // 更新按钮为“停止”状态
     if (!state.activeChatId) return;
     const chatId = state.activeChatId;
     const chat = state.chats[state.activeChatId];
@@ -11776,7 +11783,8 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
                         contents: contents,
                         generationConfig: { temperature: 0.8 },
                         systemInstruction: { parts: [{ "text": systemPrompt }] }
-                    })
+                    }),
+                signal: abortController.signal // <<<<<<< 添加这一行
                 });
             } else if (isLegacyGemini) {
                 const contents = formatMessagesForGemini(messagesPayload);
@@ -11787,7 +11795,8 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
                         contents: contents,
                         generationConfig: { temperature: 0.8 },
                         systemInstruction: { parts: [{ "text": systemPrompt }] }
-                    })
+                    }),
+                signal: abortController.signal // <<<<<<< 添加这一行
                 });
             } else { // OpenAI-compatible
                 response = await fetch(`${proxyUrl}/v1/chat/completions`, {
@@ -11798,7 +11807,8 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
                         messages: [{role: 'system', content: systemPrompt}, ...messagesPayload],
                         temperature: 0.8,
                         stream: false
-                    })
+                    }),
+                signal: abortController.signal // <<<<<<< 添加这一行
                 });
             }
             if (!response.ok) {
@@ -12621,6 +12631,17 @@ createMessageElement
         await db.chats.put(chat);
 
     } catch (error) {
+        // 【修改点3】捕获中断错误
+        if (error.name === 'AbortError') {
+            console.log('API请求被用户手动中断。');
+            const systemMessage = { role: 'system', type: 'pat_message', content: '[AI思考被打断]', timestamp: Date.now(), isHidden: true };
+            chat.history.push(systemMessage);
+            await db.chats.put(chat);
+            if (document.getElementById('chat-interface-screen').classList.contains('active') && state.activeChatId === chatId) {
+                appendMessage(systemMessage, chat);
+            }
+            return; // 中断后直接返回，不执行后续错误处理
+        }
         chat.history = chat.history.filter(msg => !msg.isTemporary);
         if (!chat.isGroup && chat.relationship?.status === 'pending_ai_approval') {
             chat.relationship.status = 'blocked_by_ai';
@@ -12639,6 +12660,10 @@ createMessageElement
             renderChatInterface(chatId);
         }
     } finally {
+        // 【修改点4】在 finally 块中重置状态并更新UI
+        isAiGenerating = false;
+        abortController = null;
+        updateWaitButtonUI(false);
         // ★★★★★【核心修改4:在 finally 块中统一隐藏所有类型的提示】★★★★★
         if (chat.isGroup) {
             if (typingIndicator) {
@@ -18206,6 +18231,26 @@ async function deleteCategory(categoryId) {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】更新等待/停止按钮UI的辅助函数 ▼▼▼
+function updateWaitButtonUI(isStopping) {
+    const waitBtn = document.getElementById('wait-reply-btn');
+    const waitBtnIcon = waitBtn.querySelector('img');
+    if (!waitBtn || !waitBtnIcon) return;
+
+    if (isStopping) {
+        // 切换到“停止”状态
+        waitBtn.classList.add('stop-generation-mode');
+        waitBtnIcon.src = 'https://i.postimg.cc/P5tW701z/image.png'; // 这是一个方形的停止图标
+        waitBtn.title = '停止生成';
+    } else {
+        // 恢复为“等待”状态
+        waitBtn.classList.remove('stop-generation-mode');
+        waitBtnIcon.src = 'https://i.postimg.cc/q72zq80N/ECE92-BBC-BE57-48-E9-BB2-C-345-B6019-C4-B2.png'; // 恢复为原来的等待图标
+        waitBtn.title = '等待回复';
+    }
+}
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
         // ===================================================================
         // 4. 初始化函数 init()
         // ===================================================================
@@ -18400,7 +18445,20 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     // --- 【核心修改】发送后,取消引用模式 ---
     cancelReplyMode(); 
 });
-            document.getElementById('wait-reply-btn').addEventListener('click', triggerAiResponse);
+            // ▼▼▼ 【功能升级】用这块代码替换旧的 wait-reply-btn 事件监听器 ▼▼▼
+document.getElementById('wait-reply-btn').addEventListener('click', () => {
+    if (isAiGenerating) {
+        // 如果AI正在生成，则执行“停止”逻辑
+        if (abortController) {
+            abortController.abort(); // 发出中断信号
+            console.log("已发送中断请求...");
+        }
+    } else {
+        // 如果AI未在生成，则执行“触发”逻辑
+        triggerAiResponse();
+    }
+});
+// ▲▲▲ 替换结束 ▲▲▲
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('send-btn').click(); } });
             chatInput.addEventListener('input', () => { chatInput.style.height = 'auto'; chatInput.style.height = (chatInput.scrollHeight) + 'px'; });
 
