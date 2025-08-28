@@ -4184,7 +4184,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 修复结束 ▲▲▲ */
 
-/* ▼▼▼ 【最终修复版 V2】聊天设置页面卡片式布局样式 ▼▼▼ */
+/* ▼▼▼ 【最终修复版 V5 - 恢复人设框/图标居中】聊天设置页面卡片式布局样式 ▼▼▼ */
 
 /* 1. 让设置屏幕成为一个能正确滚动的flex容器 (保持不变) */
 #chat-settings-screen {
@@ -4195,7 +4195,7 @@ input[type="color"]::-webkit-color-swatch {
     flex-shrink: 0; 
 }
 
-/* 2. 【核心修复】为form-container添加padding-top */
+/* 2. 让form-container填满剩余空间并启用滚动 (保持不变) */
 #chat-settings-screen .form-container {
     flex-grow: 1;
     overflow-y: auto;
@@ -4203,11 +4203,8 @@ input[type="color"]::-webkit-color-swatch {
     background-color: #f0f2f5;
     padding: 15px;
     gap: 15px;
-    
-    /* ▼▼▼ 唯一的、核心的修改就在这里 ▼▼▼ */
-    padding-top: 80px;  /* 把它从 15px 增加到 80px，为header留出空间 */
-    margin-top: -80px;  /* (可选但推荐) 使用负外边距技巧，让滚动条从header下方开始，视觉效果更好 */
-    /* ▲▲▲ 修改结束 ▲▲▲ */
+    padding-top: 80px;
+    margin-top: -80px;
 }
 #phone-screen.dark-mode #chat-settings-screen .form-container {
     background-color: #000000;
@@ -4232,8 +4229,8 @@ input[type="color"]::-webkit-color-swatch {
     margin-bottom: 20px;
 }
 .settings-card-header .avatar-frame-wrapper {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     flex-shrink: 0;
 }
 .settings-card-header .header-content-wrapper {
@@ -4249,7 +4246,24 @@ input[type="color"]::-webkit-color-swatch {
     margin-bottom: 8px;
 }
 
-/* 5. 底部危险操作按钮的容器 (保持不变) */
+/* 5. 【核心修复】为管理分组按钮添加专用样式，确保居中 */
+#manage-groups-btn {
+    flex-shrink: 0; /* 防止被压缩 */
+    width: 44px;
+    height: 44px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    /* 使用flex布局来完美居中内部的图标 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#phone-screen.dark-mode #manage-groups-btn {
+    background-color: #3e3e42;
+}
+
+/* 6. 底部危险操作按钮的容器 (保持不变) */
 .settings-footer-actions {
     display: flex;
     flex-direction: column;
@@ -5235,6 +5249,65 @@ input[type="color"]::-webkit-color-swatch {
     color: #ff3b30;
 }
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】壁纸库样式 ▼▼▼ */
+#wallpaper-grid {
+    display: grid;
+    /* ▼▼▼ 核心修改就在这里 ▼▼▼ */
+    grid-template-columns: repeat(3, 1fr); 
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+    gap: 15px;
+    padding: 15px;
+}
+
+.wallpaper-thumbnail-item {
+    position: relative;
+    aspect-ratio: 9 / 16; /* 模拟手机屏幕比例 */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.wallpaper-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.wallpaper-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0; /* 默认隐藏 */
+    transition: opacity 0.2s ease-in-out;
+}
+
+.wallpaper-thumbnail-item:hover .wallpaper-actions {
+    opacity: 1; /* 鼠标悬停时显示操作按钮 */
+}
+
+.wallpaper-action-btn {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.wallpaper-action-btn.delete {
+    background-color: rgba(255, 59, 48, 0.9);
+    color: white;
+}
+/* ▲▲▲ 壁纸库样式结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新】外观设置页面整合与美化样式 ▼▼▼ */
 
@@ -6991,6 +7064,43 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 替换区域结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 【全新】壁纸库屏幕 ▼▼▼ -->
+<div id="wallpaper-library-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" id="wallpaper-library-back-btn">‹</span>
+        <span>壁纸库</span>
+                <span class="action-btn" id="add-wallpapers-btn">
+            <img src="https://sharkpan.xyz/f/knAwH6/MaterialSymbolsLightImageArrowUpRounded.png" alt="添加壁纸" style="height: 28px;">
+        </span>
+    </div>
+    <div class="list-container" style="padding: 0;">
+        <div id="wallpaper-grid">
+            <!-- 壁纸缩略图将由JS动态生成在这里 -->
+        </div>
+    </div>
+    <!-- 隐藏的文件上传控件 -->
+    <input type="file" id="wallpaper-upload-input-library" accept="image/*" multiple hidden>
+</div>
+<!-- ▲▲▲ 壁纸库屏幕结束 ▲▲▲ -->
+
+
+<!-- ▼▼▼ 【全新】壁纸应用目标选择模态框 ▼▼▼ -->
+<div id="wallpaper-apply-modal" class="modal">
+    <div class="modal-content" style="width: 280px; height: auto;">
+        <div class="modal-header">
+            <span>要将壁纸应用到哪里？</span>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px; padding: 20px;">
+            <button id="apply-to-home-btn" class="form-button">主屏幕壁纸</button>
+            <button id="apply-to-chat-btn" class="form-button">当前聊天背景</button>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="apply-wallpaper-cancel-btn" style="width: 100%;">取消</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 模态框结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 【全新】游戏选择面板 (粘贴到 <body> 末尾) ▼▼▼ -->
 <div id="game-panel">
     <div class="game-panel-header">
@@ -7464,14 +7574,12 @@ input:checked + .slider:before {
 
 <!-- ▲▲▲ HTML 替换结束 ▲▲▲ -->
         <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
-
-        <!-- 2. 壁纸设置区域 -->
+        <!-- ▼▼▼ 【重构后】的壁纸设置区域 ▼▼▼ -->
         <div id="wallpaper-settings-section">
-            <label class="section-title">聊天壁纸</label>
-            <div id="wallpaper-preview">点击下方上传</div>
-            <button class="form-button" onclick="document.getElementById('wallpaper-upload-input').click();">上传壁纸</button>
-            <input type="file" id="wallpaper-upload-input" accept="image/*" hidden>
+            <label class="section-title">壁纸库</label>
+            <button class="form-button" id="manage-wallpaper-library-btn">管理壁纸库</button>
         </div>
+        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
         <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
 
@@ -7670,7 +7778,7 @@ input:checked + .slider:before {
     <!-- ▼▼▼ 【最终重构版】的 form-container ▼▼▼ -->
     <div class="form-container" id="chat-settings-form-container">
         
-        <!-- 卡片1: 对方信息 -->
+        <!-- ▼▼▼ 【最终修复版】对方信息卡片 ▼▼▼ -->
         <div class="settings-card" id="ai-settings-card">
             <div class="settings-card-header">
                 <div id="settings-ai-avatar-clickable" class="avatar-frame-wrapper" style="cursor: pointer;">
@@ -7678,14 +7786,14 @@ input:checked + .slider:before {
                     <img id="ai-avatar-frame-preview" class="avatar-frame-overlay">
                 </div>
                 <div class="header-content-wrapper">
-                    <!-- 【核心修改】使用新的可编辑文本块 -->
+                    <!-- 【核心修复1】恢复为可点击的文本块 -->
                     <div id="ai-name-display-block" class="editable-name-block">
                         <span class="label">备注名 / 群名</span>
                         <span id="ai-name-value" class="value"></span>
                     </div>
                 </div>
             </div>
-            <!-- 旧的输入框被隐藏，但ID保留，以防万一 -->
+            <!-- 【核心修复2】保留隐藏的输入框，用于弹窗交互 -->
             <div class="form-group" id="chat-name-group" style="display: none;">
                 <input type="text" id="chat-name-input">
             </div>
@@ -7705,7 +7813,10 @@ input:checked + .slider:before {
                 <label for="assign-group-select">好友分组</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <select id="assign-group-select" style="flex-grow: 1;"></select>
-                    <button id="manage-groups-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">管理分组</button>
+                    <!-- 我们保留图标按钮的HTML -->
+                    <span id="manage-groups-btn" class="action-btn" style="width: 44px; height: 44px; background-color: #e9ecef; border-radius: 8px;">
+                        <img src="https://sharkpan.xyz/f/jxWwf6/StreamlineUltimateHierarchy5Organize.png" alt="管理分组" style="height: 24px;">
+                    </span>
                 </div>
             </div>
 
@@ -7728,8 +7839,8 @@ input:checked + .slider:before {
                 <button id="manage-members-btn" class="form-button form-button-secondary" style="margin-top: 15px;">管理群成员</button>
             </div>
         </div>
-
-        <!-- 卡片2: 我的信息 -->
+        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<!-- ▼▼▼ 【最终布局修复版】我的信息卡片 ▼▼▼ -->
         <div class="settings-card" id="my-settings-card">
             <div class="settings-card-header">
                  <div id="settings-my-avatar-clickable" class="avatar-frame-wrapper" style="cursor: pointer;">
@@ -7737,21 +7848,21 @@ input:checked + .slider:before {
                     <img id="my-avatar-frame-preview" class="avatar-frame-overlay">
                 </div>
                 <div class="header-content-wrapper">
-                    <!-- 【核心修改】使用新的可编辑文本块 -->
-                    <div id="my-name-display-block" class="editable-name-block">
-                        <span id="my-name-label" class="label"></span>
-                        <span id="my-name-value" class="value"></span>
+                    <!-- 【核心修复1】将“我的群昵称”输入框放回到头部 -->
+                    <div class="form-group" id="my-group-nickname-group" style="display:none;">
+                        <label for="my-group-nickname-input">我的群昵称</label>
+                        <input type="text" id="my-group-nickname-input">
+                    </div>
+                    <!-- 【核心修复2】将“我的人设”输入框也放回到头部 -->
+                    <div class="form-group" id="my-persona-group">
+                        <label for="my-persona">我的人设 (My Persona)</label>
+                        <textarea id="my-persona" rows="3"></textarea>
                     </div>
                 </div>
             </div>
-            <!-- 隐藏旧的输入框 -->
-            <div class="form-group" id="my-group-nickname-group" style="display:none;">
-                <input type="text" id="my-group-nickname-input">
-            </div>
-            <div class="form-group" id="my-persona-group" style="display:none;">
-                <textarea id="my-persona" rows="3"></textarea>
-            </div>
+            <!-- 这个卡片的主体部分现在是空的，因为所有内容都移到了头部 -->
         </div>
+        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
         
         <!-- 卡片3: 外观与杂项 -->
         <div class="settings-card" id="appearance-settings-card">
@@ -7779,22 +7890,23 @@ input:checked + .slider:before {
                 <input type="range" id="font-size-slider" min="12" max="20" step="1" value="13" style="width: 100%; margin-top: 8px;">
             </div>
 
+                        <!-- ▼▼▼ 【重构后】的聊天背景设置 ▼▼▼ -->
             <div class="form-group">
                 <label>聊天背景</label>
-                <div class="bg-upload-container">
-                    <button type="button" class="form-button-secondary" style="width: auto; padding: 8px 12px; margin-top: 0;" onclick="document.getElementById('bg-input').click()">上传背景图</button>
-                    <button type="button" id="remove-bg-btn">移除背景</button>
-                </div>
+                <!-- 旧的上传控件被替换为一个统一的入口按钮 -->
+                <button id="open-wallpaper-library-from-chat-btn" class="form-button form-button-secondary" style="margin-top: 0;">从壁纸库选择或上传</button>
+            </div>
+            <!-- ▲▲▲ 替换结束 ▲▲▲ -->
                 <img id="bg-preview" class="bg-preview-img">
                 <input type="file" id="bg-input" accept="image/*" style="display: none;">
             </div>
-        </div>
 
-        <!-- 底部按钮区 -->
+        <!-- ▼▼▼ 【核心修复】将底部按钮区移动到这里，即 form-container 的内部 ▼▼▼ -->
         <div class="settings-footer-actions">
             <button class="form-button form-button-secondary" id="clear-chat-btn">清空聊天记录</button>
             <button class="form-button form-button-secondary danger" id="block-chat-btn">拉黑对方</button>
         </div>
+        <!-- ▲▲▲ 修复结束 ▲▲▲ -->
 
     </div>
     <!-- ▲▲▲ 重构结束 ▲▲▲ -->
@@ -7822,17 +7934,18 @@ input:checked + .slider:before {
         </div>
     </div>
   
-    <!-- ▼▼▼ 请将这段新代码粘贴到“备注名”输入框的 form-group 之后 ▼▼▼ -->
-    <div class="form-group" id="assign-group-section" style="display: none;"> <!-- 默认隐藏,只对单聊显示 -->
-        <label for="assign-group-select">好友分组</label>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <select id="assign-group-select" style="flex-grow: 1;">
-                <!-- 分组选项将由JS动态生成 -->
-            </select>
-            <button id="manage-groups-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">管理分组</button>
-        </div>
-    </div>
-    <!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
+<!-- ▼▼▼ 【核心修改2】管理分组按钮已替换为图标 ▼▼▼ -->
+            <div class="form-group" id="assign-group-section" style="display: none;">
+                <label for="assign-group-select">好友分组</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <select id="assign-group-select" style="flex-grow: 1;"></select>
+                    <!-- 将<button>替换为<span>包裹的<img> -->
+                    <span id="manage-groups-btn" class="action-btn" style="width: 44px; height: 44px; background-color: #e9ecef; border-radius: 8px;">
+                        <img src="https://sharkpan.xyz/f/jxWwf6/StreamlineUltimateHierarchy5Organize.png" alt="管理分组" style="height: 24px;">
+                    </span>
+                </div>
+            </div>
+            <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
 <div class="form-group" id="my-group-nickname-group"><label for="my-group-nickname-input">我的群昵称</label><input type="text" id="my-group-nickname-input"></div><div class="form-group" id="group-avatar-group"><label>群头像</label><div class="avatar-upload"><img id="group-avatar-preview"><button onclick="document.getElementById('group-avatar-input').click()">上传群头像</button><input type="file" id="group-avatar-input" accept="image/*"></div></div>
             <div class="form-group" id="world-book-link-group">
@@ -8579,6 +8692,7 @@ input:checked + .slider:before {
 
         let isAiGenerating = false; // 用于跟踪AI是否正在生成内容
 let avatarEditorContext = { target: null, newAvatarSrc: null, newFrameSrc: null };
+let wallpaperLibraryContext = { from: null, activeChatId: null }; // 用于记录壁纸库的打开来源
         let canRegenerate = false; // 用于跟踪是否可以执行“重新生成”操作
         let abortController = null; // 用于存储和调用fetch的中断控制器
 
@@ -8982,7 +9096,7 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // ===================================================================
 
 // ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
-db.version(26).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
+db.version(27).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
     chats: '&id, isGroup, groupId',
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
@@ -9003,7 +9117,8 @@ db.version(26).stores({ // <-- Increment the version number by 1 (e.g., from 23 
     customThemes: '&id, name',
     customBubbleThemes: '&id, name',// <-- 【全新添加】这张表用来存储自定义气泡主题
     avatarFrames: '&id, name, url', // <-- 【全新添加】这张表用来存储头像框
-    calendarEvents: '++id, [chatId+date], createdBy'// <-- 【全新添加】这张表用来存储日历事件
+    calendarEvents: '++id, [chatId+date], createdBy',// <-- 【全新添加】这张表用来存储日历事件
+    wallpapers: '&id' // <-- 【全新添加】这张表用来存储壁纸库
 });
 // ▲▲▲ Modification Ends ▲▲▲
 
@@ -10435,34 +10550,34 @@ async function saveCurrentTheme() {
     alert('主题保存成功!');
 }
 
-/**
- * 【全新重构版】渲染整个外观设置页面
- */
+// ▼▼▼ 【全新重构版】渲染整个外观设置页面 ▼▼▼
 function renderWallpaperScreen() { 
     const settings = state.globalSettings;
     
-    // 1. 【核心修改】初始化全局CSS文本框
+    // 1. 初始化全局CSS文本框 (保持不变)
     document.getElementById('global-custom-css-input').value = settings.globalCustomCss || '';
     
-    // 2. 初始化壁纸预览 (逻辑不变)
-    const preview = document.getElementById('wallpaper-preview'); 
-    const bg = newWallpaperBase64 || settings.wallpaper; 
-    if (bg && bg.startsWith('data:image')) { 
-        preview.style.backgroundImage = `url(${bg})`; 
-        preview.textContent = ''; 
-    } else if(bg) { 
-        preview.style.backgroundImage = bg; 
-        preview.textContent = '当前为渐变色'; 
-    }
+    // 2. 【核心修复】移除所有对旧预览框的操作
+    // const preview = document.getElementById('wallpaper-preview'); 
+    // const bg = newWallpaperBase64 || settings.wallpaper; 
+    // if (bg && bg.startsWith('data:image')) { 
+    //     preview.style.backgroundImage = `url(${bg})`; 
+    //     preview.textContent = ''; 
+    // } else if(bg) { 
+    //     preview.style.backgroundImage = bg; 
+    //     preview.textContent = '当前为渐变色'; 
+    // }
 
     // 3. 初始化图标和开关 (逻辑不变)
     renderIconSettings();
     document.getElementById('border-toggle-switch').checked = (settings.borderMode === 'bordered');
-    document.getElementById('theme-toggle-switch').checked = document.body.classList.contains('dark-mode');
+    // 【修正】确保夜间模式开关状态正确同步
+    document.getElementById('theme-toggle-switch').checked = document.getElementById('phone-screen').classList.contains('dark-mode');
     
     // 4. 渲染已保存的主题列表 (逻辑不变)
     renderSavedThemes();
 }
+// ▲▲▲ 重构结束 ▲▲▲
 
     // 【全新】同步边框开关的状态
     document.getElementById('border-toggle-switch').checked = (state.globalSettings.borderMode === 'bordered');
@@ -13426,6 +13541,107 @@ async function startGame(gameType) {
     if (nextTurn === 'ai' || nextTurn === 'none') {
         triggerAiResponse();
     }
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】壁纸库核心功能函数 ▼▼▼
+// ▼▼▼ 【升级版】打开壁纸库屏幕，并记录来源 ▼▼▼
+function openWallpaperLibrary(context = { from: 'global' }) {
+    wallpaperLibraryContext = context; // 记录打开壁纸库的意图
+    renderWallpaperLibrary();
+    showScreen('wallpaper-library-screen');
+}
+// ▲▲▲ 替换结束 ▲▲▲
+/**
+ * 渲染壁纸库中的所有壁纸
+ */
+async function renderWallpaperLibrary() {
+    const grid = document.getElementById('wallpaper-grid');
+    grid.innerHTML = '';
+    const wallpapers = await db.wallpapers.orderBy('id').reverse().toArray();
+
+    if (wallpapers.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); margin-top: 50px;">壁纸库是空的, 点击右上角“添加”上传吧!</p>';
+        return;
+    }
+
+    wallpapers.forEach(wallpaper => {
+        const item = document.createElement('div');
+        item.className = 'wallpaper-thumbnail-item';
+        item.innerHTML = `
+            <img src="${wallpaper.url}" class="wallpaper-preview-img">
+            <div class="wallpaper-actions">
+                <button class="wallpaper-action-btn apply" data-url="${wallpaper.url}">应用</button>
+                <button class="wallpaper-action-btn delete" data-id="${wallpaper.id}">删除</button>
+            </div>
+        `;
+        grid.appendChild(item);
+    });
+}
+
+// ▼▼▼ 【最终精简版】只负责触发文件选择 ▼▼▼
+async function addWallpapers() {
+    document.getElementById('wallpaper-upload-input-library').click();
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+/**
+ * 删除壁纸库中的一张壁纸
+ * @param {string} wallpaperId - 要删除的壁纸的ID
+ */
+async function deleteWallpaper(wallpaperId) {
+    const confirmed = await showCustomConfirm('删除壁纸', '确定要永久删除这张壁纸吗？此操作不可恢复。', { confirmButtonClass: 'btn-danger' });
+    if (confirmed) {
+        await db.wallpapers.delete(wallpaperId);
+        await renderWallpaperLibrary(); // 刷新视图
+    }
+}
+
+// ▼▼▼ 【智能版】根据上下文决定如何应用壁纸 ▼▼▼
+function promptWallpaperApplyTarget(wallpaperUrl) {
+    // 检查上下文
+    if (wallpaperLibraryContext.from === 'chat' && wallpaperLibraryContext.activeChatId) {
+        // 如果是从聊天设置打开的，直接应用为聊天背景
+        applyWallpaper('chat', wallpaperUrl);
+    } else {
+        // 否则（从全局外观设置打开），弹出选择模态框
+        const modal = document.getElementById('wallpaper-apply-modal');
+        modal.dataset.url = wallpaperUrl;
+        modal.classList.add('visible');
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【升级版】将壁纸应用到指定目标 ▼▼▼
+async function applyWallpaper(target, url = null) {
+    const modal = document.getElementById('wallpaper-apply-modal');
+    // 如果没有直接传入URL，就从模态框获取
+    const wallpaperUrl = url || modal.dataset.url;
+    if (!wallpaperUrl) return;
+
+    if (target === 'home') {
+        state.globalSettings.wallpaper = wallpaperUrl;
+        await db.globalSettings.put(state.globalSettings);
+        applyGlobalWallpaper();
+        alert('主屏幕壁纸已更换!');
+        // 应用后返回壁纸库
+        showScreen('wallpaper-library-screen');
+    } else if (target === 'chat') {
+        // 【核心】从上下文中获取正确的chatId
+        const chatId = wallpaperLibraryContext.activeChatId;
+        if (!chatId) {
+            alert('无法确定要为哪个聊天设置背景。');
+            return;
+        }
+        const chat = state.chats[chatId];
+        chat.settings.background = wallpaperUrl;
+        await db.chats.put(chat);
+        // 应用后返回聊天设置界面
+        showScreen('chat-settings-screen');
+        alert(`与“${chat.name}”的聊天背景已更换!`);
+    }
+    
+    modal.classList.remove('visible');
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
@@ -18657,7 +18873,7 @@ function updateWaitButtonUI(isStopping) {
     if (isStopping) {
         // 切换到“停止”状态
         waitBtn.classList.add('stop-generation-mode');
-        waitBtnIcon.src = 'https://i.postimg.cc/P5tW701z/image.png'; // 这是一个方形的停止图标
+        waitBtnIcon.src = 'https://sharkpan.xyz/f/5y67ij/MaterialSymbolsPauseCircleOutlineRounded.png'; // 这是一个方形的停止图标
         waitBtn.title = '停止生成';
     } else {
         // 恢复为“等待”状态
@@ -18849,43 +19065,50 @@ window.addEventListener('click', (e) => {
             audioPlayer.addEventListener('play', () => { if(musicState.isActive) { musicState.isPlaying = true; updatePlayerUI(); } });
 
             const chatInput = document.getElementById('chat-input');
-// ▼▼▼ 【功能升级】用这整块代码替换旧的 'send-btn' 事件监听器 ▼▼▼
+// ▼▼▼ 【最终修复版 V3 - 智能删除】'send-btn' 事件监听器 ▼▼▼
 document.getElementById('send-btn').addEventListener('click', async () => {
     const chatInput = document.getElementById('chat-input');
     const content = chatInput.value.trim();
     
-    // 【核心判断】
     if (canRegenerate && content === '') {
         // --- 执行“重新生成”逻辑 ---
         console.log("重新生成功能已触发。");
         canRegenerate = false;
-        updateSendButtonUI('send'); // 立刻恢复按钮状态
+        updateSendButtonUI('send'); 
 
         const chat = state.chats[state.activeChatId];
         if (!chat) return;
 
-        // 找到AI上一次回复的第一条消息的索引
-        const lastUserOrSystemMessageIndex = chat.history.findLastIndex(msg => 
-            msg.role === 'user' || (msg.role === 'system' && !msg.isHidden)
-        );
-        
-        const firstAiResponseIndex = lastUserOrSystemMessageIndex + 1;
+        // ▼▼▼ 【核心修复】使用更智能的判断条件来删除AI的整轮回复 ▼▼▼
+        let i = chat.history.length - 1;
+        while (i >= 0) {
+            const message = chat.history[i];
+            
+            // 检查这条消息是否属于“AI的回合”
+            // 条件1: role 是 'assistant' (AI自己说的)
+            // 条件2: role 是 'system', 但不是 isHidden (系统替AI说的，且用户可见)
+            const isAiTurnMessage = message.role === 'assistant' || (message.role === 'system' && !message.isHidden);
 
-        // 从该索引开始，删除所有后续消息（即AI的整个回复）
-        if (firstAiResponseIndex < chat.history.length) {
-            chat.history.splice(firstAiResponseIndex);
+            if (isAiTurnMessage) {
+                chat.history.pop();
+                i--;
+            } else {
+                // 一旦遇到用户消息或隐藏的系统指令，就停止
+                break;
+            }
         }
+        // ▲▲▲ 修复结束 ▲▲▲
 
         await db.chats.put(chat);
-        renderChatInterface(state.activeChatId); // 刷新界面，移除旧回复
-        triggerAiResponse(); // 重新触发AI生成
+        renderChatInterface(state.activeChatId);
+        triggerAiResponse();
 
     } else {
         // --- 执行原有的“发送消息”逻辑 ---
         if (!content || !state.activeChatId) return;
         
         canRegenerate = false;
-        updateSendButtonUI('send'); // 确保按钮是“发送”状态
+        updateSendButtonUI('send'); 
 
         const chat = state.chats[state.activeChatId];
         const msg = {
@@ -18909,6 +19132,7 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     }
 });
 // ▲▲▲ 替换结束 ▲▲▲
+
             // ▼▼▼ 【功能升级】用这块代码替换旧的 wait-reply-btn 事件监听器 ▼▼▼
 document.getElementById('wait-reply-btn').addEventListener('click', () => {
     if (isAiGenerating) {
@@ -18937,7 +19161,6 @@ chatInput.addEventListener('input', () => {
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
-            document.getElementById('wallpaper-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if(file) { const dataUrl = await new Promise((res, rej) => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.onerror = () => rej(reader.error); reader.readAsDataURL(file); }); newWallpaperBase64 = dataUrl; renderWallpaperScreen(); } });
             // 【功能增强版】保存所有外观设置按钮
 document.getElementById('save-wallpaper-btn').addEventListener('click', async () => {
     // 1. 保存壁纸 (逻辑不变)
@@ -19095,34 +19318,26 @@ function updateWorldBookSelectionDisplay() { const checkedBoxes = worldBookCheck
             document.getElementById('world-book-checkboxes-container').addEventListener('change', updateWorldBookSelectionDisplay);
             window.addEventListener('click', (e) => { if (!document.querySelector('.custom-multiselect').contains(e.target)) { worldBookCheckboxesContainer.classList.remove('visible'); worldBookSelectBox.classList.remove('expanded'); } });
 
-// ▼▼▼ 【最终重构版】'chat-settings-btn' 事件监听器 ▼▼▼
+// ▼▼▼ 【最终修复版】'chat-settings-btn' 事件监听器 ▼▼▼
 document.getElementById('chat-settings-btn').addEventListener('click', async () => {
     if (!state.activeChatId) return;
     const chat = state.chats[state.activeChatId];
     const isGroup = chat.isGroup;
 
     // --- 显示/隐藏控件 ---
-    // (这部分逻辑保持不变)
     document.getElementById('my-group-nickname-group').style.display = isGroup ? 'block' : 'none';
+    document.getElementById('my-persona-group').style.display = isGroup ? 'none' : 'block';
     document.getElementById('group-avatar-group').style.display = isGroup ? 'block' : 'none';
     document.getElementById('group-members-group').style.display = isGroup ? 'block' : 'none';
     document.getElementById('ai-persona-group').style.display = isGroup ? 'none' : 'block';
     document.getElementById('assign-group-section').style.display = isGroup ? 'none' : 'block';
     
-    // --- 【核心修改】填充新的可编辑文本块 ---
+    // --- 【核心修复】为不同的UI控件分别填充数据 ---
+    // 1. 填充“对方姓名”的可点击文本块
     document.getElementById('ai-name-value').textContent = chat.name;
-    const myNameLabel = document.getElementById('my-name-label');
-    const myNameValue = document.getElementById('my-name-value');
-    if (isGroup) {
-        myNameLabel.textContent = '我的群昵称';
-        myNameValue.textContent = chat.settings.myNickname || '';
-    } else {
-        myNameLabel.textContent = '我的人设 (My Persona)';
-        myNameValue.textContent = chat.settings.myPersona || '';
-    }
-    
-    // --- 填充旧的、现在被隐藏的输入框（为了数据一致性） ---
+    // 2. 填充隐藏的输入框
     document.getElementById('chat-name-input').value = chat.name;
+    // 3. 填充“我的人设”和“我的群昵称”的直接输入框
     document.getElementById('my-persona').value = chat.settings.myPersona;
     if (isGroup) {
         document.getElementById('my-group-nickname-input').value = chat.settings.myNickname || '';
@@ -19136,6 +19351,7 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
         if (!myFrameOverlay) { myFrameOverlay = document.createElement('img'); myFrameOverlay.className = 'avatar-frame-overlay'; myAvatarPreviewWrapper.appendChild(myFrameOverlay); }
         myFrameOverlay.src = chat.settings.myAvatarFrame; myFrameOverlay.style.display = 'block';
     } else if (myFrameOverlay) { myFrameOverlay.style.display = 'none'; }
+    
     if (!isGroup) {
         const aiAvatarPreviewWrapper = document.getElementById('ai-avatar-preview').parentElement;
         aiAvatarPreviewWrapper.querySelector('.avatar-img').src = chat.settings.aiAvatar || defaultAvatar;
@@ -19144,12 +19360,15 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
             if (!aiFrameOverlay) { aiFrameOverlay = document.createElement('img'); aiFrameOverlay.className = 'avatar-frame-overlay'; aiAvatarPreviewWrapper.appendChild(aiFrameOverlay); }
             aiFrameOverlay.src = chat.settings.aiAvatarFrame; aiFrameOverlay.style.display = 'block';
         } else if (aiFrameOverlay) { aiFrameOverlay.style.display = 'none'; }
+        document.getElementById('ai-persona').value = chat.settings.aiPersona;
     }
+    
     document.getElementById('max-memory').value = chat.settings.maxMemory;
     const bgPreview = document.getElementById('bg-preview');
     const removeBgBtn = document.getElementById('remove-bg-btn');
     if (chat.settings.background) { bgPreview.src = chat.settings.background; bgPreview.style.display = 'block'; removeBgBtn.style.display = 'inline-block'; } 
     else { bgPreview.style.display = 'none'; removeBgBtn.style.display = 'none'; }
+
     if (isGroup) {
         document.getElementById('group-avatar-preview').src = chat.settings.groupAvatar || defaultGroupAvatar;
         renderGroupMemberSettings(chat.members);
@@ -19190,8 +19409,7 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     await renderSavedBubbleThemes();
     showScreen('chat-settings-screen'); 
 });
-
-// ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这整块新代码 ▼▼▼
+// ▼▼▼ 【最终修复版】恢复AI姓名块的点击事件 ▼▼▼
 
 // 为“对方姓名”可编辑块绑定点击事件
 document.getElementById('ai-name-display-block').addEventListener('click', async () => {
@@ -19205,30 +19423,8 @@ document.getElementById('ai-name-display-block').addEventListener('click', async
         document.getElementById('chat-name-input').value = newName.trim();
     }
 });
-
-// 为“我的姓名/人设”可编辑块绑定点击事件
-document.getElementById('my-name-display-block').addEventListener('click', async () => {
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
-
-    if (chat.isGroup) {
-        // 编辑我的群昵称
-        const newNickname = await showCustomPrompt('编辑我的群昵称', '请输入新的昵称', chat.settings.myNickname);
-        if (newNickname !== null) {
-            document.getElementById('my-name-value').textContent = newNickname.trim();
-            document.getElementById('my-group-nickname-input').value = newNickname.trim();
-        }
-    } else {
-        // 编辑我的人设
-        const newPersona = await showCustomPrompt('编辑我的人设', '请输入新的人设', chat.settings.myPersona, 'textarea');
-        if (newPersona !== null) {
-            document.getElementById('my-name-value').textContent = newPersona.trim();
-            document.getElementById('my-persona').value = newPersona.trim();
-        }
-    }
-});
-// ▲▲▲ 新代码粘贴结束 ▲▲▲
-// ▲▲▲ 替换结束 ▲▲▲            
+// ▲▲▲ 修复结束 ▲▲▲
+            
 function renderGroupMemberSettings(members) { 
     const container = document.getElementById('group-members-settings'); 
     container.innerHTML = ''; 
@@ -20170,6 +20366,100 @@ document.getElementById('save-chat-settings-btn-screen').addEventListener('click
     // alert('聊天设置已保存!'); 
 });
 // ▲▲▲ 修正结束 ▲▲▲
+
+// ▼▼▼ 【最终修复版】壁纸库事件绑定 ▼▼▼
+
+// 1. 外观设置页的按钮 -> 打开全局模式的壁纸库
+document.getElementById('manage-wallpaper-library-btn').addEventListener('click', () => {
+    openWallpaperLibrary({ from: 'global' });
+});
+
+// 2. 聊天设置页的按钮 -> 打开聊天模式的壁纸库
+document.getElementById('open-wallpaper-library-from-chat-btn').addEventListener('click', () => {
+    openWallpaperLibrary({ from: 'chat', activeChatId: state.activeChatId });
+});
+
+// 3. 壁纸库的返回按钮 -> 根据来源返回到正确的位置
+document.getElementById('wallpaper-library-back-btn').addEventListener('click', () => {
+    if (wallpaperLibraryContext.from === 'chat') {
+        showScreen('chat-settings-screen');
+    } else {
+        showScreen('wallpaper-screen');
+    }
+});
+
+// 4. 壁纸库的添加按钮 (逻辑不变)
+document.getElementById('add-wallpapers-btn').addEventListener('click', addWallpapers);
+
+// 5. 【核心修复】将文件上传的监听器放在这里，并直接调用核心处理逻辑
+document.getElementById('wallpaper-upload-input-library').addEventListener('change', async (event) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+        console.log("用户取消了文件选择或未选择文件。");
+        return;
+    }
+
+    const newWallpapers = [];
+    // 显示一个加载提示，因为读取多个文件可能需要时间
+    showCustomAlert("请稍候...", "正在处理上传的壁纸...");
+
+    for (const file of files) {
+        try {
+            const base64Url = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsDataURL(file);
+            });
+            newWallpapers.push({
+                id: 'wall_' + (Date.now() + newWallpapers.length),
+                url: base64Url
+            });
+        } catch (error) {
+            console.error("读取文件失败:", file.name, error);
+        }
+    }
+
+    // 隐藏加载提示
+    hideCustomModal();
+
+    if (newWallpapers.length > 0) {
+        await db.wallpapers.bulkAdd(newWallpapers);
+        await renderWallpaperLibrary();
+        
+        if (newWallpapers.length === 1 && wallpaperLibraryContext.from === 'chat') {
+            const confirmed = await showCustomConfirm(
+                '上传成功',
+                '壁纸已成功添加到库中。要立即将其设为当前聊天背景吗？'
+            );
+            if (confirmed) {
+                applyWallpaper('chat', newWallpapers[0].url);
+            }
+        } else {
+             alert(`成功添加了 ${newWallpapers.length} 张新壁纸到库中!`);
+        }
+    }
+    event.target.value = null; // 清空以便下次选择
+});
+
+
+// 6. 使用事件委托处理壁纸库中的点击事件 (逻辑不变)
+document.getElementById('wallpaper-grid').addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('apply')) {
+        promptWallpaperApplyTarget(target.dataset.url);
+    } else if (target.classList.contains('delete')) {
+        deleteWallpaper(target.dataset.id);
+    }
+});
+
+// 7. 应用目标模态框的按钮事件 (逻辑不变)
+document.getElementById('apply-to-home-btn').addEventListener('click', () => applyWallpaper('home'));
+document.getElementById('apply-to-chat-btn').addEventListener('click', () => applyWallpaper('chat'));
+document.getElementById('apply-wallpaper-cancel-btn').addEventListener('click', () => {
+    document.getElementById('wallpaper-apply-modal').classList.remove('visible');
+});
+// ▲▲▲ 新事件绑定结束 ▲▲▲
 
 // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴或替换为这段新代码 ▼▼▼
 
