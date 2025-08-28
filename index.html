@@ -316,8 +316,9 @@ body.bordered-mode #status-bar {
     /* 容器本身没有背景或边框 */
 }
 
-/* 2. 内部的头像图片:撑满整个容器 */
-.avatar-frame-wrapper .avatar-img {
+/* 2. 内部的头像图片:撑满整个容器 (已修正) */
+.avatar-frame-wrapper .avatar-img,
+.avatar-editor-preview-wrapper .avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -325,8 +326,9 @@ body.bordered-mode #status-bar {
     display: block; /* 移除图片默认的底部间隙 */
 }
 
-/* 3. 【【【核心魔法】】】叠加的头像框图片 */
-.avatar-frame-wrapper .avatar-frame-overlay {
+/* 3. 【【【核心魔法】】】叠加的头像框图片 (已修正) */
+.avatar-frame-wrapper .avatar-frame-overlay,
+.avatar-editor-preview-wrapper .avatar-frame-overlay {
     position: absolute; /* 脱离文档流,悬浮起来 */
     z-index: 1;         /* 确保在头像图片之上 */
     pointer-events: none; /* 让鼠标可以穿透它 */
@@ -892,6 +894,41 @@ body.bordered-mode #status-bar {
     font-size: 13px !important;
 }
 /* ▲▲▲ 1. 粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】聊天设置页可编辑文本块样式 ▼▼▼ */
+.editable-name-block {
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+
+/* 鼠标悬停时给一个视觉反馈 */
+.editable-name-block:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+#phone-screen.dark-mode .editable-name-block:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.editable-name-block .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block; /* 确保标签独占一行 */
+    margin-bottom: 5px; /* 标签和值之间的间距 */
+}
+
+.editable-name-block .value {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    /* 处理长文本换行 */
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新】游戏功能样式 (从这里开始粘贴) ▼▼▼ */
 
@@ -4140,6 +4177,107 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 /* --- 视频通话界面 --- */
+
+/* ▼▼▼ 【层级修复】确保人设库在最顶层 ▼▼▼ */
+#persona-library-modal {
+    z-index: 101; /* 默认弹窗是100,我们把它设为101,就能盖住其他弹窗了 */
+}
+/* ▲▲▲ 修复结束 ▲▲▲ */
+
+/* ▼▼▼ 【最终修复版 V2】聊天设置页面卡片式布局样式 ▼▼▼ */
+
+/* 1. 让设置屏幕成为一个能正确滚动的flex容器 (保持不变) */
+#chat-settings-screen {
+    display: flex;
+    flex-direction: column;
+}
+#chat-settings-screen .header {
+    flex-shrink: 0; 
+}
+
+/* 2. 【核心修复】为form-container添加padding-top */
+#chat-settings-screen .form-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
+    background-color: #f0f2f5;
+    padding: 15px;
+    gap: 15px;
+    
+    /* ▼▼▼ 唯一的、核心的修改就在这里 ▼▼▼ */
+    padding-top: 80px;  /* 把它从 15px 增加到 80px，为header留出空间 */
+    margin-top: -80px;  /* (可选但推荐) 使用负外边距技巧，让滚动条从header下方开始，视觉效果更好 */
+    /* ▲▲▲ 修改结束 ▲▲▲ */
+}
+#phone-screen.dark-mode #chat-settings-screen .form-container {
+    background-color: #000000;
+}
+
+/* 3. 卡片的基础样式 (保持不变) */
+.settings-card {
+    background-color: var(--secondary-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+#phone-screen.dark-mode .settings-card {
+    border: 1px solid var(--border-color);
+}
+
+/* 4. 卡片头部的样式 (保持不变) */
+.settings-card-header {
+    display: flex;
+    align-items: center; 
+    gap: 15px; 
+    margin-bottom: 20px;
+}
+.settings-card-header .avatar-frame-wrapper {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+.settings-card-header .header-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.settings-card-header .form-group {
+    margin-bottom: 0; 
+}
+.settings-card-header .form-group > label {
+    margin-bottom: 8px;
+}
+
+/* 5. 底部危险操作按钮的容器 (保持不变) */
+.settings-footer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 15px;
+}
+.settings-footer-actions .form-button-secondary {
+    width: 100%;
+    margin: 0;
+    padding: 15px; 
+    background-color: #e9ecef; 
+    color: var(--text-primary);
+    font-weight: 500;
+    border: none;
+}
+#phone-screen.dark-mode .settings-footer-actions .form-button-secondary {
+    background-color: #2c2c2e;
+}
+.settings-footer-actions .form-button-secondary.danger {
+    background-color: #e9ecef;
+    color: #ff3b30;
+}
+#phone-screen.dark-mode .settings-footer-actions .form-button-secondary.danger {
+    background-color: #2c2c2e;
+    color: #ff453a;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 请用这一整块【最终修正版】的代码,替换所有旧的 video-call 相关CSS ▼▼▼ */
 
 /* 1. 通话屏幕总容器 (保持不变) */
@@ -5623,6 +5761,58 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 /* ▲▲▲ 修正CSS粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新修复版】头像设置模态框样式 ▼▼▼ */
+.avatar-editor-preview-area {
+    width: 95%; /* 让它稍微窄一点，有呼吸感 */
+    margin: 0 auto; /* 强制水平居中 */
+    padding: 15px;
+    background-color: #f7f8fa;
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#phone-screen.dark-mode .avatar-editor-preview-area {
+    background-color: #2c2c2e;
+}
+
+.avatar-editor-preview-wrapper {
+    width: 100px;
+    height: 100px;
+    position: relative;
+}
+
+.avatar-editor-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 95%; /* 与预览区域宽度保持一致 */
+    margin: 0 auto; /* 强制水平居中 */
+}
+
+.avatar-editor-action-btn {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    background-color: #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.avatar-editor-action-btn:hover {
+    background-color: #dee2e6;
+}
+#phone-screen.dark-mode .avatar-editor-action-btn {
+    background-color: #3e3e42;
+    color: #f0f0f0;
+}
+#phone-screen.dark-mode .avatar-editor-action-btn:hover {
+    background-color: #505054;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 把这一整块全新的CSS,粘贴到 <style> 的末尾 ▼▼▼ */
 
@@ -7468,149 +7658,146 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
-<!-- ▼▼▼ 【全新】全屏聊天设置界面 ▼▼▼ -->
+<!-- ▼▼▼ 【全新修复版】全屏聊天设置界面 ▼▼▼ -->
 <div id="chat-settings-screen" class="screen">
     <!-- 1. 全新的、符合规范的屏幕头部 -->
     <div class="header">
         <span class="back-btn" id="back-from-settings-btn">‹</span>
         <span>聊天设置</span>
-        <!-- 我们把“保存”按钮也移到这里，更符合UI规范 -->
         <span class="save-btn" id="save-chat-settings-btn-screen">保存</span>
     </div>
 
-    <!-- 2. 将原有的 modal-body 改为 form-container，使其可以滚动 -->
+    <!-- ▼▼▼ 【最终重构版】的 form-container ▼▼▼ -->
     <div class="form-container" id="chat-settings-form-container">
         
-        <!-- 这里的内容几乎和旧的 modal-body 完全一样 -->
-        <div class="form-group" id="chat-name-group">
-            <label for="chat-name-input">备注名 / 群名</label>
-            <input type="text" id="chat-name-input">
-        </div>
-
-        <div class="form-group" id="assign-group-section" style="display: none;">
-            <label for="assign-group-select">好友分组</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <select id="assign-group-select" style="flex-grow: 1;"></select>
-                <button id="manage-groups-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">管理分组</button>
-            </div>
-        </div>
-
-        <div class="form-group" id="my-group-nickname-group">
-            <label for="my-group-nickname-input">我的群昵称</label>
-            <input type="text" id="my-group-nickname-input">
-        </div>
-
-        <div class="form-group" id="group-avatar-group">
-            <label>群头像</label>
-            <div class="avatar-upload">
-                <img id="group-avatar-preview">
-                <button onclick="document.getElementById('group-avatar-input').click()">上传群头像</button>
-                <input type="file" id="group-avatar-input" accept="image/*">
-            </div>
-        </div>
-        
-        <div class="form-group" id="world-book-link-group">
-             <label>关联世界书 (可多选)</label>
-             <div class="custom-multiselect">
-                 <div class="select-box">
-                     <span class="selected-options-text">-- 点击选择 --</span>
-                     <span class="arrow-down">▼</span>
-                 </div>
-                 <div id="world-book-checkboxes-container" class="checkboxes-container"></div>
-             </div>
-        </div>
-
-        <div class="form-group" id="ai-persona-group">
-            <label for="ai-persona">对方人设 (AI Persona)</label>
-            <textarea id="ai-persona" rows="3"></textarea>
-        </div>
-
-        <div class="form-group" id="ai-avatar-group">
-            <label>对方头像</label>
-            <div class="avatar-upload">
-                <div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
+        <!-- 卡片1: 对方信息 -->
+        <div class="settings-card" id="ai-settings-card">
+            <div class="settings-card-header">
+                <div id="settings-ai-avatar-clickable" class="avatar-frame-wrapper" style="cursor: pointer;">
                     <img id="ai-avatar-preview" class="avatar-img">
+                    <img id="ai-avatar-frame-preview" class="avatar-frame-overlay">
                 </div>
-                <button onclick="document.getElementById('ai-avatar-input').click()">上传对方头像</button>
-                <button id="manage-ai-avatar-library-btn">管理头像库</button>
-                <input type="file" id="ai-avatar-input" accept="image/*">
+                <div class="header-content-wrapper">
+                    <!-- 【核心修改】使用新的可编辑文本块 -->
+                    <div id="ai-name-display-block" class="editable-name-block">
+                        <span class="label">备注名 / 群名</span>
+                        <span id="ai-name-value" class="value"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 旧的输入框被隐藏，但ID保留，以防万一 -->
+            <div class="form-group" id="chat-name-group" style="display: none;">
+                <input type="text" id="chat-name-input">
+            </div>
+
+            <div class="form-group" id="world-book-link-group">
+                 <label>关联世界书 (可多选)</label>
+                 <div class="custom-multiselect">
+                     <div class="select-box">
+                         <span class="selected-options-text">-- 点击选择 --</span>
+                         <span class="arrow-down">▼</span>
+                     </div>
+                     <div id="world-book-checkboxes-container" class="checkboxes-container"></div>
+                 </div>
+            </div>
+
+            <div class="form-group" id="assign-group-section" style="display: none;">
+                <label for="assign-group-select">好友分组</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <select id="assign-group-select" style="flex-grow: 1;"></select>
+                    <button id="manage-groups-btn" class="form-button-secondary" style="margin-top: 0; padding: 12px;">管理分组</button>
+                </div>
+            </div>
+
+            <div class="form-group" id="ai-persona-group">
+                <label for="ai-persona">对方人设 (AI Persona)</label>
+                <textarea id="ai-persona" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group" id="group-avatar-group" style="display:none;">
+                <label>群头像</label>
+                <div class="avatar-upload">
+                    <img id="group-avatar-preview">
+                    <button onclick="document.getElementById('group-avatar-input').click()">上传群头像</button>
+                    <input type="file" id="group-avatar-input" accept="image/*">
+                </div>
+            </div>
+            <div class="form-group" id="group-members-group" style="display:none;">
+                <label>群成员人设</label>
+                <div id="group-members-settings"></div>
+                <button id="manage-members-btn" class="form-button form-button-secondary" style="margin-top: 15px;">管理群成员</button>
             </div>
         </div>
 
-        <div class="form-group" id="my-persona-group">
-            <label for="my-persona">我的人设 (My Persona)</label>
-            <textarea id="my-persona" rows="3"></textarea>
-        </div>
-
-        <div class="form-group" id="my-avatar-group">
-            <label>我的头像</label>
-            <div class="avatar-upload">
-                <div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
+        <!-- 卡片2: 我的信息 -->
+        <div class="settings-card" id="my-settings-card">
+            <div class="settings-card-header">
+                 <div id="settings-my-avatar-clickable" class="avatar-frame-wrapper" style="cursor: pointer;">
                     <img id="my-avatar-preview" class="avatar-img">
+                    <img id="my-avatar-frame-preview" class="avatar-frame-overlay">
                 </div>
-                <button onclick="document.getElementById('my-avatar-input').click()">上传我的头像</button>
-                <button id="open-persona-library-btn">预设</button>
-                <button id="open-avatar-frame-library-btn">头像框</button>
-                <input type="file" id="my-avatar-input" accept="image/*">
+                <div class="header-content-wrapper">
+                    <!-- 【核心修改】使用新的可编辑文本块 -->
+                    <div id="my-name-display-block" class="editable-name-block">
+                        <span id="my-name-label" class="label"></span>
+                        <span id="my-name-value" class="value"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 隐藏旧的输入框 -->
+            <div class="form-group" id="my-group-nickname-group" style="display:none;">
+                <input type="text" id="my-group-nickname-input">
+            </div>
+            <div class="form-group" id="my-persona-group" style="display:none;">
+                <textarea id="my-persona" rows="3"></textarea>
+            </div>
+        </div>
+        
+        <!-- 卡片3: 外观与杂项 -->
+        <div class="settings-card" id="appearance-settings-card">
+            <div class="form-group">
+                <label for="max-memory">上下文记忆条数</label>
+                <input type="number" id="max-memory" value="10">
+            </div>
+
+            <div class="form-group">
+                <label for="custom-css-input">自定义气泡样式 (CSS)</label>
+                <textarea id="custom-css-input" rows="5" style="width: 100%; margin-top: 8px; font-family: monospace; font-size: 12px; resize: vertical;" placeholder="/* 示例:为“我”的气泡添加渐变背景... */"></textarea>
+                 <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="form-button-secondary" id="save-custom-css-theme-btn" style="flex:1; margin-top:0;">存为主题</button>
+                    <button class="form-button-secondary" id="reset-custom-css-btn" type="button" style="flex:1; margin-top:0;">重置</button>
+                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>我保存的气泡主题</label>
+                <div id="saved-bubble-themes-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto; padding-top: 10px;"></div>
+            </div>
+            
+             <div class="form-group">
+                <label for="font-size-slider">聊天字体大小 <span id="font-size-value">13px</span></label>
+                <input type="range" id="font-size-slider" min="12" max="20" step="1" value="13" style="width: 100%; margin-top: 8px;">
+            </div>
+
+            <div class="form-group">
+                <label>聊天背景</label>
+                <div class="bg-upload-container">
+                    <button type="button" class="form-button-secondary" style="width: auto; padding: 8px 12px; margin-top: 0;" onclick="document.getElementById('bg-input').click()">上传背景图</button>
+                    <button type="button" id="remove-bg-btn">移除背景</button>
+                </div>
+                <img id="bg-preview" class="bg-preview-img">
+                <input type="file" id="bg-input" accept="image/*" style="display: none;">
             </div>
         </div>
 
-        <div class="form-group" id="group-members-group">
-            <label>群成员人设</label>
-            <div id="group-members-settings"></div>
-            <button id="manage-members-btn" class="form-button form-button-secondary" style="margin-top: 15px;">管理群成员</button>
+        <!-- 底部按钮区 -->
+        <div class="settings-footer-actions">
+            <button class="form-button form-button-secondary" id="clear-chat-btn">清空聊天记录</button>
+            <button class="form-button form-button-secondary danger" id="block-chat-btn">拉黑对方</button>
         </div>
 
-        <div class="form-group">
-            <label for="max-memory">上下文记忆条数</label>
-            <input type="number" id="max-memory" value="10">
-        </div>
-
-        <div class="form-group">
-            <label>聊天主题 <button id="reset-theme-btn" type="button">重置</button></label>
-        </div>
-
-        <div class="form-group">
-            <label for="font-size-slider">聊天字体大小 <span id="font-size-value">13px</span></label>
-            <input type="range" id="font-size-slider" min="12" max="20" step="1" value="13" style="width: 100%; margin-top: 8px;">
-        </div>
-
-        <div class="form-group">
-            <label for="custom-css-input">
-                自定义气泡样式 (CSS)
-                <button id="reset-custom-css-btn" type="button" style="background: none; border: 1px solid #ccc; color: #555; font-size: 12px; padding: 2px 8px; border-radius: 5px; cursor: pointer; margin-left: 10px;">重置</button>
-            </label>
-            <textarea id="custom-css-input" rows="5" style="width: 100%; margin-top: 8px; font-family: monospace; font-size: 12px; resize: vertical;" placeholder="/* 示例:为“我”的气泡添加渐变背景... */"></textarea>
-        </div>
-
-        <div class="form-group">
-            <button class="form-button form-button-secondary" id="save-custom-css-theme-btn">将当前CSS存为新主题</button>
-        </div>
-
-        <hr style="opacity: 0.2; margin: 20px 0;">
-
-        <div class="form-group">
-            <label>我保存的气泡主题</label>
-            <div id="saved-bubble-themes-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto; padding-top: 10px;"></div>
-        </div>
-
-        <div class="form-group">
-            <label>聊天背景</label>
-            <div class="bg-upload-container">
-                <button type="button" class="form-button-secondary" style="width: auto; padding: 8px 12px; margin-top: 0;" onclick="document.getElementById('bg-input').click()">上传背景图</button>
-                <button type="button" id="remove-bg-btn">移除背景</button>
-            </div>
-            <img id="bg-preview" class="bg-preview-img">
-            <input type="file" id="bg-input" accept="image/*" style="display: none;">
-        </div>
-        
-        <hr style="margin: 25px 0; border: none; border-top: 1px solid #eee;">
-        
-        <button class="form-button form-button-secondary" id="block-chat-btn" style="background-color: #ff3b30; color: white; border-color: #ff3b30;">拉黑对方</button>
-        <button class="form-button form-button-secondary" id="clear-chat-btn">清空聊天记录</button>
     </div>
-</div>
-<!-- ▲▲▲ 全新界面粘贴结束 ▲▲▲ -->
+    <!-- ▲▲▲ 重构结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 在这里粘贴全新的线下模式屏幕 ▼▼▼ -->
 <div id="offline-mode-screen" class="screen">
@@ -8083,6 +8270,73 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 【全新】AI头像设置模态框 (P1) ▼▼▼ -->
+<div id="ai-avatar-editor-modal" class="modal">
+    <div class="modal-content" style="width: 290px; height: auto;">
+        <div class="modal-header">
+            <span>设置对方头像</span>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <!-- 1. 预览区域 -->
+            <div class="avatar-editor-preview-area">
+                <div id="ai-editor-preview-wrapper" class="avatar-editor-preview-wrapper">
+                    <img id="ai-editor-preview-img" class="avatar-img" src="">
+                    <img id="ai-editor-preview-frame" class="avatar-frame-overlay" src="">
+                </div>
+            </div>
+            <!-- 2. 操作按钮网格 -->
+            <div class="avatar-editor-actions-grid">
+                <button id="ai-editor-upload-btn" class="avatar-editor-action-btn">上传头像</button>
+                <button id="ai-editor-manage-library-btn" class="avatar-editor-action-btn">管理头像库</button>
+                <button id="ai-editor-select-frame-btn" class="avatar-editor-action-btn">选择头像框</button>
+                <button id="ai-editor-remove-frame-btn" class="avatar-editor-action-btn">移除头像框</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="ai-editor-cancel-btn">取消</button>
+            <button class="save" id="ai-editor-save-btn">保存</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ AI头像模态框结束 ▲▲▲ -->
+
+
+<!-- ▼▼▼ 【全新】我的头像设置模态框 (P2) ▼▼▼ -->
+<div id="my-avatar-editor-modal" class="modal">
+    <div class="modal-content" style="width: 290px; height: auto;">
+        <div class="modal-header">
+            <span>设置我的头像</span>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <!-- 1. 预览区域 -->
+            <div class="avatar-editor-preview-area">
+                <div id="my-editor-preview-wrapper" class="avatar-editor-preview-wrapper">
+                    <img id="my-editor-preview-img" class="avatar-img" src="">
+                    <img id="my-editor-preview-frame" class="avatar-frame-overlay" src="">
+                </div>
+            </div>
+            <!-- 2. 操作按钮网格 -->
+            <div class="avatar-editor-actions-grid">
+                <button id="my-editor-upload-btn" class="avatar-editor-action-btn">上传头像</button>
+                <button id="my-editor-persona-library-btn" class="avatar-editor-action-btn">人设预设库</button>
+                <button id="my-editor-select-frame-btn" class="avatar-editor-action-btn">选择头像框</button>
+                <button id="my-editor-remove-frame-btn" class="avatar-editor-action-btn">移除头像框</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="my-editor-cancel-btn">取消</button>
+            <button class="save" id="my-editor-save-btn">保存</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 我的头像模态框结束 ▲▲▲ -->
+
+
+<!-- ▼▼▼ 【全新】为新模态框准备的隐藏文件上传控件 ▼▼▼ -->
+<input type="file" id="ai-avatar-editor-upload-input" accept="image/*" hidden>
+<input type="file" id="my-avatar-editor-upload-input" accept="image/*" hidden>
+<!-- ▲▲▲ 添加结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 【全新】AI头像库管理模态框 ▼▼▼ -->
 <div id="ai-avatar-library-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
@@ -8324,6 +8578,7 @@ input:checked + .slider:before {
         // --- 修正结束 ---
 
         let isAiGenerating = false; // 用于跟踪AI是否正在生成内容
+let avatarEditorContext = { target: null, newAvatarSrc: null, newFrameSrc: null };
         let canRegenerate = false; // 用于跟踪是否可以执行“重新生成”操作
         let abortController = null; // 用于存储和调用fetch的中断控制器
 
@@ -14270,6 +14525,152 @@ async function copyMessageContent() {
     hideMessageActions();
 }
 
+// ▼▼▼ 【全新】头像编辑器核心功能 ▼▼▼
+
+/**
+ * 打开AI头像设置模态框
+ */
+function openAiAvatarEditor() {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+    
+    // 1. 设置上下文
+    avatarEditorContext = {
+        target: 'ai',
+        newAvatarSrc: chat.settings.aiAvatar || defaultAvatar,
+        newFrameSrc: chat.settings.aiAvatarFrame || ''
+    };
+
+    // 2. 填充预览
+    document.getElementById('ai-editor-preview-img').src = avatarEditorContext.newAvatarSrc;
+    const frameImg = document.getElementById('ai-editor-preview-frame');
+    frameImg.src = avatarEditorContext.newFrameSrc;
+    frameImg.style.display = avatarEditorContext.newFrameSrc ? 'block' : 'none';
+
+    // 3. 显示模态框
+    document.getElementById('ai-avatar-editor-modal').classList.add('visible');
+}
+
+/**
+ * 打开我的头像设置模态框
+ */
+function openMyAvatarEditor() {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+    
+    avatarEditorContext = {
+        target: 'my',
+        newAvatarSrc: chat.settings.myAvatar || (chat.isGroup ? defaultMyGroupAvatar : defaultAvatar),
+        newFrameSrc: chat.settings.myAvatarFrame || ''
+    };
+    
+    document.getElementById('my-editor-preview-img').src = avatarEditorContext.newAvatarSrc;
+    const frameImg = document.getElementById('my-editor-preview-frame');
+    frameImg.src = avatarEditorContext.newFrameSrc;
+    frameImg.style.display = avatarEditorContext.newFrameSrc ? 'block' : 'none';
+
+    document.getElementById('my-avatar-editor-modal').classList.add('visible');
+}
+
+/**
+ * 处理头像编辑器内的文件上传
+ */
+function handleAvatarEditorUpload() {
+    const inputId = `${avatarEditorContext.target}-avatar-editor-upload-input`;
+    document.getElementById(inputId).click();
+}
+
+/**
+ * 预览上传的头像
+ */
+function previewEditorAvatar(inputId) {
+    const fileInput = document.getElementById(inputId);
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const base64 = e.target.result;
+        avatarEditorContext.newAvatarSrc = base64; // 更新临时状态
+        document.getElementById(`${avatarEditorContext.target}-editor-preview-img`).src = base64; // 更新预览
+    };
+    reader.readAsDataURL(file);
+    fileInput.value = ''; // 清空以便下次选择
+}
+
+/**
+ * 为编辑器选择头像框
+ */
+function selectFrameForEditor() {
+    // 调用现有的函数打开头像框库
+    openAvatarFrameLibrary();
+    // avatarEditorContext.target 会告诉库应该更新哪个预览
+}
+
+/**
+ * 移除编辑器中的头像框预览
+ */
+function removeFrameFromEditor() {
+    avatarEditorContext.newFrameSrc = ''; // 清空临时状态
+    const frameImg = document.getElementById(`${avatarEditorContext.target}-editor-preview-frame`);
+    frameImg.src = '';
+    frameImg.style.display = 'none';
+}
+
+/**
+ * 保存头像编辑器的所有更改
+ */
+async function saveAvatarEditorSettings() {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+
+    if (avatarEditorContext.target === 'ai') {
+        chat.settings.aiAvatar = avatarEditorContext.newAvatarSrc;
+        chat.settings.aiAvatarFrame = avatarEditorContext.newFrameSrc;
+        document.getElementById('ai-avatar-editor-modal').classList.remove('visible');
+    } else if (avatarEditorContext.target === 'my') {
+        chat.settings.myAvatar = avatarEditorContext.newAvatarSrc;
+        chat.settings.myAvatarFrame = avatarEditorContext.newFrameSrc;
+        document.getElementById('my-avatar-editor-modal').classList.remove('visible');
+    }
+
+    await db.chats.put(chat);
+    
+    // 强制刷新聊天设置屏幕以显示最新头像
+    document.getElementById('chat-settings-btn').click(); 
+    
+    // 同时刷新聊天界面和列表
+    renderChatInterface(chat.id);
+    renderChatList();
+}
+
+// 绑定所有新按钮的事件
+document.getElementById('settings-ai-avatar-clickable').addEventListener('click', openAiAvatarEditor);
+document.getElementById('settings-my-avatar-clickable').addEventListener('click', openMyAvatarEditor);
+
+document.getElementById('ai-editor-cancel-btn').addEventListener('click', () => document.getElementById('ai-avatar-editor-modal').classList.remove('visible'));
+document.getElementById('my-editor-cancel-btn').addEventListener('click', () => document.getElementById('my-avatar-editor-modal').classList.remove('visible'));
+
+document.getElementById('ai-editor-save-btn').addEventListener('click', saveAvatarEditorSettings);
+document.getElementById('my-editor-save-btn').addEventListener('click', saveAvatarEditorSettings);
+
+document.getElementById('ai-editor-upload-btn').addEventListener('click', handleAvatarEditorUpload);
+document.getElementById('my-editor-upload-btn').addEventListener('click', handleAvatarEditorUpload);
+
+document.getElementById('ai-avatar-editor-upload-input').addEventListener('change', () => previewEditorAvatar('ai-avatar-editor-upload-input'));
+document.getElementById('my-avatar-editor-upload-input').addEventListener('change', () => previewEditorAvatar('my-avatar-editor-upload-input'));
+
+document.getElementById('ai-editor-manage-library-btn').addEventListener('click', openAiAvatarLibraryModal);
+document.getElementById('my-editor-persona-library-btn').addEventListener('click', openPersonaLibrary);
+
+document.getElementById('ai-editor-select-frame-btn').addEventListener('click', selectFrameForEditor);
+document.getElementById('my-editor-select-frame-btn').addEventListener('click', selectFrameForEditor);
+
+document.getElementById('ai-editor-remove-frame-btn').addEventListener('click', removeFrameFromEditor);
+document.getElementById('my-editor-remove-frame-btn').addEventListener('click', removeFrameFromEditor);
+
+// ▲▲▲ 新JS代码粘贴结束 ▲▲▲
+
 // ▼▼▼ 用这个【已更新】的版本,替换旧的 createMessageEditorBlock 函数 ▼▼▼
 /**
  * 创建一个可编辑的消息块(包含文本框、格式助手和删除按钮)
@@ -17258,14 +17659,12 @@ function closeAvatarFrameLibrary() {
     document.getElementById('avatar-frame-library-modal').classList.remove('visible');
 }
 
-/**
- * 渲染头像框库的网格内容
- */
+// ▼▼▼ 【修改版】渲染头像框库，使其能与新编辑器交互 ▼▼▼
 async function renderAvatarFrameLibrary() {
     const grid = document.getElementById('avatar-frame-library-grid');
     grid.innerHTML = '';
     const frames = await db.avatarFrames.toArray();
-    state.avatarFrames = frames; // 同步内存状态
+    state.avatarFrames = frames; 
 
     if (frames.length === 0) {
         grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">头像框库是空的,点击“添加”上传吧!</p>';
@@ -17274,11 +17673,10 @@ async function renderAvatarFrameLibrary() {
 
     frames.forEach(frame => {
         const item = document.createElement('div');
-        item.className = 'sticker-item'; // 复用表情的样式
+        item.className = 'sticker-item'; 
         item.style.cursor = 'pointer';
         item.title = frame.name;
         
-        // 创建一个预览用的头像框结构
         item.innerHTML = `
             <div class="avatar-frame-wrapper" style="width: 100%; height: 100%;">
                 <img src="${defaultAvatar}" class="avatar-img" style="border-radius: 18px;">
@@ -17286,21 +17684,33 @@ async function renderAvatarFrameLibrary() {
             </div>
         `;
 
-        // 点击事件:应用头像框
-        item.addEventListener('click', () => applyAvatarFrame(frame.url));
+        // 【核心修改】点击事件现在会检查上下文
+        item.addEventListener('click', () => {
+            // 如果是从头像编辑器打开的
+            if (avatarEditorContext.target) {
+                avatarEditorContext.newFrameSrc = frame.url; // 更新临时状态
+                const framePreview = document.getElementById(`${avatarEditorContext.target}-editor-preview-frame`);
+                framePreview.src = frame.url;
+                framePreview.style.display = 'block';
+                closeAvatarFrameLibrary(); // 只关闭库，不关闭编辑器
+            } else {
+                // 否则，执行旧的应用逻辑（现在我们不再使用这个流程，但保留以防万一）
+                applyAvatarFrame(frame.url);
+            }
+        });
         
-        // 长按事件:删除头像框
         addLongPressListener(item, async () => {
             const confirmed = await showCustomConfirm('删除头像框', `确定要删除头像框“${frame.name}”吗？`, { confirmButtonClass: 'btn-danger' });
             if (confirmed) {
                 await db.avatarFrames.delete(frame.id);
-                renderAvatarFrameLibrary(); // 刷新库
+                renderAvatarFrameLibrary();
             }
         });
         
         grid.appendChild(item);
     });
 }
+// ▲▲▲ 替换结束 ▲▲▲
 
 /**
  * 批量添加头像框(从本地文件)
@@ -18685,89 +19095,70 @@ function updateWorldBookSelectionDisplay() { const checkedBoxes = worldBookCheck
             document.getElementById('world-book-checkboxes-container').addEventListener('change', updateWorldBookSelectionDisplay);
             window.addEventListener('click', (e) => { if (!document.querySelector('.custom-multiselect').contains(e.target)) { worldBookCheckboxesContainer.classList.remove('visible'); worldBookSelectBox.classList.remove('expanded'); } });
 
-// ▼▼▼ 【最终修正版】请用这块完整的代码，替换旧的 'chat-settings-btn' 事件监听器 ▼▼▼
+// ▼▼▼ 【最终重构版】'chat-settings-btn' 事件监听器 ▼▼▼
 document.getElementById('chat-settings-btn').addEventListener('click', async () => {
     if (!state.activeChatId) return;
     const chat = state.chats[state.activeChatId];
     const isGroup = chat.isGroup;
 
-    // --- 统一显示/隐藏控件 ---
-    document.getElementById('chat-name-group').style.display = 'block';
-    document.getElementById('my-persona-group').style.display = 'block';
-    document.getElementById('my-avatar-group').style.display = 'block';
+    // --- 显示/隐藏控件 ---
+    // (这部分逻辑保持不变)
     document.getElementById('my-group-nickname-group').style.display = isGroup ? 'block' : 'none';
     document.getElementById('group-avatar-group').style.display = isGroup ? 'block' : 'none';
     document.getElementById('group-members-group').style.display = isGroup ? 'block' : 'none';
     document.getElementById('ai-persona-group').style.display = isGroup ? 'none' : 'block';
-    document.getElementById('ai-avatar-group').style.display = isGroup ? 'none' : 'block';
     document.getElementById('assign-group-section').style.display = isGroup ? 'none' : 'block';
     
-    // --- 加载表单数据 ---
+    // --- 【核心修改】填充新的可编辑文本块 ---
+    document.getElementById('ai-name-value').textContent = chat.name;
+    const myNameLabel = document.getElementById('my-name-label');
+    const myNameValue = document.getElementById('my-name-value');
+    if (isGroup) {
+        myNameLabel.textContent = '我的群昵称';
+        myNameValue.textContent = chat.settings.myNickname || '';
+    } else {
+        myNameLabel.textContent = '我的人设 (My Persona)';
+        myNameValue.textContent = chat.settings.myPersona || '';
+    }
+    
+    // --- 填充旧的、现在被隐藏的输入框（为了数据一致性） ---
     document.getElementById('chat-name-input').value = chat.name;
     document.getElementById('my-persona').value = chat.settings.myPersona;
+    if (isGroup) {
+        document.getElementById('my-group-nickname-input').value = chat.settings.myNickname || '';
+    }
+    
+    // --- 填充其余表单数据 (这部分逻辑保持不变) ---
     const myAvatarPreviewWrapper = document.getElementById('my-avatar-preview').parentElement;
     myAvatarPreviewWrapper.querySelector('.avatar-img').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
     let myFrameOverlay = myAvatarPreviewWrapper.querySelector('.avatar-frame-overlay');
     if (chat.settings.myAvatarFrame) {
-        if (!myFrameOverlay) {
-            myFrameOverlay = document.createElement('img');
-            myFrameOverlay.className = 'avatar-frame-overlay';
-            myAvatarPreviewWrapper.appendChild(myFrameOverlay);
-        }
-        myFrameOverlay.src = chat.settings.myAvatarFrame;
-        myFrameOverlay.style.display = 'block';
-    } else if (myFrameOverlay) {
-        myFrameOverlay.style.display = 'none';
-    }
-    
+        if (!myFrameOverlay) { myFrameOverlay = document.createElement('img'); myFrameOverlay.className = 'avatar-frame-overlay'; myAvatarPreviewWrapper.appendChild(myFrameOverlay); }
+        myFrameOverlay.src = chat.settings.myAvatarFrame; myFrameOverlay.style.display = 'block';
+    } else if (myFrameOverlay) { myFrameOverlay.style.display = 'none'; }
     if (!isGroup) {
         const aiAvatarPreviewWrapper = document.getElementById('ai-avatar-preview').parentElement;
         aiAvatarPreviewWrapper.querySelector('.avatar-img').src = chat.settings.aiAvatar || defaultAvatar;
         let aiFrameOverlay = aiAvatarPreviewWrapper.querySelector('.avatar-frame-overlay');
         if (chat.settings.aiAvatarFrame) {
-            if (!aiFrameOverlay) {
-                aiFrameOverlay = document.createElement('img');
-                aiFrameOverlay.className = 'avatar-frame-overlay';
-                aiAvatarPreviewWrapper.appendChild(aiFrameOverlay);
-            }
-            aiFrameOverlay.src = chat.settings.aiAvatarFrame;
-            aiFrameOverlay.style.display = 'block';
-        } else if (aiFrameOverlay) {
-            aiFrameOverlay.style.display = 'none';
-        }
+            if (!aiFrameOverlay) { aiFrameOverlay = document.createElement('img'); aiFrameOverlay.className = 'avatar-frame-overlay'; aiAvatarPreviewWrapper.appendChild(aiFrameOverlay); }
+            aiFrameOverlay.src = chat.settings.aiAvatarFrame; aiFrameOverlay.style.display = 'block';
+        } else if (aiFrameOverlay) { aiFrameOverlay.style.display = 'none'; }
     }
-
     document.getElementById('max-memory').value = chat.settings.maxMemory;
     const bgPreview = document.getElementById('bg-preview');
     const removeBgBtn = document.getElementById('remove-bg-btn');
-    if (chat.settings.background) {
-        bgPreview.src = chat.settings.background;
-        bgPreview.style.display = 'block';
-        removeBgBtn.style.display = 'inline-block';
-    } else {
-        bgPreview.style.display = 'none';
-        removeBgBtn.style.display = 'none';
-    }
-
+    if (chat.settings.background) { bgPreview.src = chat.settings.background; bgPreview.style.display = 'block'; removeBgBtn.style.display = 'inline-block'; } 
+    else { bgPreview.style.display = 'none'; removeBgBtn.style.display = 'none'; }
     if (isGroup) {
-        document.getElementById('my-group-nickname-input').value = chat.settings.myNickname || '';
         document.getElementById('group-avatar-preview').src = chat.settings.groupAvatar || defaultGroupAvatar;
         renderGroupMemberSettings(chat.members);
     } else {
-        document.getElementById('ai-persona').value = chat.settings.aiPersona;
-        // ai-avatar-preview 的 src 在上面已经处理过了
         const select = document.getElementById('assign-group-select');
         select.innerHTML = '<option value="">未分组</option>';
         const groups = await db.qzoneGroups.toArray();
-        groups.forEach(group => {
-            const option = document.createElement('option');
-            option.value = group.id;
-            option.textContent = group.name;
-            if (chat.groupId === group.id) option.selected = true;
-            select.appendChild(option);
-        }); 
+        groups.forEach(group => { const option = document.createElement('option'); option.value = group.id; option.textContent = group.name; if (chat.groupId === group.id) option.selected = true; select.appendChild(option); }); 
     }
-    
     const worldBookCheckboxesContainer = document.getElementById('world-book-checkboxes-container');
     worldBookCheckboxesContainer.innerHTML = '';
     const linkedIds = new Set(chat.settings.linkedWorldBookIds || []);
@@ -18775,12 +19166,7 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     const books = state.worldBooks;
     const hasUncategorized = books.some(book => !book.categoryId);
     if (hasUncategorized) categories.push({ id: 'uncategorized', name: '未分类' });
-    const booksByCategoryId = books.reduce((acc, book) => {
-        const categoryId = book.categoryId || 'uncategorized';
-        if (!acc[categoryId]) acc[categoryId] = [];
-        acc[categoryId].push(book);
-        return acc;
-    }, {});
+    const booksByCategoryId = books.reduce((acc, book) => { const categoryId = book.categoryId || 'uncategorized'; if (!acc[categoryId]) acc[categoryId] = []; acc[categoryId].push(book); return acc; }, {});
     categories.forEach(category => {
         const booksInCategory = booksByCategoryId[category.id] || [];
         if (booksInCategory.length > 0) {
@@ -18791,27 +19177,57 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
             const bookContainer = document.createElement('div');
             bookContainer.className = 'wb-book-container collapsed';
             bookContainer.dataset.containerFor = category.id;
-            booksInCategory.forEach(book => {
-                const isChecked = linkedIds.has(book.id);
-                const label = document.createElement('label');
-                label.innerHTML = `<input type="checkbox" class="wb-book-checkbox" value="${book.id}" data-parent-category="${category.id}" ${isChecked ? 'checked' : ''}> ${book.name}`;
-                bookContainer.appendChild(label);
-            });
+            booksInCategory.forEach(book => { const isChecked = linkedIds.has(book.id); const label = document.createElement('label'); label.innerHTML = `<input type="checkbox" class="wb-book-checkbox" value="${book.id}" data-parent-category="${category.id}" ${isChecked ? 'checked' : ''}> ${book.name}`; bookContainer.appendChild(label); });
             worldBookCheckboxesContainer.appendChild(header);
             worldBookCheckboxesContainer.appendChild(bookContainer);
         }
     });
     updateWorldBookSelectionDisplay();
-    
     const fontSizeSlider = document.getElementById('font-size-slider');
     fontSizeSlider.value = chat.settings.fontSize || 13;
     document.getElementById('font-size-value').textContent = `${fontSizeSlider.value}px`;
     document.getElementById('custom-css-input').value = chat.settings.customCss || '';
     await renderSavedBubbleThemes();
-    
-    // 修正：将原来的打开弹窗，改为打开新的屏幕
     showScreen('chat-settings-screen'); 
 });
+
+// ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这整块新代码 ▼▼▼
+
+// 为“对方姓名”可编辑块绑定点击事件
+document.getElementById('ai-name-display-block').addEventListener('click', async () => {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+
+    const newName = await showCustomPrompt('编辑备注名 / 群名', '请输入新的名称', chat.name);
+    if (newName !== null && newName.trim()) {
+        document.getElementById('ai-name-value').textContent = newName.trim();
+        // 同时也更新隐藏的输入框，以便“保存”按钮能获取到值
+        document.getElementById('chat-name-input').value = newName.trim();
+    }
+});
+
+// 为“我的姓名/人设”可编辑块绑定点击事件
+document.getElementById('my-name-display-block').addEventListener('click', async () => {
+    const chat = state.chats[state.activeChatId];
+    if (!chat) return;
+
+    if (chat.isGroup) {
+        // 编辑我的群昵称
+        const newNickname = await showCustomPrompt('编辑我的群昵称', '请输入新的昵称', chat.settings.myNickname);
+        if (newNickname !== null) {
+            document.getElementById('my-name-value').textContent = newNickname.trim();
+            document.getElementById('my-group-nickname-input').value = newNickname.trim();
+        }
+    } else {
+        // 编辑我的人设
+        const newPersona = await showCustomPrompt('编辑我的人设', '请输入新的人设', chat.settings.myPersona, 'textarea');
+        if (newPersona !== null) {
+            document.getElementById('my-name-value').textContent = newPersona.trim();
+            document.getElementById('my-persona').value = newPersona.trim();
+        }
+    }
+});
+// ▲▲▲ 新代码粘贴结束 ▲▲▲
 // ▲▲▲ 替换结束 ▲▲▲            
 function renderGroupMemberSettings(members) { 
     const container = document.getElementById('group-members-settings'); 
