@@ -8324,6 +8324,7 @@ input:checked + .slider:before {
         // --- 修正结束 ---
 
         let isAiGenerating = false; // 用于跟踪AI是否正在生成内容
+        let canRegenerate = false; // 用于跟踪是否可以执行“重新生成”操作
         let abortController = null; // 用于存储和调用fetch的中断控制器
 
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
@@ -12664,6 +12665,12 @@ createMessageElement
         isAiGenerating = false;
         abortController = null;
         updateWaitButtonUI(false);
+        // 【核心修改】检查是否应该启用“重新生成”功能
+        // 只有当聊天记录的最后一条消息是AI发的，才启用
+        if (chat.history.length > 0 && chat.history[chat.history.length - 1].role === 'assistant') {
+            canRegenerate = true;
+            updateSendButtonUI('regenerate');
+        }
         // ★★★★★【核心修改4:在 finally 块中统一隐藏所有类型的提示】★★★★★
         if (chat.isGroup) {
             if (typingIndicator) {
@@ -18251,6 +18258,24 @@ function updateWaitButtonUI(isStopping) {
 }
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】更新发送/重生成按钮UI的辅助函数 ▼▼▼
+function updateSendButtonUI(mode = 'send') {
+    const sendBtn = document.getElementById('send-btn');
+    const sendBtnIcon = sendBtn.querySelector('img');
+    if (!sendBtn || !sendBtnIcon) return;
+
+    if (mode === 'regenerate') {
+        // 切换到“重新生成”状态
+        sendBtnIcon.src = 'https://sharkpan.xyz/f/e7wLsa/%E5%88%B7%E6%96%B0.png'; // 这是一个刷新/重做图标
+        sendBtn.title = '重新生成';
+    } else {
+        // 恢复为“发送”状态
+        sendBtnIcon.src = 'https://sharkpan.xyz/f/ZqlriW/%E5%8F%91%E9%80%81%202.png'; // 恢复为原来的发送图标
+        sendBtn.title = '发送';
+    }
+}
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
         // ===================================================================
         // 4. 初始化函数 init()
         // ===================================================================
@@ -18414,37 +18439,66 @@ window.addEventListener('click', (e) => {
             audioPlayer.addEventListener('play', () => { if(musicState.isActive) { musicState.isPlaying = true; updatePlayerUI(); } });
 
             const chatInput = document.getElementById('chat-input');
-            // ▼▼▼ 找到 id="send-btn" 的 click 事件监听器 ▼▼▼
-document.getElementById('send-btn').addEventListener('click', async () => { 
-    const content = chatInput.value.trim(); 
-    if (!content || !state.activeChatId) return; 
+// ▼▼▼ 【功能升级】用这整块代码替换旧的 'send-btn' 事件监听器 ▼▼▼
+document.getElementById('send-btn').addEventListener('click', async () => {
+    const chatInput = document.getElementById('chat-input');
+    const content = chatInput.value.trim();
     
-    const chat = state.chats[state.activeChatId]; 
-    
-    // --- 【核心修改】在这里添加 ---
-    const msg = { 
-        role: 'user', 
-        content, 
-        timestamp: Date.now() 
-    };
+    // 【核心判断】
+    if (canRegenerate && content === '') {
+        // --- 执行“重新生成”逻辑 ---
+        console.log("重新生成功能已触发。");
+        canRegenerate = false;
+        updateSendButtonUI('send'); // 立刻恢复按钮状态
 
-    // 检查当前是否处于引用回复模式
-    if (currentReplyContext) {
-        msg.quote = currentReplyContext; // 将引用信息附加到消息对象上
+        const chat = state.chats[state.activeChatId];
+        if (!chat) return;
+
+        // 找到AI上一次回复的第一条消息的索引
+        const lastUserOrSystemMessageIndex = chat.history.findLastIndex(msg => 
+            msg.role === 'user' || (msg.role === 'system' && !msg.isHidden)
+        );
+        
+        const firstAiResponseIndex = lastUserOrSystemMessageIndex + 1;
+
+        // 从该索引开始，删除所有后续消息（即AI的整个回复）
+        if (firstAiResponseIndex < chat.history.length) {
+            chat.history.splice(firstAiResponseIndex);
+        }
+
+        await db.chats.put(chat);
+        renderChatInterface(state.activeChatId); // 刷新界面，移除旧回复
+        triggerAiResponse(); // 重新触发AI生成
+
+    } else {
+        // --- 执行原有的“发送消息”逻辑 ---
+        if (!content || !state.activeChatId) return;
+        
+        canRegenerate = false;
+        updateSendButtonUI('send'); // 确保按钮是“发送”状态
+
+        const chat = state.chats[state.activeChatId];
+        const msg = {
+            role: 'user',
+            content,
+            timestamp: Date.now()
+        };
+
+        if (currentReplyContext) {
+            msg.quote = currentReplyContext;
+        }
+
+        chat.history.push(msg);
+        await db.chats.put(chat);
+        appendMessage(msg, chat);
+        renderChatList();
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        chatInput.focus();
+        cancelReplyMode();
     }
-    // --- 【修改结束】 ---
-    
-    chat.history.push(msg); 
-    await db.chats.put(chat); 
-    appendMessage(msg, chat); 
-    renderChatList(); 
-    chatInput.value = ''; 
-    chatInput.style.height = 'auto'; 
-    chatInput.focus(); 
-    
-    // --- 【核心修改】发送后,取消引用模式 ---
-    cancelReplyMode(); 
 });
+// ▲▲▲ 替换结束 ▲▲▲
             // ▼▼▼ 【功能升级】用这块代码替换旧的 wait-reply-btn 事件监听器 ▼▼▼
 document.getElementById('wait-reply-btn').addEventListener('click', () => {
     if (isAiGenerating) {
@@ -18460,7 +18514,18 @@ document.getElementById('wait-reply-btn').addEventListener('click', () => {
 });
 // ▲▲▲ 替换结束 ▲▲▲
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('send-btn').click(); } });
-            chatInput.addEventListener('input', () => { chatInput.style.height = 'auto'; chatInput.style.height = (chatInput.scrollHeight) + 'px'; });
+            // ▼▼▼ 【功能升级】用这块代码替换旧的 chatInput 'input' 事件监听器 ▼▼▼
+chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = (chatInput.scrollHeight) + 'px';
+    
+    // 【核心修改】当用户开始输入时，禁用“重新生成”功能
+    if (canRegenerate) {
+        canRegenerate = false;
+        updateSendButtonUI('send'); // 按钮恢复为“发送”
+    }
+});
+// ▲▲▲ 替换结束 ▲▲▲
 
             document.getElementById('wallpaper-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if(file) { const dataUrl = await new Promise((res, rej) => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.onerror = () => rej(reader.error); reader.readAsDataURL(file); }); newWallpaperBase64 = dataUrl; renderWallpaperScreen(); } });
             // 【功能增强版】保存所有外观设置按钮
