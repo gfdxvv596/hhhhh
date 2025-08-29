@@ -242,6 +242,72 @@ body {
     font-size: 13px;
 }
 /* ▲▲▲ 替换结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】世界书胶囊式选择器样式 ▼▼▼ */
+#world-book-pills-container {
+    padding: 10px;
+    background-color: #f7f8fa; /* 给一个淡淡的背景色以区分 */
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    max-height: 200px; /* 增加最大高度和滚动条 */
+    overflow-y: auto;
+}
+#phone-screen.dark-mode #world-book-pills-container {
+    background-color: #2c2c2e;
+    border-color: #38383a;
+}
+
+.wb-pill-category-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 10px 5px 5px;
+    margin-top: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+.wb-pill-category-title:first-child {
+    margin-top: 0;
+}
+
+.wb-pills-wrapper {
+    display: flex;
+    flex-wrap: wrap; /* 允许换行 */
+    gap: 10px; /* 胶囊之间的间距 */
+    padding-top: 10px;
+}
+
+.wb-pill {
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 20px; /* 胶囊形状 */
+    background-color: #e9ecef;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+#phone-screen.dark-mode .wb-pill {
+    background-color: #3e3e42;
+}
+
+/* 选中状态 */
+.wb-pill.selected {
+    background-color: var(--accent-color);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+}
+
+.wb-pill .check-icon {
+    display: none; /* 默认隐藏对勾 */
+    font-weight: bold;
+}
+.wb-pill.selected .check-icon {
+    display: inline; /* 选中时显示 */
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
         .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-size: 14px; font-weight: 500; text-align: center; }
         .app-icon .icon-bg { width: 65px; height: 65px; border-radius: 18px; background-color: var(--secondary-bg); display: flex; justify-content: center; align-items: center; font-size: 32px; margin-bottom: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s ease; overflow: hidden; }
         .app-icon:active .icon-bg { transform: scale(0.9); }
@@ -4466,6 +4532,40 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】世界书分类摘要胶囊样式 ▼▼▼ */
+
+/* 1. 让摘要栏背景透明，并调整内边距 */
+#wb-pills-summary-box {
+    background-color: transparent !important;
+    padding: 5px 10px; /* 调整内边距以适应胶囊 */
+    min-height: 46px; /* 确保有一个最小高度 */
+    display: flex; /* 使用flex布局 */
+    align-items: center; /* 垂直居中 */
+}
+
+/* 2. 摘要栏内部的胶囊容器 */
+#wb-pills-summary-text {
+    flex-grow: 1; /* 占据大部分空间 */
+    display: flex;
+    flex-wrap: wrap; /* 允许分类胶囊换行 */
+    gap: 6px; /* 胶囊之间的间距 */
+    align-items: center; /* 确保“--点击选择--”文本也能垂直居中 */
+}
+
+/* 3. 单个分类摘要胶囊的样式 */
+.wb-summary-pill {
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 15px;
+    background-color: #e9ecef;
+    color: var(--text-primary);
+}
+#phone-screen.dark-mode .wb-summary-pill {
+    background-color: #3e3e42;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 请用这一整块【最终修正版】的代码,替换所有旧的 video-call 相关CSS ▼▼▼ */
 
 /* 1. 通话屏幕总容器 (保持不变) */
@@ -7974,16 +8074,24 @@ input:checked + .slider:before {
                 <input type="text" id="chat-name-input">
             </div>
 
+            <!-- ▼▼▼ 【可折叠版】的世界书选择器 ▼▼▼ -->
             <div class="form-group" id="world-book-link-group">
-                 <label>关联世界书 (可多选)</label>
+                 <label>关联世界书</label>
+                 <!-- 【新增】可点击的摘要栏 -->
                  <div class="custom-multiselect">
-                     <div class="select-box">
-                         <span class="selected-options-text">-- 点击选择 --</span>
+                     <div class="select-box" id="wb-pills-summary-box">
+                         <span class="selected-options-text" id="wb-pills-summary-text">-- 点击选择 --</span>
                          <span class="arrow-down">▼</span>
                      </div>
-                     <div id="world-book-checkboxes-container" class="checkboxes-container"></div>
+                 </div>
+                 <!-- 【新增】可折叠的胶囊容器，默认隐藏 -->
+                 <div id="world-book-pills-collapsible-container" style="display: none; margin-top: 5px;">
+                     <div id="world-book-pills-container">
+                         <!-- 世界书胶囊将由JS动态生成在这里 -->
+                     </div>
                  </div>
             </div>
+            <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
             <div class="form-group" id="assign-group-section" style="display: none;">
                 <label for="assign-group-select">好友分组</label>
@@ -8124,17 +8232,24 @@ input:checked + .slider:before {
             <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
 <div class="form-group" id="my-group-nickname-group"><label for="my-group-nickname-input">我的群昵称</label><input type="text" id="my-group-nickname-input"></div><div class="form-group" id="group-avatar-group"><label>群头像</label><div class="avatar-upload"><img id="group-avatar-preview"><button onclick="document.getElementById('group-avatar-input').click()">上传群头像</button><input type="file" id="group-avatar-input" accept="image/*"></div></div>
+            <!-- ▼▼▼ 【可折叠版】的世界书选择器 ▼▼▼ -->
             <div class="form-group" id="world-book-link-group">
-                <label>关联世界书 (可多选)</label>
-                <div class="custom-multiselect">
-                    <div class="select-box">
-                        <span class="selected-options-text">-- 点击选择 --</span>
-                        <span class="arrow-down">▼</span>
-                    </div>
-                    <div id="world-book-checkboxes-container" class="checkboxes-container">
-                    </div>
-                </div>
+                 <label>关联世界书</label>
+                 <!-- 【新增】可点击的摘要栏 -->
+                 <div class="custom-multiselect">
+                     <div class="select-box" id="wb-pills-summary-box">
+                         <span class="selected-options-text" id="wb-pills-summary-text">-- 点击选择 --</span>
+                         <span class="arrow-down">▼</span>
+                     </div>
+                 </div>
+                 <!-- 【新增】可折叠的胶囊容器，默认隐藏 -->
+                 <div id="world-book-pills-collapsible-container" style="display: none; margin-top: 5px;">
+                     <div id="world-book-pills-container">
+                         <!-- 世界书胶囊将由JS动态生成在这里 -->
+                     </div>
+                 </div>
             </div>
+            <!-- ▲▲▲ 替换结束 ▲▲▲ -->
             <div class="form-group" id="ai-persona-group"><label for="ai-persona">对方人设 (AI Persona)</label><textarea id="ai-persona" rows="3"></textarea></div><div class="form-group" id="ai-avatar-group"><label>对方头像</label><div class="avatar-upload"><div class="avatar-frame-wrapper" style="width: 60px; height: 60px;">
     <img id="ai-avatar-preview" class="avatar-img">
 </div><button onclick="document.getElementById('ai-avatar-input').click()">上传对方头像</button><button id="manage-ai-avatar-library-btn">管理头像库</button>
@@ -19590,13 +19705,6 @@ await db.worldBooks.put(book); document.getElementById('world-book-editor-title'
             document.getElementById('chat-messages').addEventListener('click', (e) => { const aiImage = e.target.closest('.ai-generated-image'); if (aiImage) { const description = aiImage.dataset.description; if (description) showCustomAlert('照片描述', description); return; }  });
             
             const worldBookSelectBox = document.querySelector('.custom-multiselect .select-box');
-            const worldBookCheckboxesContainer = document.getElementById('world-book-checkboxes-container');
-
-function updateWorldBookSelectionDisplay() { const checkedBoxes = worldBookCheckboxesContainer.querySelectorAll('input:checked'); const displayText = document.querySelector('.selected-options-text'); if (checkedBoxes.length === 0) { displayText.textContent = '-- 点击选择 --'; } else if (checkedBoxes.length > 2) { displayText.textContent = `已选择 ${checkedBoxes.length} 项`; } else { displayText.textContent = Array.from(checkedBoxes).map(cb => cb.parentElement.textContent.trim()).join(', '); } }        
-            
-            worldBookSelectBox.addEventListener('click', (e) => { e.stopPropagation(); worldBookCheckboxesContainer.classList.toggle('visible'); worldBookSelectBox.classList.toggle('expanded'); });
-            document.getElementById('world-book-checkboxes-container').addEventListener('change', updateWorldBookSelectionDisplay);
-            window.addEventListener('click', (e) => { if (!document.querySelector('.custom-multiselect').contains(e.target)) { worldBookCheckboxesContainer.classList.remove('visible'); worldBookSelectBox.classList.remove('expanded'); } });
 
 // ▼▼▼ 【最终修复版】'chat-settings-btn' 事件监听器 ▼▼▼
 document.getElementById('chat-settings-btn').addEventListener('click', async () => {
@@ -19658,30 +19766,105 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
         const groups = await db.qzoneGroups.toArray();
         groups.forEach(group => { const option = document.createElement('option'); option.value = group.id; option.textContent = group.name; if (chat.groupId === group.id) option.selected = true; select.appendChild(option); }); 
     }
-    const worldBookCheckboxesContainer = document.getElementById('world-book-checkboxes-container');
-    worldBookCheckboxesContainer.innerHTML = '';
+    // ▼▼▼ 【分类摘要胶囊版】渲染世界书选择器 ▼▼▼
+    const pillsContainer = document.getElementById('world-book-pills-container');
+    const collapsibleContainer = document.getElementById('world-book-pills-collapsible-container');
+    const summaryBox = document.getElementById('wb-pills-summary-box');
+    const summaryTextContainer = document.getElementById('wb-pills-summary-text');
+    
+    pillsContainer.innerHTML = ''; 
     const linkedIds = new Set(chat.settings.linkedWorldBookIds || []);
-    const categories = await db.worldBookCategories.toArray();
-    const books = state.worldBooks;
-    const hasUncategorized = books.some(book => !book.categoryId);
-    if (hasUncategorized) categories.push({ id: 'uncategorized', name: '未分类' });
-    const booksByCategoryId = books.reduce((acc, book) => { const categoryId = book.categoryId || 'uncategorized'; if (!acc[categoryId]) acc[categoryId] = []; acc[categoryId].push(book); return acc; }, {});
-    categories.forEach(category => {
-        const booksInCategory = booksByCategoryId[category.id] || [];
-        if (booksInCategory.length > 0) {
-            const allInCategoryChecked = booksInCategory.every(book => linkedIds.has(book.id));
-            const header = document.createElement('div');
-            header.className = 'wb-category-header collapsed';
-            header.innerHTML = `<span class="arrow">▼</span><input type="checkbox" class="wb-category-checkbox" data-category-id="${category.id}" ${allInCategoryChecked ? 'checked' : ''}><span>${category.name}</span>`;
-            const bookContainer = document.createElement('div');
-            bookContainer.className = 'wb-book-container collapsed';
-            bookContainer.dataset.containerFor = category.id;
-            booksInCategory.forEach(book => { const isChecked = linkedIds.has(book.id); const label = document.createElement('label'); label.innerHTML = `<input type="checkbox" class="wb-book-checkbox" value="${book.id}" data-parent-category="${category.id}" ${isChecked ? 'checked' : ''}> ${book.name}`; bookContainer.appendChild(label); });
-            worldBookCheckboxesContainer.appendChild(header);
-            worldBookCheckboxesContainer.appendChild(bookContainer);
+    
+    const categories = await db.worldBookCategories.orderBy('name').toArray();
+    const books = await db.worldBooks.toArray();
+    
+    const booksByCategoryId = books.reduce((acc, book) => {
+        const categoryId = book.categoryId || 'uncategorized';
+        if (!acc[categoryId]) acc[categoryId] = [];
+        acc[categoryId].push(book);
+        return acc;
+    }, {});
+    
+    if (booksByCategoryId['uncategorized']) {
+        categories.push({ id: 'uncategorized', name: '未分类' });
+    }
+
+    // 【核心升级】全新的摘要更新函数
+    const updateSummaryText = () => {
+        summaryTextContainer.innerHTML = ''; // 清空旧的胶囊
+        const selectedPills = pillsContainer.querySelectorAll('.wb-pill.selected');
+        
+        if (selectedPills.length === 0) {
+            summaryTextContainer.textContent = '-- 点击选择 --';
+            return;
         }
+
+        // 1. 获取所有被选中的世界书ID
+        const selectedBookIds = new Set(Array.from(selectedPills).map(p => p.dataset.bookId));
+        
+        // 2. 找出这些世界书所属的所有分类ID (并去重)
+        const selectedCategoryIds = new Set();
+        books.forEach(book => {
+            if (selectedBookIds.has(book.id)) {
+                selectedCategoryIds.add(book.categoryId || 'uncategorized');
+            }
+        });
+        
+        // 3. 根据分类ID找到分类名称，并创建胶囊
+        categories.forEach(category => {
+            if (selectedCategoryIds.has(category.id)) {
+                const summaryPill = document.createElement('span');
+                summaryPill.className = 'wb-summary-pill';
+                summaryPill.textContent = category.name;
+                summaryTextContainer.appendChild(summaryPill);
+            }
+        });
+    };
+
+    if (books.length === 0) {
+        pillsContainer.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">还没有创建任何世界书</p>';
+    } else {
+        categories.forEach(category => {
+            const booksInCategory = booksByCategoryId[category.id];
+            if (booksInCategory && booksInCategory.length > 0) {
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'wb-pill-category-title';
+                categoryTitle.textContent = category.name;
+                pillsContainer.appendChild(categoryTitle);
+
+                const pillsWrapper = document.createElement('div');
+                pillsWrapper.className = 'wb-pills-wrapper';
+                
+                booksInCategory.forEach(book => {
+                    const isSelected = linkedIds.has(book.id);
+                    const pill = document.createElement('div');
+                    pill.className = `wb-pill ${isSelected ? 'selected' : ''}`;
+                    pill.dataset.bookId = book.id;
+                    pill.innerHTML = `<span class="check-icon">✓</span> ${book.name}`;
+                    
+                    pill.addEventListener('click', () => {
+                        pill.classList.toggle('selected');
+                        updateSummaryText();
+                    });
+                    
+                    pillsWrapper.appendChild(pill);
+                });
+                pillsContainer.appendChild(pillsWrapper);
+            }
+        });
+    }
+
+    updateSummaryText();
+
+    const newSummaryBox = summaryBox.cloneNode(true);
+    summaryBox.parentNode.replaceChild(newSummaryBox, summaryBox);
+    newSummaryBox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = collapsibleContainer.style.display === 'block';
+        collapsibleContainer.style.display = isVisible ? 'none' : 'block';
+        newSummaryBox.classList.toggle('expanded', !isVisible);
     });
-    updateWorldBookSelectionDisplay();
+    // ▲▲▲ 渲染逻辑替换结束 ▲▲▲
     const fontSizeSlider = document.getElementById('font-size-slider');
     fontSizeSlider.value = chat.settings.fontSize || 13;
     document.getElementById('font-size-value').textContent = `${fontSizeSlider.value}px`;
@@ -20534,7 +20717,7 @@ postsList.addEventListener('focusout', (e) => {
 
 // ▲▲▲ 修复代码粘贴到此结束 ▲▲▲
 
-// ▼▼▼ 【最终修正版】为全屏设置页的“保存”按钮绑定事件 ▼▼▼
+// ▼▼▼ 【升级版】保存聊天设置，从胶囊选择器读取数据 ▼▼▼
 document.getElementById('save-chat-settings-btn-screen').addEventListener('click', async () => {
     if (!state.activeChatId) return;
     const chat = state.chats[state.activeChatId];
@@ -20546,10 +20729,13 @@ document.getElementById('save-chat-settings-btn-screen').addEventListener('click
     chat.name = newName;
     chat.settings.fontSize = parseInt(document.getElementById('font-size-slider').value);
     chat.settings.customCss = document.getElementById('custom-css-input').value.trim();
+    
+    // 【核心修改】从新的胶囊UI中读取选中的世界书
+    const selectedPills = document.querySelectorAll('#world-book-pills-container .wb-pill.selected');
+    chat.settings.linkedWorldBookIds = Array.from(selectedPills).map(pill => pill.dataset.bookId);
+
     chat.settings.myPersona = document.getElementById('my-persona').value;
     chat.settings.myAvatar = document.getElementById('my-avatar-preview').src;
-    const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container input.wb-book-checkbox:checked');
-    chat.settings.linkedWorldBookIds = Array.from(checkedBooks).map(cb => cb.value);
 
     if (chat.isGroup) {
         chat.settings.myNickname = document.getElementById('my-group-nickname-input').value.trim();
@@ -20563,23 +20749,14 @@ document.getElementById('save-chat-settings-btn-screen').addEventListener('click
 
     chat.settings.maxMemory = parseInt(document.getElementById('max-memory').value) || 10;
     
-    // 保存到数据库
     await db.chats.put(chat);
     
-    // 应用实时样式（如果需要）
-    applyScopedCss(chat.settings.customCss, '#chat-messages', 'custom-bubble-style');
-    
-    // 保存后返回聊天界面
     showScreen('chat-interface-screen');
     
-    // 刷新UI
     renderChatInterface(state.activeChatId);
     renderChatList();
-    
-    // (可选) 给出成功提示
-    // alert('聊天设置已保存!'); 
 });
-// ▲▲▲ 修正结束 ▲▲▲
+// ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 【最终修复版】壁纸库事件绑定 ▼▼▼
 
