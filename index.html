@@ -16443,6 +16443,19 @@ async function triggerAiInCallAction(userInput = null) {
     const callFeed = document.getElementById('video-call-main');
     const userNickname = chat.settings.myNickname || '我';
 
+    // 【核心修复1】将用户输入消息的渲染和记录逻辑，移到这里
+    if (userInput && videoCallState.isUserParticipating) {
+        // a. 在UI上渲染出用户自己说的话
+        const userBubble = document.createElement('div');
+        userBubble.className = 'call-message-bubble user-speech';
+        userBubble.textContent = userInput;
+        callFeed.appendChild(userBubble);
+        callFeed.scrollTop = callFeed.scrollHeight;
+
+        // b. 将用户的发言存入本次通话的临时历史记录
+        videoCallState.callHistory.push({ role: 'user', content: userInput });
+    }
+
     // ▼▼▼ 在这里添加世界书读取逻辑 ▼▼▼
     let worldBookContent = '';
     if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
@@ -21747,34 +21760,18 @@ document.getElementById('accept-call-btn').addEventListener('click', async () =>
 // ▲▲▲ 替换结束 ▲▲▲
 
 
-// ▼▼▼ 【最终修复版】用户在通话中发言的事件监听器 ▼▼▼
+// ▼▼▼ 【最终修复版 V2】用户在通话中发言的事件监听器 ▼▼▼
 document.getElementById('user-speak-btn').addEventListener('click', async () => {
     // 1. 安全检查，确保通话正在进行
-    if (!videoCallState.isActive) return;
+    if (!videoCallState.isActive || !videoCallState.isUserParticipating) return;
 
     // 2. 弹出输入框，让用户输入内容
     const userInput = await showCustomPrompt('你说', '请输入你想说的话...');
     
-    // 3. 【核心】只有当用户输入了有效内容后，才执行后续逻辑
+    // 3. 【核心】只有当用户输入了有效内容后，才调用AI思考函数
     if (userInput && userInput.trim()) {
-        const trimmedInput = userInput.trim();
-        const chat = state.chats[videoCallState.activeChatId];
-        const callFeed = document.getElementById('video-call-main');
-        
-        // a. 在UI上渲染出用户自己说的话
-        const userBubble = document.createElement('div');
-        userBubble.className = 'call-message-bubble user-speech';
-        userBubble.textContent = trimmedInput;
-        callFeed.appendChild(userBubble);
-        callFeed.scrollTop = callFeed.scrollHeight; // 自动滚动到底部
-
-        // b. 将用户的发言存入本次通话的临时历史记录
-        // 注意：这里的 role 应该是 'user'，而不是之前的 assistant
-        videoCallState.callHistory.push({ role: 'user', content: trimmedInput });
-
-        // c. 【关键】调用AI的思考函数，并将用户的输入作为触发器
-        // 我们不再需要在这里传入参数，因为 triggerAiInCallAction 会自动读取完整的 callHistory
-        triggerAiInCallAction();
+        // 直接将用户输入的内容，作为参数传递给AI处理函数
+        triggerAiInCallAction(userInput.trim());
     }
 });
 // ▲▲▲ 替换结束 ▲▲▲
