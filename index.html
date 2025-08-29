@@ -16443,19 +16443,6 @@ async function triggerAiInCallAction(userInput = null) {
     const callFeed = document.getElementById('video-call-main');
     const userNickname = chat.settings.myNickname || '我';
 
-    // 【核心修复1】将用户输入消息的渲染和记录逻辑，移到这里
-    if (userInput && videoCallState.isUserParticipating) {
-        // a. 在UI上渲染出用户自己说的话
-        const userBubble = document.createElement('div');
-        userBubble.className = 'call-message-bubble user-speech';
-        userBubble.textContent = userInput;
-        callFeed.appendChild(userBubble);
-        callFeed.scrollTop = callFeed.scrollHeight;
-
-        // b. 将用户的发言存入本次通话的临时历史记录
-        videoCallState.callHistory.push({ role: 'user', content: userInput });
-    }
-
     // ▼▼▼ 在这里添加世界书读取逻辑 ▼▼▼
     let worldBookContent = '';
     if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
