@@ -4532,6 +4532,48 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】世界书分类全选按钮样式 ▼▼▼ */
+
+/* 1. 让分类标题栏成为一个flex容器，方便按钮定位 */
+.wb-pill-category-title {
+    display: flex;
+    justify-content: space-between; /* 让标题在左，按钮在右 */
+    align-items: center; /* 垂直居中 */
+}
+
+/* 2. 圆形全选按钮的外框 */
+.wb-category-select-all-btn {
+    width: 10px;
+    height: 10px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* 防止被压缩 */
+}
+
+/* 3. 按钮内部的“选中点” */
+.wb-category-select-all-btn .inner-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    transform: scale(0); /* 默认不显示 */
+    transition: transform 0.2s ease;
+}
+
+/* 4. 当按钮被激活时 (该分类下所有/部分书被选中) */
+.wb-category-select-all-btn.active {
+    border-color: var(--accent-color);
+}
+.wb-category-select-all-btn.active .inner-dot {
+    transform: scale(1); /* 显示内部的“选中点” */
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲__▲ */
+
 /* ▼▼▼ 【全新】世界书分类摘要胶囊样式 ▼▼▼ */
 
 /* 1. 让摘要栏背景透明，并调整内边距 */
@@ -19766,7 +19808,7 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
         const groups = await db.qzoneGroups.toArray();
         groups.forEach(group => { const option = document.createElement('option'); option.value = group.id; option.textContent = group.name; if (chat.groupId === group.id) option.selected = true; select.appendChild(option); }); 
     }
-    // ▼▼▼ 【分类摘要胶囊版】渲染世界书选择器 ▼▼▼
+    // ▼▼▼ 【全选功能版】渲染世界书选择器 ▼▼▼
     const pillsContainer = document.getElementById('world-book-pills-container');
     const collapsibleContainer = document.getElementById('world-book-pills-collapsible-container');
     const summaryBox = document.getElementById('wb-pills-summary-box');
@@ -19789,28 +19831,20 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
         categories.push({ id: 'uncategorized', name: '未分类' });
     }
 
-    // 【核心升级】全新的摘要更新函数
-    const updateSummaryText = () => {
-        summaryTextContainer.innerHTML = ''; // 清空旧的胶囊
+    const updateSummaryText = () => { /* ... (这部分函数保持不变) ... */
+        summaryTextContainer.innerHTML = '';
         const selectedPills = pillsContainer.querySelectorAll('.wb-pill.selected');
-        
         if (selectedPills.length === 0) {
             summaryTextContainer.textContent = '-- 点击选择 --';
             return;
         }
-
-        // 1. 获取所有被选中的世界书ID
         const selectedBookIds = new Set(Array.from(selectedPills).map(p => p.dataset.bookId));
-        
-        // 2. 找出这些世界书所属的所有分类ID (并去重)
         const selectedCategoryIds = new Set();
         books.forEach(book => {
             if (selectedBookIds.has(book.id)) {
                 selectedCategoryIds.add(book.categoryId || 'uncategorized');
             }
         });
-        
-        // 3. 根据分类ID找到分类名称，并创建胶囊
         categories.forEach(category => {
             if (selectedCategoryIds.has(category.id)) {
                 const summaryPill = document.createElement('span');
@@ -19827,29 +19861,69 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
         categories.forEach(category => {
             const booksInCategory = booksByCategoryId[category.id];
             if (booksInCategory && booksInCategory.length > 0) {
+                // 1. 创建分类标题
                 const categoryTitle = document.createElement('div');
                 categoryTitle.className = 'wb-pill-category-title';
-                categoryTitle.textContent = category.name;
+                // 【核心修改】将标题和按钮分开创建
+                const titleText = document.createElement('span');
+                titleText.textContent = category.name;
+                
+                const selectAllBtn = document.createElement('div');
+                selectAllBtn.className = 'wb-category-select-all-btn';
+                selectAllBtn.innerHTML = '<div class="inner-dot"></div>';
+                
+                categoryTitle.appendChild(titleText);
+                categoryTitle.appendChild(selectAllBtn);
                 pillsContainer.appendChild(categoryTitle);
 
                 const pillsWrapper = document.createElement('div');
                 pillsWrapper.className = 'wb-pills-wrapper';
                 
+                // 2. 渲染该分类下的所有书籍胶囊 (逻辑不变)
                 booksInCategory.forEach(book => {
                     const isSelected = linkedIds.has(book.id);
                     const pill = document.createElement('div');
                     pill.className = `wb-pill ${isSelected ? 'selected' : ''}`;
                     pill.dataset.bookId = book.id;
                     pill.innerHTML = `<span class="check-icon">✓</span> ${book.name}`;
-                    
-                    pill.addEventListener('click', () => {
-                        pill.classList.toggle('selected');
-                        updateSummaryText();
-                    });
-                    
                     pillsWrapper.appendChild(pill);
                 });
                 pillsContainer.appendChild(pillsWrapper);
+
+                // 3. 【核心】定义一个函数来检查并更新全选按钮的状态
+                const checkCategorySelectionState = () => {
+                    const allPillsInCategory = pillsWrapper.querySelectorAll('.wb-pill');
+                    const selectedPillsInCategory = pillsWrapper.querySelectorAll('.wb-pill.selected');
+                    // 如果该分类下所有书都被选中，则按钮为激活状态
+                    const areAllSelected = allPillsInCategory.length === selectedPillsInCategory.length;
+                    selectAllBtn.classList.toggle('active', areAllSelected);
+                };
+                
+                // 4. 为每个胶囊的点击事件增加更新“全选按钮”和“摘要”的逻辑
+                pillsWrapper.querySelectorAll('.wb-pill').forEach(pill => {
+                    pill.addEventListener('click', () => {
+                        pill.classList.toggle('selected');
+                        checkCategorySelectionState(); // 更新全选按钮状态
+                        updateSummaryText(); // 更新摘要文本
+                    });
+                });
+                
+                // 5. 为全选按钮绑定点击事件
+                selectAllBtn.addEventListener('click', () => {
+                    const areAllCurrentlySelected = selectAllBtn.classList.contains('active');
+                    const allPillsInCategory = pillsWrapper.querySelectorAll('.wb-pill');
+                    
+                    // 如果当前已全选，则全部取消；否则，全部选中
+                    allPillsInCategory.forEach(pill => {
+                        pill.classList.toggle('selected', !areAllCurrentlySelected);
+                    });
+                    
+                    checkCategorySelectionState(); // 更新全选按钮自身的视觉状态
+                    updateSummaryText(); // 更新顶部的摘要
+                });
+
+                // 6. 初始加载时检查一次状态
+                checkCategorySelectionState();
             }
         });
     }
