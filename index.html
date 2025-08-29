@@ -4407,91 +4407,114 @@ input[type="color"]::-webkit-color-swatch {
     align-items: center; /* 保持内容居中 */
 }
 
-/* ▼▼▼ 【全新】来电请求与视频通话界面样式 ▼▼▼ */
+/* ▼▼▼ 【全新沉浸式】视频通话界面样式 (V2) ▼▼▼ */
 
-/* --- 来电请求模态框 --- */
+/* --- 来电请求模态框 (保持不变) --- */
 #incoming-call-modal .incoming-call-content {
     background-color: rgba(40, 40, 40, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
-    width: 280px;
-    padding: 30px 20px;
-    text-align: center;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px; width: 280px; padding: 30px 20px;
+    text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-
 .caller-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 12px;
-    border: 3px solid rgba(255,255,255,0.5);
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    margin-bottom: 12px; border: 3px solid rgba(255,255,255,0.5);
+}
+.caller-name { font-size: 20px; font-weight: 600; margin-bottom: 5px; }
+.caller-text { font-size: 14px; color: #ccc; margin-bottom: 30px; }
+.incoming-call-actions { display: flex; justify-content: space-around; align-items: center; }
+.action-button-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; color: #e0e0e0; }
+.call-action-btn {
+    width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer;
+    background-size: 50%; background-repeat: no-repeat; background-position: center;
+    transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.call-action-btn:active { transform: scale(0.9); }
+.call-action-btn.decline { background-color: #ff3b30; background-image: url('https://sharkpan.xyz/f/ppmNSQ/MaterialSymbolsCall.png'); }
+.call-action-btn.accept { background-color: #4cd964; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>'); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(76, 217, 100, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(76, 217, 100, 0); } 100% { box-shadow: 0 0 0 0 rgba(76, 217, 100, 0); } }
+
+/* --- 【全新】沉浸式视频通话界面 --- */
+#video-call-screen {
+    background-color: #1c1c1e;
+    color: white;
+    /* 【核心】启用背景图样式 */
+    background-size: cover;
+    background-position: center;
+    display: flex; /* 确保flex布局生效 */
+    flex-direction: column;
+    justify-content: flex-end; /* 让内容从底部开始对齐 */
+    padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* 适配底部安全区 */
+    box-sizing: border-box;
 }
 
-.caller-name {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 5px;
+/* 顶部通话时间 */
+.video-call-top-bar {
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    padding: 15px 20px;
+    padding-top: calc(15px + env(safe-area-inset-top)); /* 适配顶部安全区 */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+    z-index: 10;
+    text-align: center;
+    box-sizing: border-box;
+    pointer-events: none; /* 让鼠标可以穿透它 */
+}
+#call-timer {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
-.caller-text {
-    font-size: 14px;
-    color: #ccc;
-    margin-bottom: 30px;
+/* 半透明对话框 */
+#video-call-main {
+    width: 100%;
+    height: 35%; /* 占据屏幕约1/3的高度 */
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 20px;
+    margin-bottom: 25px; /* 与底部按钮的间距 */
+    padding: 15px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.incoming-call-actions {
+/* 底部控制按钮区域 */
+.video-call-controls {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    width: 100%;
 }
 
-.action-button-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #e0e0e0;
-}
-
-.call-action-btn {
-    width: 60px;
-    height: 60px;
+.control-btn {
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
-    background-size: 50%;
     background-repeat: no-repeat;
     background-position: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background-color 0.2s;
 }
-.call-action-btn:active {
-    transform: scale(0.9);
+.control-btn:active { transform: scale(0.9); }
+.control-btn.speak-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    background-size: 55%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>');
 }
-
-.call-action-btn.decline {
+.control-btn.hangup-btn {
     background-color: #ff3b30;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 16.5L3 6m18 6l-5.6-5.6a1.2 1.2 0 0 0-1.7 0L3 18.2a1.2 1.2 0 0 0-.3 1.2l1.2 3.6a1.2 1.2 0 0 0 1.2.9h15.6a1.2 1.2 0 0 0 1.2-1.2V7.7a1.2 1.2 0 0 0-.3-1.1z"/></svg>');
+    background-size: 50%;
+    background-image: url('https://sharkpan.xyz/f/ppmNSQ/MaterialSymbolsCall.png');
 }
-
-.call-action-btn.accept {
-    background-color: #4cd964;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>');
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(76, 217, 100, 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(76, 217, 100, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(76, 217, 100, 0); }
-}
-
-/* --- 视频通话界面 --- */
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 【层级修复】确保人设库在最顶层 ▼▼▼ */
 #persona-library-modal {
@@ -4810,7 +4833,7 @@ input[type="color"]::-webkit-color-swatch {
 .control-btn.hangup-btn {
     background-color: #ff3b30;
     background-size: 50%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 16.5L3 6m18 6l-5.6-5.6a1.2 1.2 0 0 0-1.7 0L3 18.2a1.2 1.2 0 0 0-.3 1.2l1.2 3.6a1.2 1.2 0 0 0 1.2.9h15.6a1.2 1.2 0 0 0 1.2-1.2V7.7a1.2 1.2 0 0 0-.3-1.1z"/></svg>');
+    background-image: url('https://sharkpan.xyz/f/ppmNSQ/MaterialSymbolsCall.png');
 }
 .control-btn.join-btn {
     background-color: #007bff;
@@ -8108,13 +8131,6 @@ input:checked + .slider:before {
     <!-- 1. 顶部栏 (保持不变) -->
     <div class="video-call-top-bar">
         <span id="call-timer">00:00</span>
-    </div>
-    
-    <!-- 2. 【升级】参与者头像网格区域 -->
-    <div class="video-call-avatar-area">
-        <div id="participant-avatars-grid">
-            <!-- JS会在这里动态生成头像 -->
-        </div>
     </div>
 
     <!-- 3. 对话框区域 (保持不变) -->
@@ -16188,9 +16204,9 @@ let videoCallState = {
     startTime: null,       
     participants: [],      
     isUserParticipating: true,
-    // --- 【核心新增】---
-    callHistory: [], // 用于存储通话中的对话历史
-    preCallContext: "" // 用于存储通话前的聊天摘要
+    callHistory: [],
+    preCallContext: "",
+    backgroundUrl: "" // <<<<<<< 【新增】用于存储当前通话的背景URL
 };
 
 // ▼▼▼ 在这里粘贴新的状态变量 ▼▼▼
@@ -16246,6 +16262,7 @@ async function handleInitiateCall() {
 }
 
 
+// ▼▼▼ 【沉浸式版】启动视频通话 ▼▼▼
 function startVideoCall() {
     const chat = state.chats[videoCallState.activeChatId];
     if (!chat) return;
@@ -16253,23 +16270,27 @@ function startVideoCall() {
     videoCallState.isActive = true;
     videoCallState.isAwaitingResponse = false;
     videoCallState.startTime = Date.now();
-    videoCallState.callHistory = []; // 【新增】清空上一次通话的历史
+    videoCallState.callHistory = []; 
 
-    // --- 【核心新增:抓取通话前上下文】---
-    const preCallHistory = chat.history.slice(-10); // 取最后10条作为上下文
+    const preCallHistory = chat.history.slice(-10);
     videoCallState.preCallContext = preCallHistory.map(msg => {
         const sender = msg.role === 'user' ? (chat.settings.myNickname || '我') : (msg.senderName || chat.name);
         return `${sender}: ${String(msg.content).substring(0, 50)}...`;
     }).join('\n');
-    // --- 新增结束 ---
-
-    updateParticipantAvatars(); 
     
+    // 【核心修改1】应用背景
+    const videoScreen = document.getElementById('video-call-screen');
+    // 优先使用当前通话的背景，如果没有，则使用聊天设置里的背景，如果还没有，则不设置
+    const bgToUse = videoCallState.backgroundUrl || chat.settings.offlineVideoBackground || '';
+    videoScreen.style.backgroundImage = bgToUse ? `url(${bgToUse})` : 'none';
+
     document.getElementById('video-call-main').innerHTML = `<em>${videoCallState.isGroupCall ? '群聊已建立...' : '正在接通...'}</em>`;
     showScreen('video-call-screen');
 
-    document.getElementById('user-speak-btn').style.display = videoCallState.isUserParticipating ? 'block' : 'none';
-    document.getElementById('join-call-btn').style.display = videoCallState.isUserParticipating ? 'none' : 'block';
+    // 【核心修改2】移除了所有与头像网格相关的调用
+    // updateParticipantAvatars(); 
+    // document.getElementById('user-speak-btn').style.display = ...
+    // document.getElementById('join-call-btn').style.display = ...
 
     if (callTimerInterval) clearInterval(callTimerInterval);
     callTimerInterval = setInterval(updateCallTimer, 1000);
@@ -16277,6 +16298,7 @@ function startVideoCall() {
 
     triggerAiInCallAction();
 }
+// ▲▲▲ 替换结束 ▲▲▲
 
 /**
  * 【核心】结束视频通话
@@ -16359,69 +16381,6 @@ if (chat.isGroup && summaryMessage.role === 'assistant') {
 // ▲▲▲ 替换结束 ▲▲▲
 
 /**
- * 【全新】更新通话界面的参与者头像网格
- */
-function updateParticipantAvatars() {
-    const grid = document.getElementById('participant-avatars-grid');
-    grid.innerHTML = '';
-    const chat = state.chats[videoCallState.activeChatId];
-    if (!chat) return;
-
-    let participantsToRender = [];
-
-    // ★ 核心修正:区分群聊和单聊
-    if (videoCallState.isGroupCall) {
-        // 群聊逻辑:显示所有已加入的AI成员
-        participantsToRender = [...videoCallState.participants];
-        // 如果用户也参与了,就把用户信息也加进去
-        if (videoCallState.isUserParticipating) {
-            participantsToRender.unshift({
-                id: 'user',
-                name: chat.settings.myNickname || '我',
-                avatar: chat.settings.myAvatar || defaultMyGroupAvatar
-            });
-        }
-    } else {
-        // 单聊逻辑:只显示对方的头像和名字
-        participantsToRender.push({
-            id: 'ai',
-            name: chat.name,
-            avatar: chat.settings.aiAvatar || defaultAvatar
-        });
-    }
-    
-    participantsToRender.forEach(p => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'participant-avatar-wrapper';
-        wrapper.dataset.participantId = p.id;
-const displayName = p.groupNickname || p.name; // <-- 核心修复在这里
-wrapper.innerHTML = `
-    <img src="${p.avatar}" class="participant-avatar" alt="${displayName}">
-    <div class="participant-name">${displayName}</div>
-`;
-        grid.appendChild(wrapper);
-    });
-}
-
-/**
- * 【全新】处理用户加入/重新加入通话
- */
-function handleUserJoinCall() {
-    if (!videoCallState.isActive || videoCallState.isUserParticipating) return;
-    
-    videoCallState.isUserParticipating = true;
-    updateParticipantAvatars(); // 更新头像列表,加入用户
-
-    // 切换底部按钮
-    document.getElementById('user-speak-btn').style.display = 'block';
-    document.getElementById('join-call-btn').style.display = 'none';
-
-    // 告知AI用户加入了
-    triggerAiInCallAction("[系统提示:用户加入了通话]");
-}
-
-
-/**
  * 更新通话计时器显示 (保持不变)
  */
 function updateCallTimer() {
@@ -16454,6 +16413,20 @@ function showIncomingCallModal() {
     document.getElementById('incoming-call-modal').classList.add('visible');
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【已恢复并优化】处理用户加入/接听通话的逻辑 ▼▼▼
+function handleUserJoinCall() {
+    if (!videoCallState.isActive || videoCallState.isUserParticipating) return;
+    
+    videoCallState.isUserParticipating = true;
+    
+    // 我们不再需要更新头像，所以这行是注释掉的
+    // updateParticipantAvatars(); 
+
+    // 【核心】告知AI用户加入了，触发它的第一句话
+    triggerAiInCallAction("[系统提示:用户加入了通话]");
+}
+// ▲▲▲ 恢复结束 ▲▲▲
 
 /**
  * 隐藏AI发起的通话请求模态框 (保持不变)
@@ -21200,6 +21173,44 @@ document.getElementById('delete-event-btn').addEventListener('click', deleteCale
 
             // ▲▲▲ 添加结束 ▲▲▲
 
+// ▼▼▼ 【全新】视频通话背景上传功能 ▼▼▼
+document.getElementById('video-call-screen').addEventListener('click', (e) => {
+    // 确保只有在点击背景本身（而不是按钮或对话框）时才触发
+    if (e.target.id === 'video-call-screen') {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (readEvent) => {
+                    const base64Url = readEvent.target.result;
+                    // 更新当前通话的状态
+                    videoCallState.backgroundUrl = base64Url;
+                    // 同时保存到聊天设置中，作为该聊天的默认通话/线下背景
+                    const chat = state.chats[videoCallState.activeChatId];
+                    if (chat) {
+                        chat.settings.offlineVideoBackground = base64Url;
+                        await db.chats.put(chat);
+                    }
+                    // 实时应用新背景
+                    document.getElementById('video-call-screen').style.backgroundImage = `url(${base64Url})`;
+                    await showCustomAlert('成功', '通话背景已更换！');
+                };
+                reader.readAsDataURL(file);
+            }
+            document.body.removeChild(fileInput); // 清理DOM
+        });
+
+        document.body.appendChild(fileInput);
+        fileInput.click();
+    }
+});
+// ▲▲▲ 新增事件结束 ▲▲▲
+
             // ▼▼▼ 在 init() 函数的事件监听器区域,检查并确保你有这段完整的代码 ▼▼▼
 
             // 收藏页搜索功能
@@ -21658,9 +21669,6 @@ document.getElementById('cancel-call-btn').addEventListener('click', () => {
     showScreen('chat-interface-screen');
 });
 
-// 【全新】绑定“加入通话”按钮
-document.getElementById('join-call-btn').addEventListener('click', handleUserJoinCall);
-
 // ▼▼▼ 用这个【已修复并激活旁观模式】的版本替换旧的 decline-call-btn 事件监听器 ▼▼▼
 // 绑定来电请求的“拒绝”按钮
 document.getElementById('decline-call-btn').addEventListener('click', async () => {
@@ -21704,57 +21712,72 @@ document.getElementById('decline-call-btn').addEventListener('click', async () =
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 用这个【已修复重复头像BUG】的版本替换旧的 accept-call-btn 事件监听器 ▼▼▼
-// 绑定来电请求的“接听”按钮
+// ▼▼▼ 【已修复】接听按钮事件，重新连接关键逻辑 ▼▼▼
 document.getElementById('accept-call-btn').addEventListener('click', async () => {
     hideIncomingCallModal();
     
     videoCallState.initiator = 'ai';
-    videoCallState.isUserParticipating = true;
+    videoCallState.isUserParticipating = true; // 标记用户已参与
     videoCallState.activeChatId = state.activeChatId;
     
-    // 【核心修正】我们在这里不再手动添加用户到 participants 列表
+    // 【核心修复1】恢复群聊参与者的添加逻辑
     if (videoCallState.isGroupCall) {
-        // 对于群聊,我们只把【发起通话的AI】加入参与者列表
         const chat = state.chats[videoCallState.activeChatId];
-        const requester = chat.members.find(m => m.name === videoCallState.callRequester);
+        const requester = chat.members.find(m => m.originalName === videoCallState.callRequester); // 注意这里是 originalName
         if (requester) {
-            // 清空可能存在的旧数据,然后只添加发起者
             videoCallState.participants = [requester];
         } else {
-            videoCallState.participants = []; // 如果找不到发起者,就清空
+            videoCallState.participants = [];
         }
+    } else {
+        videoCallState.participants = []; // 单聊清空即可
     }
     
-    // 无论单聊还是群聊,直接启动通话界面!
+    // 【核心修复2】调用 startVideoCall 来启动界面
     startVideoCall();
+    
+    // 【核心修复3】在界面启动后，调用 handleUserJoinCall 来触发AI说话
+    // 我们需要稍微延迟一下，确保通话状态已激活
+    setTimeout(() => {
+        // 在调用前，我们手动将 isUserParticipating 设为 false，以“欺骗” handleUserJoinCall 函数让它执行
+        videoCallState.isUserParticipating = false; 
+        handleUserJoinCall();
+    }, 100); // 延迟100毫秒
 });
 // ▲▲▲ 替换结束 ▲▲▲
 
 
-// ▼▼▼ 请用这个【已增加用户高亮】的全新版本,完整替换旧的 user-speak-btn 事件监听器 ▼▼▼
-// 绑定用户在通话中发言的按钮
+// ▼▼▼ 【最终修复版】用户在通话中发言的事件监听器 ▼▼▼
 document.getElementById('user-speak-btn').addEventListener('click', async () => {
+    // 1. 安全检查，确保通话正在进行
     if (!videoCallState.isActive) return;
 
-    // ★★★★★ 核心新增:在弹出输入框前,先找到并高亮用户头像 ★★★★★
-    const userAvatar = document.querySelector('.participant-avatar-wrapper[data-participant-id="user"] .participant-avatar');
-    if (userAvatar) {
-        userAvatar.classList.add('speaking');
-    }
-
+    // 2. 弹出输入框，让用户输入内容
     const userInput = await showCustomPrompt('你说', '请输入你想说的话...');
     
-    // ★★★★★ 核心新增:无论用户是否输入,只要关闭输入框就移除高亮 ★★★★★
-    if (userAvatar) {
-        userAvatar.classList.remove('speaking');
-    }
-
+    // 3. 【核心】只有当用户输入了有效内容后，才执行后续逻辑
     if (userInput && userInput.trim()) {
-        triggerAiInCallAction(userInput.trim());
+        const trimmedInput = userInput.trim();
+        const chat = state.chats[videoCallState.activeChatId];
+        const callFeed = document.getElementById('video-call-main');
+        
+        // a. 在UI上渲染出用户自己说的话
+        const userBubble = document.createElement('div');
+        userBubble.className = 'call-message-bubble user-speech';
+        userBubble.textContent = trimmedInput;
+        callFeed.appendChild(userBubble);
+        callFeed.scrollTop = callFeed.scrollHeight; // 自动滚动到底部
+
+        // b. 将用户的发言存入本次通话的临时历史记录
+        // 注意：这里的 role 应该是 'user'，而不是之前的 assistant
+        videoCallState.callHistory.push({ role: 'user', content: trimmedInput });
+
+        // c. 【关键】调用AI的思考函数，并将用户的输入作为触发器
+        // 我们不再需要在这里传入参数，因为 triggerAiInCallAction 会自动读取完整的 callHistory
+        triggerAiInCallAction();
     }
 });
-// ▲▲▲ 替换结束 ▲▲
+// ▲▲▲ 替换结束 ▲▲▲
 
 // 【全新】拉黑功能事件绑定
 document.getElementById('block-chat-btn').addEventListener('click', async () => {
