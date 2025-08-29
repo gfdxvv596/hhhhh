@@ -4067,6 +4067,121 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】淘宝/礼物功能样式 ▼▼▼ */
+
+/* 1. 商品列表网格 */
+#shopping-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+/* 2. 单个商品卡片 */
+.shopping-item-card {
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s, transform 0.2s;
+}
+.shopping-item-card.selected {
+    border-color: var(--accent-color);
+    transform: scale(1.03);
+}
+.shopping-item-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+}
+.shopping-item-card .info {
+    padding: 8px;
+}
+.shopping-item-card .name {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary);
+    /* 最多显示两行 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 36px; /* 约等于两行的高度 */
+}
+.shopping-item-card .price {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ff5000;
+    margin-top: 5px;
+}
+#phone-screen.dark-mode .shopping-item-card .price {
+    color: #ff8c66;
+}
+
+/* 3. 聊天气泡中的礼物卡片 */
+.message-bubble.is-gift-card .content {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+.gift-card {
+    width: 230px;
+    border-radius: 12px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    cursor: pointer;
+}
+.gift-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+}
+.gift-card-header img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+.gift-card-header .details {
+    overflow: hidden;
+}
+.gift-card-header .name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gift-card-header .price {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ff5000;
+}
+.gift-card-footer {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a8a8a;
+    background-color: #f7f8fa;
+    padding: 6px 12px;
+    border-top: 1px solid #e0e0e0;
+}
+.gift-card.declined {
+    opacity: 0.7;
+    text-decoration: line-through;
+}
+.gift-card.accepted .gift-card-footer {
+    color: #28a745;
+    background-color: #e9f7ec;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* === 【新增】统一设置页面的背景色 (已修正) === */
 #api-settings-screen,
 #font-settings-screen,
@@ -7414,9 +7529,11 @@ input:checked + .slider:before {
         <button id="open-sticker-panel-btn" class="chat-action-icon-btn action-button" title="表情">
             <img src="https://sharkpan.xyz/f/JZxJFg/%E5%9C%86%E6%B7%BB%E5%8A%A0.png" alt="表情">
         </button>
-        <button id="send-waimai-request-btn" class="chat-action-icon-btn action-button" title="外卖">
-            <img src="https://sharkpan.xyz/f/B7wWsa/%E8%AE%A2%E5%8D%95.png" alt="外卖">
-        </button>
+        <!-- ▼▼▼ 【功能升级】外卖按钮改为淘宝/礼物按钮 ▼▼▼ -->
+<button id="open-shopping-btn" class="chat-action-icon-btn action-button" title="礼物">
+    <img src="https://sharkpan.xyz/f/B7wWsa/%E8%AE%A2%E5%8D%95.png" alt="礼物">
+</button>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
         <button id="video-call-btn" class="chat-action-icon-btn action-button" title="视频通话">
             <img src="https://sharkpan.xyz/f/4mAqCj/%E6%91%84%E5%83%8F%E6%9C%BA.png" alt="视频通话">
         </button>
@@ -8147,6 +8264,37 @@ input:checked + .slider:before {
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】淘宝/礼物功能模态框 ▼▼▼ -->
+<div id="shopping-modal" class="modal">
+    <div class="modal-content" style="height: 80%; width: 95%;">
+        <!-- ▼▼▼ 【视觉修复版】的模态框头部 ▼▼▼ -->
+        <div class="modal-header" style="flex-direction: column; align-items: stretch; gap: 12px; padding-bottom: 10px;">
+            <span>选个礼物吧</span>
+            <!-- 淘宝风格标题栏 -->
+            <div id="shopping-title-bar" style="display: none; width: 100%; background-color: #f0f2f5; padding: 10px 12px; border-radius: 8px; font-size: 14px; text-align: center; box-sizing: border-box;">
+                为 <strong id="shopping-keyword-display"></strong> 找到了以下宝贝
+            </div>
+        </div>
+        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+        <div class="modal-body" id="shopping-list-container" style="padding: 10px; background-color: #f0f2f5;">
+            <!-- AI生成的商品列表将在这里显示 -->
+            <div id="shopping-loading-spinner" style="text-align: center; padding: 40px; color: var(--text-secondary);">正在生成商品...</div>
+        </div>
+        <div class="modal-footer" style="flex-direction: column; gap: 10px; padding: 15px;">
+            <div id="shopping-item-preview" style="display: none; text-align: center; margin-bottom: 10px;">
+                <img id="shopping-preview-img" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-bottom: 5px;">
+                <p id="shopping-preview-name" style="font-weight: 500; margin: 0;"></p>
+            </div>
+            <div id="shopping-actions" style="display: none; width: 100%; gap: 10px;">
+                <button class="form-button" id="shopping-action-give">送给Ta</button>
+                <button class="form-button form-button-secondary" id="shopping-action-request">让Ta送</button>
+            </div>
+            <button class="cancel" id="shopping-cancel-btn" style="width: 100%;">取消</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 请将这个新的模态框HTML粘贴到所有其他模态框之后 ▼▼▼ -->
 <div id="group-management-modal" class="modal">
@@ -10347,7 +10495,6 @@ else if (!chat.isGroup && chat.relationship?.status === 'blocked_by_ai') {
 
 // ▼▼▼ 请用这个【带诊断功能的全新版本】替换旧的 renderChatInterface 函数 ▼▼▼
 function renderChatInterface(chatId) {
-    cleanupWaimaiTimers();
     const chat = state.chats[chatId];
     if (!chat) return;
     exitSelectionMode();
@@ -11097,6 +11244,47 @@ else if (msg.type === 'interactive_html') {
 }
 // ▲▲▲ 粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】添加对礼物卡片的渲染逻辑 ▼▼▼
+else if (msg.type === 'gift_card') {
+    bubble.classList.add('is-gift-card');
+    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
+    const aiName = chat.name;
+
+    let footerText = '';
+    let cardClass = '';
+
+    if (msg.status === 'pending') {
+        if (msg.action === 'give' && msg.senderName === myNickname) {
+            footerText = `已赠送给 ${aiName}，待回应ing...`;
+        } else if (msg.action === 'request' && msg.senderName === myNickname) {
+            footerText = `已向 ${aiName} 发出请求...`;
+        } else {
+            // 这是对方发来的，需要处理
+            footerText = msg.action === 'give' ? `来自 ${msg.senderName} 的礼物` : `来自 ${msg.senderName} 的支付请求`;
+        }
+    } else if (msg.status === 'accepted') {
+        footerText = `✅ 已接受`;
+        cardClass = 'accepted';
+    } else if (msg.status === 'declined') {
+        footerText = `❌ 已拒绝`;
+        cardClass = 'declined';
+    }
+
+    contentHtml = `
+        <div class="gift-card ${cardClass}">
+            <div class="gift-card-header">
+                <img src="${msg.item.imageUrl}" alt="${msg.item.name}">
+                <div class="details">
+                    <p class="name">${msg.item.name}</p>
+                    <p class="price">¥${Number(msg.item.price).toFixed(2)}</p>
+                </div>
+            </div>
+            <div class="gift-card-footer">${footerText}</div>
+        </div>
+    `;
+}
+// ▲▲▲ 粘贴结束 ▲▲▲
+
 else if (msg.type === 'share_card') {
     bubble.classList.add('is-link-share'); // 复用链接分享的卡片样式
     // 【核心】把时间戳加到卡片上,方便后面点击时识别
@@ -11193,83 +11381,7 @@ else if (msg.type === 'share_card') {
             <div class.transfer-note">${noteText}</div>
         </div>
     `;
-} else if (msg.type === 'waimai_request') {
-        bubble.classList.add('is-waimai-request');
-        if (msg.status === 'paid' || msg.status === 'rejected') {
-            bubble.classList.add(`status-${msg.status}`);
-        }
-        let displayName;
-        // 如果是群聊
-        if (chat.isGroup) {
-            // 就执行原来的逻辑:在成员列表里查找昵称
-            const member = chat.members.find(m => m.originalName === msg.senderName);
-            displayName = member ? member.groupNickname : msg.senderName;
-        } else {
-            // 否则(是单聊),直接使用聊天对象的名称
-            displayName = chat.name;
-        }
-        // 【核心修改】使用我们刚刚查找到的 displayName
-        const requestTitle = `来自 ${displayName} 的代付请求`;
-        let actionButtonsHtml = '';
-        if (msg.status === 'pending' && !isUser) {
-            actionButtonsHtml = `
-                <div class="waimai-user-actions">
-                    <button class="waimai-decline-btn" data-choice="rejected">残忍拒绝</button>
-                    <button class="waimai-pay-btn" data-choice="paid">为Ta买单</button>
-                </div>`;
-        }
-        contentHtml = `
-            <div class="waimai-card">
-                <div class="waimai-header">
-                    <img src="https://files.catbox.moe/mq179k.png" class="icon" alt="Meituan Icon">
-                    <div class="title-group">
-                        <span class="brand">美团外卖</span><span class="separator">|</span><span>外卖美食</span>
-                    </div>
-                </div>
-                <div class="waimai-catchphrase">Hi,你和我的距离只差一顿外卖～</div>
-                <div class="waimai-main">
-                    <div class="request-title">${requestTitle}</div>
-                    <div class="payment-box">
-                        <div class="payment-label">需付款</div>
-                        <div class="amount">¥${Number(msg.amount).toFixed(2)}</div>
-                        <div class="countdown-label">剩余支付时间
-                            <div class="countdown-timer" id="waimai-timer-${msg.timestamp}"></div>
-                        </div>
-                    </div>
-                    <button class="waimai-details-btn">查看详情</button>
-                </div>
-                ${actionButtonsHtml}
-            </div>`;
-        
-        setTimeout(() => {
-            const timerEl = document.getElementById(`waimai-timer-${msg.timestamp}`);
-            if (timerEl && msg.countdownEndTime) {
-                if (waimaiTimers[msg.timestamp]) clearInterval(waimaiTimers[msg.timestamp]);
-                if (msg.status === 'pending') {
-                    waimaiTimers[msg.timestamp] = startWaimaiCountdown(timerEl, msg.countdownEndTime);
-                } else {
-                    timerEl.innerHTML = `<span>已</span><span>处</span><span>理</span>`;
-                }
-            }
-            const detailsBtn = document.querySelector(`.message-bubble[data-timestamp="${msg.timestamp}"] .waimai-details-btn`);
-            if (detailsBtn) {
-                detailsBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const paidByText = msg.paidBy ? `<br><br><b>状态:</b>由 ${msg.paidBy} 为您代付成功` : '';
-                    showCustomAlert('订单详情', `<b>商品:</b>${msg.productInfo}<br><b>金额:</b>¥${Number(msg.amount).toFixed(2)}${paidByText}`);
-                });
-            }
-            const actionButtons = document.querySelectorAll(`.message-bubble[data-timestamp="${msg.timestamp}"] .waimai-user-actions button`);
-            actionButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const choice = e.target.dataset.choice;
-                    handleWaimaiResponse(msg.timestamp, choice);
-                });
-            });
-        }, 0);
-
-} else if (msg.type === 'red_packet') {
+}else if (msg.type === 'red_packet') {
     bubble.classList.add('is-red-packet');
     const myNickname = chat.settings.myNickname || '我';
     
@@ -11961,9 +12073,9 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **发送图片**: \`{"type": "ai_image", "description": "图片的详细【中文】文字描述..."}\`
 - **发送语音**: \`{"type": "voice_message", "content": "语音的文字内容..."}\`
 - **发起转账**: \`{"type": "transfer", "amount": 5.20, "note": "一点心意"}\`
-- **发起外卖请求**: \`{"type": "waimai_request", "productInfo": "一杯咖啡", "amount": 25}\`
-- **回应外卖-同意**: \`{"type": "waimai_response", "status": "paid", "for_timestamp": 1688888888888}\`
-- **回应外卖-拒绝**: \`{"type": "waimai_response", "status": "rejected", "for_timestamp": 1688888888888}\`
+- **【【【功能升级】】】赠送礼物**: \`{"type": "gift_card", "action": "give", "item": {"name": "商品名", "price": 10.0, "imageUrl": "https://..."}}\`
+- **【【【功能升级】】】索要礼物**: \`{"type": "gift_card", "action": "request", "item": {"name": "商品名", "price": 10.0, "imageUrl": "https://..."}}\`
+- **【【【功能升级】】】回应礼物/索要**: \`{"type": "gift_response", "decision": "accepted" or "declined", "for_timestamp": 1688888888888}\`
 - **【新】发起视频通话**: \`{"type": "video_call_request"}\`
 - **【新】回应视频通话-接受**: \`{"type": "video_call_response", "decision": "accept"}\`
 - **【新】回应视频通话-拒绝**: \`{"type": "video_call_response", "decision": "reject"}\`
@@ -11989,10 +12101,13 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】,比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细【中文】文字描述..."}\`
 -   **表情 (sticker)**: 指的是【卡通或梗图】,用于表达情绪。
 
-# 如何正确使用“外卖代付”功能:
-1.  这个指令代表【你,AI角色】向【用户】发起一个代付请求。也就是说,你希望【用户帮你付钱】。
-2.  【【【重要】】】: 当【用户】说他们想要某样东西时(例如“我想喝奶茶”),你【绝对不能】使用这个指令。你应该用其他方式回应,比如直接发起【转账】(\`transfer\`),或者在对话中提议:“我帮你点吧？”
-3.  只有当【你,AI角色】自己想要某样东西,并且想让【用户】为你付款时,才使用此指令。
+# 【【【全新】】】如何处理礼物/索要请求:
+1.  **感知事件**: 当对话历史中出现 \`[系统提示:用户向你赠送了'商品名'...]\` 或 \`[系统提示:用户向你索要'商品名'...]\` 时，意味着你收到了一个请求。
+2.  **做出决策**: 你【必须】根据自己的人设、当前对话的氛围、以及商品本身，来决定是“接受”还是“拒绝”这个请求。
+3.  **使用指令回应**:
+    -   如果决定接受, 你【必须】使用指令: \`{"type": "gift_response", "decision": "accepted", "for_timestamp": (收到请求的那条消息的时间戳)}\`。
+    -   如果决定拒绝, 你【必须】使用指令: \`{"type": "gift_response", "decision": "declined", "for_timestamp": (收到请求的那条消息的时间戳)}\`。
+4.  **【【【至关重要】】】**: 在使用上述任一指令后, 你还【必须】紧接着发送一条或多条 \`text\` 消息, 来对你的决定进行表达。例如，接受后说“哇谢谢你！这个我超喜欢的！”，拒绝后说“心意领啦，不过这个我暂时用不上哦~”。
 
 # 如何处理用户转账:
 1.  **感知事件**: 当对话历史中出现 \`[你收到了来自用户的转账...]\` 的系统提示时,意味着你刚刚收到了一笔钱。
@@ -12022,12 +12137,32 @@ ${sharedContext}
 现在,请根据以上规则和下面的对话历史,继续进行对话。`;
             
 // ▼▼▼ 请用这【一整块已修复时间戳】的代码,替换旧的【单人聊天】messagesPayload构建逻辑 ▼▼▼
+// ▼▼▼ 【最终修复版】messagesPayload 构建逻辑 ▼▼▼
 messagesPayload = historySlice.map(msg => {
-    // 过滤掉不应发送给AI的消息
-
     if (msg.type === 'share_card') return null;
-    
-    // 1. 如果是AI自己的消息,我们将其转换为AI能理解的JSON字符串格式
+
+    // 【核心修复1】将礼物卡片的处理逻辑提升到最前面
+    if (msg.type === 'gift_card') {
+        let actionText = '';
+        if (msg.role === 'user') { // 用户发起的
+            if (msg.action === 'give') {
+                actionText = `[系统提示:你于时间戳 ${msg.timestamp} 收到了来自用户的礼物: '${msg.item.name}'。请你决策并使用 'gift_response' 指令回应。]`;
+            } else if (msg.action === 'request') {
+                actionText = `[系统提示:用户于时间戳 ${msg.timestamp} 向你索要礼物: '${msg.item.name}'。请你决策并使用 'gift_response' 指令回应。]`;
+            }
+        } else { // AI自己发起的 (对AI来说是历史记录)
+            if (msg.status === 'accepted') {
+                actionText = `[系统提示:用户接受了你送出/索要的 '${msg.item.name}'。]`;
+            } else if (msg.status === 'declined') {
+                actionText = `[系统提示:用户拒绝了你送出/索要的 '${msg.item.name}'。]`;
+            } else {
+                actionText = `[你之前发起了关于 '${msg.item.name}' 的请求，正在等待用户回应。]`;
+            }
+        }
+        return { role: 'user', content: `(Timestamp: ${msg.timestamp}) ${actionText}` };
+    }
+
+    // 【核心修复2】在处理AI消息时，明确跳过礼物卡片，因为它已在上面处理
     if (msg.role === 'assistant') {
         let assistantMsgObject = { type: msg.type || 'text' };
         if (msg.type === 'sticker') {
@@ -12036,9 +12171,7 @@ messagesPayload = historySlice.map(msg => {
         } else if (msg.type === 'transfer') {
             assistantMsgObject.amount = msg.amount;
             assistantMsgObject.note = msg.note;
-        } else if (msg.type === 'waimai_request') {
-            assistantMsgObject.productInfo = msg.productInfo;
-            assistantMsgObject.amount = msg.amount;
+        // 注意：这里没有 gift_card 的 case
         } else {
             if (msg.quote) {
                 assistantMsgObject.quote_reply = {
@@ -12050,38 +12183,26 @@ messagesPayload = historySlice.map(msg => {
                  assistantMsgObject.content = msg.content;
             }
         }
-        // 【核心修改】在这里为AI提供它自己消息的时间戳
         const assistantContent = JSON.stringify([assistantMsgObject]);
         return { role: 'assistant', content: `(Timestamp: ${msg.timestamp}) ${assistantContent}` };
     }
 
-    // 2. 如果是用户的消息,我们将其转换为带上下文的纯文本
-    let contentStr = '';
-    
-    // 【核心修改】在所有内容前,都先加上时间戳!
-    contentStr += `(Timestamp: ${msg.timestamp}) `;
-
+    // --- 后续处理用户其他消息的逻辑保持不变 ---
+    let contentStr = `(Timestamp: ${msg.timestamp}) `;
     if (msg.quote) {
         contentStr += `(回复 ${msg.quote.senderName}): ${msg.content}`;
     } else {
         contentStr += msg.content;
     }
-    
-    // 特殊消息类型的文本化处理
     if (msg.type === 'user_photo') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [你收到了一张用户描述的照片,内容是:'${msg.content}']` };
     if (msg.type === 'voice_message') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [用户发来一条语音消息,内容是:'${msg.content}']` };
     if (msg.type === 'transfer') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [系统提示:你于时间戳 ${msg.timestamp} 收到了来自用户的转账: ${msg.amount}元, 备注: ${msg.note}。请你决策并使用 'accept_transfer' 或 'decline_transfer' 指令回应。]` };
-    if (msg.type === 'waimai_request') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [系统提示:用户于时间戳 ${msg.timestamp} 发起了外卖代付请求,商品是“${msg.productInfo}”,金额是 ${msg.amount} 元。请你决策并使用 waimai_response 指令回应。]` };
-
-if (Array.isArray(msg.content) && msg.content[0]?.type === 'image_url') {
-    const prefix = `(Timestamp: ${msg.timestamp}) `;
-    // 将文本前缀和图片内容打包成一个数组,这才是正确的格式
-    return { role: 'user', content: [ { type: 'text', text: prefix }, ...msg.content ] };
-}
-
+    if (Array.isArray(msg.content) && msg.content[0]?.type === 'image_url') {
+        const prefix = `(Timestamp: ${msg.timestamp}) `;
+        return { role: 'user', content: [ { type: 'text', text: prefix }, ...msg.content ] };
+    }
     if (msg.meaning) return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [用户发送了一个表情,意思是:'${msg.meaning}']` };
     
-    // 对于普通文本和带引用的文本,统一返回
     return { role: msg.role, content: contentStr };
 
 }).filter(Boolean);
@@ -12322,6 +12443,21 @@ case 'qzone_post':
                        await renderQzonePosts();
                     }
                     continue;
+
+// ▼▼▼ 【全新】处理AI对礼物的回应 ▼▼▼
+                case 'gift_response': {
+                    const originalGiftMsgIndex = chat.history.findIndex(m => m.timestamp === msgData.for_timestamp);
+                    if (originalGiftMsgIndex > -1) {
+                        const originalMsg = chat.history[originalGiftMsgIndex];
+                        originalMsg.status = msgData.decision;
+                        // 刷新UI以显示“已接受”或“已拒绝”
+                        if (isViewingThisChat) {
+                            renderChatInterface(chatId);
+                        }
+                    }
+                    continue; // 这条指令只修改状态，不产生新消息
+                }
+// ▲▲▲ 添加结束 ▲▲▲
 
 // ▼▼▼ 请用这块【全新的代码】替换旧的 case 'qzone_comment' ▼▼▼
 case 'qzone_comment': { 
@@ -13067,7 +13203,6 @@ createMessageElement
         function enterSelectionMode(initialMsgTimestamp) { if (isSelectionMode) return; isSelectionMode = true; document.getElementById('chat-interface-screen').classList.add('selection-mode'); toggleMessageSelection(initialMsgTimestamp); }
 
         function exitSelectionMode() {
-    cleanupWaimaiTimers(); // <--- 在这里添加这行代码
  if (!isSelectionMode) return; isSelectionMode = false; document.getElementById('chat-interface-screen').classList.remove('selection-mode'); selectedMessages.forEach(ts => { const bubble = document.querySelector(`.message-bubble[data-timestamp="${ts}"]`); if (bubble) bubble.classList.remove('selected'); }); selectedMessages.clear(); }
 
 // ▼▼▼ 请用这个【最终简化版】替换旧的 toggleMessageSelection 函数 ▼▼▼
@@ -15703,73 +15838,6 @@ async function createNewMemberInGroup() {
     alert(`新成员“${name}”已成功加入群聊!`);
 }
 
-// ▼▼▼ 【全新】外卖请求倒计时函数 ▼▼▼
-function startWaimaiCountdown(element, endTime) {
-    const timerId = setInterval(() => {
-        const now = Date.now();
-        const distance = endTime - now;
-
-        if (distance < 0) {
-            clearInterval(timerId);
-            element.innerHTML = '<span>已</span><span>超</span><span>时</span>';
-            return;
-        }
-
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        
-        const minStr = String(minutes).padStart(2, '0');
-        const secStr = String(seconds).padStart(2, '0');
-
-        element.innerHTML = `<span>${minStr.charAt(0)}</span><span>${minStr.charAt(1)}</span> : <span>${secStr.charAt(0)}</span><span>${secStr.charAt(1)}</span>`;
-    }, 1000);
-    return timerId;
-}
-
-function cleanupWaimaiTimers() {
-    for (const timestamp in waimaiTimers) {
-        clearInterval(waimaiTimers[timestamp]);
-    }
-    waimaiTimers = {};
-}
-// ▲▲▲ 新函数粘贴结束 ▲▲▲
-
-async function handleWaimaiResponse(originalTimestamp, choice) {
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
-
-    const messageIndex = chat.history.findIndex(m => m.timestamp === originalTimestamp);
-    if (messageIndex === -1) return;
-
-    // 1. 更新原始消息的状态
-    const originalMessage = chat.history[messageIndex];
-    originalMessage.status = choice;
-    
-    // 【核心修正】记录支付者,并构建对AI更清晰的系统消息
-    let systemContent;
-    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
-    
-    if (choice === 'paid') {
-        originalMessage.paidBy = myNickname; // 记录是用户付的钱
-        systemContent = `[系统提示:你 (${myNickname}) 为 ${originalMessage.senderName} 的外卖订单(时间戳: ${originalTimestamp})完成了支付。此订单已关闭,其他成员不能再支付。]`;
-    } else {
-        systemContent = `[系统提示:你 (${myNickname}) 拒绝了 ${originalMessage.senderName} 的外卖代付请求(时间戳: ${originalTimestamp})。]`;
-    }
-
-    // 2. 创建一条新的、对用户隐藏的系统消息,告知AI结果
-    const systemNote = {
-        role: 'system',
-        content: systemContent,
-        timestamp: Date.now(),
-        isHidden: true
-    };
-    chat.history.push(systemNote);
-
-    // 3. 保存更新到数据库并刷新UI
-    await db.chats.put(chat);
-    renderChatInterface(state.activeChatId);  
-}
-
 let videoCallState = {
     isActive: false,       
     isAwaitingResponse: false, 
@@ -16213,6 +16281,179 @@ function toggleCallButtons(isGroup) {
 }
 // ▲▲▲ 粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】淘宝/礼物功能核心函数 ▼▼▼
+let currentShoppingContext = {
+    keyword: '',
+    selectedItem: null
+};
+
+/**
+ * 【总入口】打开礼物/购物模态框
+ */
+async function openShoppingModal() {
+    if (!state.activeChatId) return;
+    const keyword = await showCustomPrompt('想送/要点什么？', '输入关键词，如“奶茶”、“玩偶”...');
+    if (!keyword || !keyword.trim()) return;
+
+    currentShoppingContext = { keyword: keyword.trim(), selectedItem: null };
+
+    // 1. 显示模态框并进入加载状态
+    const modal = document.getElementById('shopping-modal');
+    document.getElementById('shopping-list-container').innerHTML = `<div id="shopping-loading-spinner" style="text-align: center; padding: 40px; color: var(--text-secondary);">正在为“${keyword}”生成商品...</div>`;
+    document.getElementById('shopping-item-preview').style.display = 'none';
+    document.getElementById('shopping-actions').style.display = 'none';
+    document.getElementById('shopping-title-bar').style.display = 'none'; // 先隐藏标题栏
+    modal.classList.add('visible');
+
+    // 2. 异步触发AI生成商品
+    generateShoppingItems(keyword.trim());
+}
+
+// ▼▼▼ 【最终防崩溃版】调用AI生成商品列表 ▼▼▼
+async function generateShoppingItems(keyword) {
+    const chat = state.chats[state.activeChatId];
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+
+    const systemPrompt = `
+# 你的任务
+你是一个顶级的电商商品策划师。你的任务是根据用户提供的关键词，策划并生成一个包含5个相关商品的JSON数组。
+
+# 核心规则
+1.  商品多样性: 生成的商品应该在品牌、风格、价格上有所区别，显得真实且吸引人。例如，搜索“玩偶”，可以生成不同IP（草莓熊、玲娜贝儿）、不同材质（毛绒、棉花）、不同风格（可爱、搞怪）的商品。
+2.  价格合理: 价格应该是符合商品定位的随机数字，可以保留两位小数。
+3.  【【【图片Prompt铁律 V3】】】: 商品图片必须使用 \`https://image.pollinations.ai/prompt/{...}\` 生成。Prompt必须遵循“**商品白底图、专业摄影**”的原则，以达到逼真的电商效果。
+    *   关键词库: 必须包含 \`product_photography\`, \`white_background\`, \`studio_lighting\`, \`ultra-detailed\`。
+    *   主体描述: 必须清晰、具体，使用下划线 \`_\` 连接单词。
+    *   禁止: 绝对禁止出现任何人物、手、复杂的背景或艺术画风。
+    *   正确示范: \`https://image.pollinations.ai/prompt/a_cup_of_bubble_tea_with_pearls,_product_photography,_white_background,_studio_lighting,_8k,_ultra-detailed\`
+4.  【【【输出格式铁律】】】: 你的回复【必须且只能】是一个纯净的、不包含任何其他文字的JSON数组字符串。每个对象包含三个字段: "name" (string), "price" (number), "imageUrl" (string)。
+    - **示例**: \`[{"name": "经典波霸牛乳茶【冰/少糖】", "price": 15.50, "imageUrl": "https://..."}, {"name": "迪士尼草莓熊限定款毛绒玩偶【50cm】", "price": 189.90, "imageUrl": "https://..."}]\`
+`;
+    // 【重要】我们不再将 systemPrompt 放入 messages，而是作为API的专用参数
+    const messagesForApi = [{ role: 'user', content: `请为我生成关于“${keyword}”的5个商品。` }];
+
+    try {
+        let isGemini = proxyUrl === GEMINI_API_URL;
+        let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi, isGemini);
+        const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) : await fetch(`${proxyUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+            body: JSON.stringify({
+                model: model,
+                // 【重要】将 system prompt 作为 system 消息发送
+                messages: [{ role: 'system', content: systemPrompt }, ...messagesForApi],
+                temperature: 0.8
+            })
+        });
+
+        if (!response.ok) throw new Error((await response.json()).error.message);
+
+        const data = await response.json();
+        const responseText = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+        
+        // ▼▼▼ 【核心修复】使用我们已有的、更强大的 parseAiResponse 函数来解析 ▼▼▼
+        const items = parseAiResponse(responseText);
+
+        // 安全检查：确保返回的是一个数组，并且包含我们需要的字段
+        if (!Array.isArray(items) || items.length === 0 || !items[0].name || !items[0].price || !items[0].imageUrl) {
+            console.error("AI返回的数据格式不符合商品要求:", items);
+            throw new Error("AI未能生成有效的商品列表，请稍后再试。");
+        }
+        // ▲▲▲ 修复结束 ▲▲▲
+
+        renderShoppingItems(items);
+
+    } catch (error) {
+        console.error("生成商品失败:", error);
+        document.getElementById('shopping-list-container').innerHTML = `<p style="text-align: center; color: #ff3b30;">商品生成失败: ${error.message}</p>`;
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+/**
+ * 渲染AI生成的商品列表
+ * @param {Array} items 商品对象数组
+ */
+function renderShoppingItems(items) {
+    // ▼▼▼ 【新增】显示并填充淘宝风格标题栏 ▼▼▼
+    const titleBar = document.getElementById('shopping-title-bar');
+    document.getElementById('shopping-keyword-display').textContent = currentShoppingContext.keyword;
+    titleBar.style.display = 'block';
+    // ▲▲▲ 新增结束 ▲▲▲
+    const container = document.getElementById('shopping-list-container');
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.id = 'shopping-list';
+
+    items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'shopping-item-card';
+        card.dataset.index = index;
+        card.innerHTML = `
+            <img src="${item.imageUrl}" alt="${item.name}">
+            <div class="info">
+                <p class="name">${item.name}</p>
+                <p class="price">¥${Number(item.price).toFixed(2)}</p>
+            </div>
+        `;
+        card.addEventListener('click', () => {
+            // 移除其他选中项的样式
+            document.querySelectorAll('.shopping-item-card.selected').forEach(c => c.classList.remove('selected'));
+            // 添加选中样式
+            card.classList.add('selected');
+            // 更新上下文和预览
+            currentShoppingContext.selectedItem = item;
+            updateShoppingPreview(item);
+        });
+        grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+}
+
+/**
+ * 更新模态框底部的预览和操作按钮
+ * @param {object} item 选中的商品对象
+ */
+function updateShoppingPreview(item) {
+    document.getElementById('shopping-preview-img').src = item.imageUrl;
+    document.getElementById('shopping-preview-name').textContent = item.name;
+    document.getElementById('shopping-item-preview').style.display = 'block';
+    document.getElementById('shopping-actions').style.display = 'flex';
+}
+
+/**
+ * 发送礼物/索要请求
+ * @param {string} actionType 'give' (赠送) 或 'request' (索要)
+ */
+async function sendGiftAction(actionType) {
+    if (!currentShoppingContext.selectedItem) {
+        alert("请先选择一个商品。");
+        return;
+    }
+    const chat = state.chats[state.activeChatId];
+    const item = currentShoppingContext.selectedItem;
+    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
+    
+    const giftMessage = {
+        role: 'user',
+        senderName: myNickname,
+        type: 'gift_card',
+        timestamp: Date.now(),
+        action: actionType, // 'give' or 'request'
+        item: { ...item },
+        status: 'pending' // 'pending', 'accepted', 'declined'
+    };
+
+    chat.history.push(giftMessage);
+    await db.chats.put(chat);
+    appendMessage(giftMessage, chat);
+    renderChatList();
+    
+    document.getElementById('shopping-modal').classList.remove('visible');
+}
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
 // ▼▼▼ 第1步:将这个【新函数】粘贴到您的JS功能函数定义区 ▼▼▼
 
 /**
@@ -16252,47 +16493,6 @@ function showEventDetails(event) {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
-// ▼▼▼ 【全新】这个函数是本次修复的核心,请粘贴到你的JS功能区 ▼▼▼
-async function handleWaimaiResponse(originalTimestamp, choice) {
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
-
-    const messageIndex = chat.history.findIndex(m => m.timestamp === originalTimestamp);
-    if (messageIndex === -1) return;
-
-    // 1. 更新内存中原始消息的状态
-    const originalMessage = chat.history[messageIndex];
-    originalMessage.status = choice;
-    
-    // 2. 获取当前用户的昵称,并构建对AI更清晰的系统消息
-    let systemContent;
-    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
-    
-    if (choice === 'paid') {
-        originalMessage.paidBy = myNickname; // 记录是“我”付的钱
-        systemContent = `[系统提示:你 (${myNickname}) 为 ${originalMessage.senderName} 的外卖订单(时间戳: ${originalTimestamp})完成了支付。此订单已关闭,其他成员不能再支付。]`;
-    } else {
-        systemContent = `[系统提示:你 (${myNickname}) 拒绝了 ${originalMessage.senderName} 的外卖代付请求(时间戳: ${originalTimestamp})。]`;
-    }
-
-    // 3. 创建一条新的、对用户隐藏的系统消息,告知AI结果
-    const systemNote = {
-        role: 'system',
-        content: systemContent,
-        timestamp: Date.now(),
-        isHidden: true
-    };
-    chat.history.push(systemNote);
-
-    // 4. 将更新后的数据保存到数据库,并立刻重绘UI
-    await db.chats.put(chat);
-    renderChatInterface(state.activeChatId);
-    
-    // 5. 【重要】只有在支付成功后,才触发一次AI响应,让它感谢你
-    if (choice === 'paid') {
-        triggerAiResponse();
-    }
-}
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 /**
@@ -19578,72 +19778,6 @@ document.getElementById('delete-selected-stickers-btn').addEventListener('click'
             document.getElementById('voice-message-btn').addEventListener('click', async () => { if (!state.activeChatId) return; const text = await showCustomPrompt("发送语音", "请输入你想说的内容:"); if (text && text.trim()) { const chat = state.chats[state.activeChatId]; const msg = { role: 'user', type: 'voice_message', content: text.trim(), timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); } });
             document.getElementById('send-photo-btn').addEventListener('click', async () => { if (!state.activeChatId) return; const description = await showCustomPrompt("发送照片", "请用文字描述您要发送的照片:"); if (description && description.trim()) { const chat = state.chats[state.activeChatId]; const msg = { role: 'user', type: 'user_photo', content: description.trim(), timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); } });
 
-// ▼▼▼ 【全新】外卖请求功能事件绑定 ▼▼▼
-const waimaiModal = document.getElementById('waimai-request-modal');
-document.getElementById('send-waimai-request-btn').addEventListener('click', () => {
-    waimaiModal.classList.add('visible');
-});
-
-document.getElementById('waimai-cancel-btn').addEventListener('click', () => {
-    waimaiModal.classList.remove('visible');
-});
-
-document.getElementById('waimai-confirm-btn').addEventListener('click', async () => {
-    if (!state.activeChatId) return;
-    
-    const productInfoInput = document.getElementById('waimai-product-info');
-    const amountInput = document.getElementById('waimai-amount');
-    
-    const productInfo = productInfoInput.value.trim();
-    const amount = parseFloat(amountInput.value);
-
-    if (!productInfo) {
-        alert('请输入商品信息!');
-        return;
-    }
-    if (isNaN(amount) || amount <= 0) {
-        alert('请输入有效的代付金额!');
-        return;
-    }
-
-    const chat = state.chats[state.activeChatId];
-    const now = Date.now();
-
-    // 【核心修正】在这里获取用户自己的昵称
-    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
-    
-    const msg = {
-        role: 'user',
-        // 【核心修正】将获取到的昵称,作为 senderName 添加到消息对象中
-        senderName: myNickname, 
-        type: 'waimai_request',
-        productInfo: productInfo,
-        amount: amount,
-        status: 'pending',
-        countdownEndTime: now + 15 * 60 * 1000,
-        timestamp: now
-    };
-
-    chat.history.push(msg);
-    await db.chats.put(chat);
-    appendMessage(msg, chat);
-    renderChatList();
-
-    productInfoInput.value = '';
-    amountInput.value = '';
-    waimaiModal.classList.remove('visible');
-});         
-            document.getElementById('open-persona-library-btn').addEventListener('click', openPersonaLibrary);
-            document.getElementById('close-persona-library-btn').addEventListener('click', closePersonaLibrary);
-            document.getElementById('add-persona-preset-btn').addEventListener('click', openPersonaEditorForCreate);
-            document.getElementById('cancel-persona-editor-btn').addEventListener('click', closePersonaEditor);
-            document.getElementById('save-persona-preset-btn').addEventListener('click', savePersonaPreset);
-            document.getElementById('preset-action-edit').addEventListener('click', openPersonaEditorForEdit);
-            document.getElementById('preset-action-delete').addEventListener('click', deletePersonaPreset);
-            document.getElementById('preset-action-cancel').addEventListener('click', hidePresetActions);
-            
-            document.getElementById('selection-cancel-btn').addEventListener('click', exitSelectionMode);
-
 // ▼▼▼ 【最终加强版】用这块代码替换旧的 selection-delete-btn 事件监听器 ▼▼▼
 document.getElementById('selection-delete-btn').addEventListener('click', async () => {
     if (selectedMessages.size === 0) return;
@@ -21720,6 +21854,44 @@ if (savedVinylCover) {
 }
 
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】淘宝/礼物功能事件绑定 ▼▼▼
+document.getElementById('open-shopping-btn').addEventListener('click', openShoppingModal);
+document.getElementById('shopping-cancel-btn').addEventListener('click', () => {
+    document.getElementById('shopping-modal').classList.remove('visible');
+});
+
+document.getElementById('shopping-action-give').addEventListener('click', () => sendGiftAction('give'));
+document.getElementById('shopping-action-request').addEventListener('click', () => sendGiftAction('request'));
+
+// 使用事件委托处理礼物卡片的点击
+document.getElementById('chat-messages').addEventListener('click', async (e) => {
+    const giftCard = e.target.closest('.gift-card');
+    const messageBubble = e.target.closest('.message-bubble');
+    if (!giftCard || !messageBubble) return;
+
+    const timestamp = parseInt(messageBubble.dataset.timestamp);
+    const chat = state.chats[state.activeChatId];
+    const msg = chat.history.find(m => m.timestamp === timestamp);
+
+    // 只有当是对方发来的、且状态是pending时，才响应点击
+    if (msg && msg.role === 'assistant' && msg.status === 'pending') {
+        const actionText = msg.action === 'give' ? '接受' : '同意';
+        const confirmed = await showCustomConfirm(
+            `回应 ${msg.senderName}`,
+            `你确定要“${actionText}”这个请求吗？`,
+            { confirmButtonClass: 'btn-danger' }
+        );
+        if (confirmed) {
+            msg.status = 'accepted';
+        } else {
+            msg.status = 'declined';
+        }
+        await db.chats.put(chat);
+        renderChatInterface(state.activeChatId);
+    }
+});
+// ▲▲▲ 新事件绑定结束 ▲▲▲
 
 // ▼▼▼ 【C】用这个新版本,替换旧的 close-cute-event-viewer-btn 监听器 ▼▼▼
 document.getElementById('close-cute-event-viewer-btn').addEventListener('click', () => {
