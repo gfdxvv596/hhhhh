@@ -2246,6 +2246,81 @@ body:not(.bordered-mode) .comment-input {
 
 /* ▲▲▲ 新的 CSS 粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【上下布局版】上下文消息操作菜单样式 (V3) ▼▼▼ */
+
+/* 1. 菜单容器 */
+#message-actions-menu {
+    position: absolute; 
+    z-index: 250; 
+    background-color: rgba(249, 249, 249, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    display: flex;
+    padding: 0px 0px; /* 调整内边距 */
+    
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    visibility: hidden;
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0.15s;
+    pointer-events: none;
+}
+#message-actions-menu.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+    pointer-events: auto;
+}
+#phone-screen.dark-mode #message-actions-menu {
+    background-color: rgba(50, 50, 52, 0.95);
+}
+
+/* 2. 【核心修改】菜单项改为垂直布局 */
+.context-menu .menu-item {
+    padding: 8px 10px; /* 调整内边距 */
+    display: flex;
+    flex-direction: column; /* <<<<<<< 核心：改为垂直排列 */
+    align-items: center;    /* <<<<<<< 核心：水平居中 */
+    gap: 6px;               /* <<<<<<< 核心：图标和文字的垂直间距 */
+    font-size: 10px;        /* <<<<<<< 核心：缩小字体 */
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    white-space: nowrap; 
+}
+.context-menu .menu-item:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+#phone-screen.dark-mode .context-menu .menu-item:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* 3. 【核心修改】调整图标尺寸 */
+.context-menu .icon {
+    width: 15px;   /* <<<<<<< 核心：增大图标尺寸 */
+    height: 15px;  /* <<<<<<< 核心：增大图标尺寸 */
+    background-color: #333; 
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+#phone-screen.dark-mode .context-menu .icon {
+    background-color: #f0f0f0;
+}
+
+/* 4. 图标SVG形状 (保持不变) */
+.context-menu .icon.edit   { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>'); }
+.context-menu .icon.copy   { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>'); }
+.context-menu .icon.recall { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l-4 2"/></svg>'); }
+.context-menu .icon.quote  { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 2v6h3v4c0 2.25 1 4 2.5 4zM14 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 2v6h3v4c0 2.25 1 4 2.5 4z"></path></svg>'); }
+.context-menu .icon.select { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'); }
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 /* ▼▼▼ 请将这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === 相册照片详情页 === */
@@ -8538,24 +8613,16 @@ input:checked + .slider:before {
 </div>
 <!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
 
-<!-- ▼▼▼ 请将这段新HTML粘贴到所有模态框的末尾 ▼▼▼ -->
-<div id="message-actions-modal" class="modal">
-    <div id="custom-modal" style="width: 250px;">
-        <div class="custom-modal-footer">
-            <!-- 新的操作按钮 -->
-            <button id="edit-message-btn">编辑消息</button>
-            <button id="copy-message-btn">复制文本</button>
-            <button id="recall-message-btn">撤回</button>
-<button id="quote-message-btn">引用</button>
-            <button id="select-message-btn">进入多选</button>
-            <!-- 取消按钮 -->
-            <button id="cancel-message-action-btn" style="margin-top: 8px; border-radius: 8px; background-color: #f0f0f0;">取消</button>
-        </div>
-    </div>
+<!-- ▼▼▼ 【全新】上下文消息操作菜单 ▼▼▼ -->
+<div id="message-actions-menu" class="context-menu">
+    <div class="menu-item" id="edit-message-btn"><span class="icon edit"></span> 编辑</div>
+    <div class="menu-item" id="copy-message-btn"><span class="icon copy"></span> 复制</div>
+    <div class="menu-item" id="recall-message-btn"><span class="icon recall"></span> 撤回</div>
+    <div class="menu-item" id="quote-message-btn"><span class="icon quote"></span> 引用</div>
+    <div class="menu-item" id="select-message-btn"><span class="icon select"></span> 多选</div>
 </div>
-<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
-<!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 请将这段新HTML粘贴到所有模态框的末尾 ▼▼▼ -->
 <div id="post-actions-modal" class="modal">
@@ -15003,27 +15070,64 @@ async function triggerAiInAutoChess(triggeringEventDescription) {
 
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 请将这【一整块新函数】粘贴到JS功能函数定义区的末尾 ▼▼▼
+// ▼▼▼ 【全新】上下文菜单核心逻辑 ▼▼▼
 
+// ▼▼▼ 【定位优化版】显示并定位上下文操作菜单 ▼▼▼
 /**
- * 当长按消息时,显示操作菜单
+ * 【重构版 V2】显示并定位上下文操作菜单 (默认在下方)
  * @param {number} timestamp - 被长按消息的时间戳
  */
 function showMessageActions(timestamp) {
-    // 如果已经在多选模式,则不弹出菜单
     if (isSelectionMode) return;
     
     activeMessageTimestamp = timestamp;
-    document.getElementById('message-actions-modal').classList.add('visible');
+    const menu = document.getElementById('message-actions-menu');
+    const messageBubble = document.querySelector(`.message-bubble[data-timestamp="${timestamp}"]`);
+    if (!messageBubble) return;
+
+    // 1. 获取目标气泡和屏幕的尺寸与位置
+    const bubbleRect = messageBubble.getBoundingClientRect();
+    const screenRect = document.getElementById('phone-screen').getBoundingClientRect();
+
+    // 2. 显示菜单，但先让它透明，以便我们计算它的尺寸
+    menu.classList.add('visible');
+    const menuRect = menu.getBoundingClientRect();
+
+    // 3. 【核心修改】计算理想位置
+    // 水平居中 (逻辑不变)
+    let left = bubbleRect.left + (bubbleRect.width / 2) - (menuRect.width / 2);
+    
+    // ▼▼▼ 默认定位逻辑已修改为在气泡下方 ▼▼▼
+    let top = bubbleRect.bottom + 10; // 10px 间距
+
+    // 4. 【核心修改】边缘检测与位置修正逻辑也相应调整
+    // 如果下方空间不足，则移动到上方
+    if (top + menuRect.height > screenRect.bottom - 10) {
+        top = bubbleRect.top - menuRect.height - 10;
+    }
+    // (水平方向的边缘检测保持不变)
+    if (left < screenRect.left + 10) {
+        left = screenRect.left + 10;
+    }
+    if (left + menuRect.width > screenRect.right - 10) {
+        left = screenRect.right - menuRect.width - 10;
+    }
+
+    // 5. 应用最终计算出的位置 (逻辑不变)
+    menu.style.top = `${top - screenRect.top}px`;
+    menu.style.left = `${left - screenRect.left}px`;
 }
+// ▲▲▲ 替换结束 ▲▲▲
 
 /**
- * 隐藏消息操作菜单
+ * 【重构版】隐藏上下文操作菜单
  */
 function hideMessageActions() {
-    document.getElementById('message-actions-modal').classList.remove('visible');
+    const menu = document.getElementById('message-actions-menu');
+    menu.classList.remove('visible');
     activeMessageTimestamp = null;
 }
+// ▲▲▲ 重构结束 ▲▲▲
 
 // ▼▼▼ 用这个【已更新】的版本,替换旧的 openMessageEditor 函数 ▼▼▼
 async function openMessageEditor() {
@@ -21461,38 +21565,27 @@ document.getElementById('existing-groups-list').addEventListener('click', (e) =>
 });
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
 
-// ▼▼▼ 请将这段【新代码】粘贴到 init() 的事件监听器区域末尾 ▼▼▼
-// 消息操作菜单的按钮事件
-document.getElementById('cancel-message-action-btn').addEventListener('click', hideMessageActions);
-// ▼▼▼ 【修正】使用新的编辑器入口 ▼▼▼
+// ▼▼▼ 【全新】上下文菜单事件绑定 ▼▼▼
 document.getElementById('edit-message-btn').addEventListener('click', openAdvancedMessageEditor);
-// ▲▲▲ 替换结束 ▲▲▲
 document.getElementById('copy-message-btn').addEventListener('click', copyMessageContent);
-
-// ▼▼▼ 在这里添加新代码 ▼▼▼
 document.getElementById('recall-message-btn').addEventListener('click', handleRecallClick);
-// ▲▲▲ 添加结束 ▲▲▲
-
-// ▼▼▼ 请用这段【修正后】的代码替换旧的 select-message-btn 事件监听器 ▼▼▼
+document.getElementById('quote-message-btn').addEventListener('click', startReplyToMessage);
 document.getElementById('select-message-btn').addEventListener('click', () => {
-    // 【核心修复】在关闭菜单前,先捕获时间戳
     const timestampToSelect = activeMessageTimestamp; 
     hideMessageActions();
-    // 使用捕获到的值
     if (timestampToSelect) {
         enterSelectionMode(timestampToSelect);
     }
 });
-// ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 在 init() 函数的事件监听器区域末尾添加 ▼▼▼
-
-// 动态操作菜单的按钮事件
-document.getElementById('edit-post-btn').addEventListener('click', openPostEditor);
-document.getElementById('copy-post-btn').addEventListener('click', copyPostContent);
-document.getElementById('cancel-post-action-btn').addEventListener('click', hidePostActions);
-
-// ▲▲▲ 添加结束 ▲▲▲
+// 添加全局点击事件，用于在点击菜单外部时关闭菜单
+window.addEventListener('click', (e) => {
+    const menu = document.getElementById('message-actions-menu');
+    if (menu.classList.contains('visible') && !menu.contains(e.target) && !e.target.closest('.message-wrapper')) {
+        hideMessageActions();
+    }
+});
+// ▲▲▲ 绑定结束 ▲▲▲
 
 // ▼▼▼ 【新增】联系人选择器事件绑定 ▼▼▼
 document.getElementById('cancel-contact-picker-btn').addEventListener('click', () => {
