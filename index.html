@@ -300,13 +300,6 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 美化样式替换结束 ▲▲▲ */
 
-/* ▼▼▼ 【全新终极修复版】头像框与弹窗样式 (完整替换所有旧版相关代码) ▼▼▼ */
-
-/* 1. 弹窗层级修复:确保应用弹窗在头像框库之上 */
-#avatar-frame-apply-modal {
-    z-index: 101; /* 比其他模态框的 z-index (通常是100) 更高 */
-}
-
 /* ▼▼▼ 【QQ头像框特效 - 终极版CSS】(请用这整块代码替换所有旧的头像框相关CSS) ▼▼▼ */
 
 /* 1. 通用包裹容器:它的尺寸就是头像的尺寸 */
@@ -863,11 +856,49 @@ body.bordered-mode #status-bar {
         .playlist-item-info .artist { font-size: 12px; color: #666; }
         .playlist-item .delete-track-btn { color: #ff3b30; font-size: 20px; padding: 5px; }
 
-        /* Persona Library Styles */
-        #persona-library-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px; }
-        .persona-preset-item { aspect-ratio: 1 / 1; border-radius: 12px; background-size: cover; background-position: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(0,0,0,0.1); }
-        .persona-preset-item:hover { transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .modal-header .action-button { font-size: 16px; color: var(--accent-color); font-weight: 600; cursor: pointer; background: none; border: none; padding: 5px; }
+/* ▼▼▼ 【修复版】Persona Library Styles ▼▼▼ */
+
+/* 1. 人设库网格样式 (保持不变) */
+#persona-library-grid { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 15px; 
+    padding: 10px; 
+}
+.persona-preset-item { 
+    aspect-ratio: 1 / 1; 
+    border-radius: 12px; 
+    background-size: cover; 
+    background-position: center; 
+    cursor: pointer; 
+    transition: transform 0.2s, box-shadow 0.2s; 
+    border: 1px solid rgba(0,0,0,0.1); 
+}
+.persona-preset-item:hover { 
+    transform: scale(1.08); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+}
+
+/* 2. 【核心修复】为人设编辑器弹窗内的头像预览设置尺寸 */
+#persona-editor-modal .avatar-upload img {
+    width: 80px;  /* 设置一个合适的宽度 */
+    height: 80px; /* 设置一个合适的高度 */
+    border-radius: 50%; /* 确保头像是圆形的 */
+    object-fit: cover; /* 确保图片不变形 */
+    border: 1px solid var(--border-color); /* 给一个细边框 */
+}
+
+/* 3. 弹窗右上角按钮样式 (保持不变) */
+.modal-header .action-button { 
+    font-size: 16px; 
+    color: var(--accent-color); 
+    font-weight: 600; 
+    cursor: pointer; 
+    background: none; 
+    border: none; 
+    padding: 5px; 
+}
+/* ▲▲▲ 修复结束 ▲▲▲ */
         
         /* Battery Alert Modal Styles */
         #battery-alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 2000; opacity: 0; transition: opacity 0.3s ease; }
@@ -1266,6 +1297,34 @@ body.bordered-mode #status-bar {
     height: 22px;
     margin-right: 12px;
 }
+
+/* ▼▼▼ 【最终修复版 V2】弹窗层级统一管理 ▼▼▼ */
+
+/* 基础弹窗层级 (聊天设置等) */
+#chat-settings-modal, .modal {
+    z-index: 100 !important;
+}
+
+/* 第一层弹窗 (头像设置) */
+#ai-avatar-editor-modal,
+#my-avatar-editor-modal {
+    z-index: 101 !important;
+}
+
+/* 第二层弹窗 (人设库 / 头像框库 / AI头像库) */
+#persona-library-modal,
+#avatar-frame-library-modal,
+#ai-avatar-library-modal {
+    z-index: 102 !important;
+}
+
+/* 第三层弹窗 (人设编辑 / 长按操作 / 头像框应用) */
+#persona-editor-modal,
+#preset-actions-modal,
+#avatar-frame-apply-modal {
+    z-index: 103 !important;
+}
+/* ▲▲▲ 修复结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新】无边框模式精致化UI布局 ▼▼▼ */
 
@@ -8279,7 +8338,7 @@ input:checked + .slider:before {
         <!-- ▲▲▲ 替换结束 ▲▲▲ -->
         <div class="modal-body" id="shopping-list-container" style="padding: 10px; background-color: #f0f2f5;">
             <!-- AI生成的商品列表将在这里显示 -->
-            <div id="shopping-loading-spinner" style="text-align: center; padding: 40px; color: var(--text-secondary);">正在生成商品...</div>
+            <div id="shopping-loading-spinner" style="text-align: center; padding: 40px; color: var(--text-secondary);">正在查找商品...</div>
         </div>
         <div class="modal-footer" style="flex-direction: column; gap: 10px; padding: 15px;">
             <div id="shopping-item-preview" style="display: none; text-align: center; margin-bottom: 10px;">
@@ -13393,7 +13452,36 @@ async function addSongFromLocal(event) {
 
         function hidePresetActions() { presetActionsModal.classList.remove('visible'); editingPersonaPresetId = null; }
 
-        function applyPersonaPreset(presetId) { const preset = state.personaPresets.find(p => p.id === presetId); if (preset) { document.getElementById('my-avatar-preview').src = preset.avatar; document.getElementById('my-persona').value = preset.persona; } closePersonaLibrary(); }
+// ▼▼▼ 【功能修复版 V2 - 修复人设替换】应用人设预设 ▼▼▼
+function applyPersonaPreset(presetId) {
+    // 1. 安全检查
+    if (!state.activeChatId) return;
+    const chat = state.chats[state.activeChatId];
+    const preset = state.personaPresets.find(p => p.id === presetId);
+    if (!chat || !preset) return;
+
+    // 2. 更新“我的头像设置”弹窗中的预览 (这部分保持不变)
+    const previewImg = document.getElementById('my-editor-preview-img');
+    if (previewImg) {
+        previewImg.src = preset.avatar;
+    }
+    
+    // 3. 更新临时的上下文状态 (这部分保持不变)
+    avatarEditorContext.newAvatarSrc = preset.avatar;
+    
+    // 4. 【核心修复】直接更新 state 中当前聊天对象的人设数据
+    chat.settings.myPersona = preset.persona;
+    
+    // 5. 【核心修复】同时，更新聊天设置页面（背景里的那个）的人设输入框内容
+    const myPersonaTextarea = document.getElementById('my-persona');
+    if (myPersonaTextarea) {
+        myPersonaTextarea.value = preset.persona;
+    }
+    
+    // 6. 关闭人设库，但保持“我的头像设置”弹窗打开 (这部分保持不变)
+    closePersonaLibrary(); 
+}
+// ▲▲▲ 替换结束 ▲▲▲
 
         function openPersonaEditorForCreate() { editingPersonaPresetId = null; document.getElementById('persona-editor-title').textContent = '添加人设预设'; document.getElementById('preset-avatar-preview').src = defaultAvatar; document.getElementById('preset-persona-input').value = ''; personaEditorModal.classList.add('visible'); }
 
@@ -14876,7 +14964,7 @@ async function copyMessageContent() {
     hideMessageActions();
 }
 
-// ▼▼▼ 【全新】头像编辑器核心功能 ▼▼▼
+// ▼▼▼ 【功能修复版】头像编辑器核心功能 ▼▼▼
 
 /**
  * 打开AI头像设置模态框
@@ -14885,20 +14973,17 @@ function openAiAvatarEditor() {
     const chat = state.chats[state.activeChatId];
     if (!chat) return;
     
-    // 1. 设置上下文
     avatarEditorContext = {
         target: 'ai',
         newAvatarSrc: chat.settings.aiAvatar || defaultAvatar,
         newFrameSrc: chat.settings.aiAvatarFrame || ''
     };
 
-    // 2. 填充预览
     document.getElementById('ai-editor-preview-img').src = avatarEditorContext.newAvatarSrc;
     const frameImg = document.getElementById('ai-editor-preview-frame');
     frameImg.src = avatarEditorContext.newFrameSrc;
     frameImg.style.display = avatarEditorContext.newFrameSrc ? 'block' : 'none';
 
-    // 3. 显示模态框
     document.getElementById('ai-avatar-editor-modal').classList.add('visible');
 }
 
@@ -14942,27 +15027,25 @@ function previewEditorAvatar(inputId) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const base64 = e.target.result;
-        avatarEditorContext.newAvatarSrc = base64; // 更新临时状态
-        document.getElementById(`${avatarEditorContext.target}-editor-preview-img`).src = base64; // 更新预览
+        avatarEditorContext.newAvatarSrc = base64;
+        document.getElementById(`${avatarEditorContext.target}-editor-preview-img`).src = base64;
     };
     reader.readAsDataURL(file);
-    fileInput.value = ''; // 清空以便下次选择
+    fileInput.value = '';
 }
 
 /**
  * 为编辑器选择头像框
  */
 function selectFrameForEditor() {
-    // 调用现有的函数打开头像框库
     openAvatarFrameLibrary();
-    // avatarEditorContext.target 会告诉库应该更新哪个预览
 }
 
 /**
  * 移除编辑器中的头像框预览
  */
 function removeFrameFromEditor() {
-    avatarEditorContext.newFrameSrc = ''; // 清空临时状态
+    avatarEditorContext.newFrameSrc = '';
     const frameImg = document.getElementById(`${avatarEditorContext.target}-editor-preview-frame`);
     frameImg.src = '';
     frameImg.style.display = 'none';
@@ -14987,10 +15070,8 @@ async function saveAvatarEditorSettings() {
 
     await db.chats.put(chat);
     
-    // 强制刷新聊天设置屏幕以显示最新头像
     document.getElementById('chat-settings-btn').click(); 
     
-    // 同时刷新聊天界面和列表
     renderChatInterface(chat.id);
     renderChatList();
 }
@@ -15012,6 +15093,7 @@ document.getElementById('ai-avatar-editor-upload-input').addEventListener('chang
 document.getElementById('my-avatar-editor-upload-input').addEventListener('change', () => previewEditorAvatar('my-avatar-editor-upload-input'));
 
 document.getElementById('ai-editor-manage-library-btn').addEventListener('click', openAiAvatarLibraryModal);
+// 【核心修复】恢复了“人设预设库”按钮的事件绑定
 document.getElementById('my-editor-persona-library-btn').addEventListener('click', openPersonaLibrary);
 
 document.getElementById('ai-editor-select-frame-btn').addEventListener('click', selectFrameForEditor);
@@ -15019,8 +15101,6 @@ document.getElementById('my-editor-select-frame-btn').addEventListener('click', 
 
 document.getElementById('ai-editor-remove-frame-btn').addEventListener('click', removeFrameFromEditor);
 document.getElementById('my-editor-remove-frame-btn').addEventListener('click', removeFrameFromEditor);
-
-// ▲▲▲ 新JS代码粘贴结束 ▲▲▲
 
 // ▼▼▼ 用这个【已更新】的版本,替换旧的 createMessageEditorBlock 函数 ▼▼▼
 /**
@@ -21854,6 +21934,24 @@ if (savedVinylCover) {
 }
 
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【功能修复版】人设库相关事件绑定 ▼▼▼
+
+// 1. 为“人设库”主弹窗的按钮绑定事件
+document.getElementById('open-persona-library-btn').addEventListener('click', openPersonaLibrary);
+document.getElementById('close-persona-library-btn').addEventListener('click', closePersonaLibrary);
+document.getElementById('add-persona-preset-btn').addEventListener('click', openPersonaEditorForCreate);
+
+// 2. 为“添加/编辑人设”弹窗的按钮绑定事件
+document.getElementById('cancel-persona-editor-btn').addEventListener('click', closePersonaEditor);
+document.getElementById('save-persona-preset-btn').addEventListener('click', savePersonaPreset);
+
+// 3. 为“长按操作”弹窗的按钮绑定事件
+document.getElementById('preset-action-edit').addEventListener('click', openPersonaEditorForEdit);
+document.getElementById('preset-action-delete').addEventListener('click', deletePersonaPreset);
+document.getElementById('preset-action-cancel').addEventListener('click', hidePresetActions);
+
+// ▲▲▲ 修复结束 ▲▲▲
 
 // ▼▼▼ 【全新】淘宝/礼物功能事件绑定 ▼▼▼
 document.getElementById('open-shopping-btn').addEventListener('click', openShoppingModal);
