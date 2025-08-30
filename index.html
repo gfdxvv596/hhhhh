@@ -617,6 +617,35 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 替换到这里结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】在直播间页面隐藏状态栏 ▼▼▼ */
+#phone-screen:has(#live-stream-screen.active) #status-bar {
+    display: none !important;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新优化版 V2】直播间特殊粉丝样式 ▼▼▼ */
+
+/* 1. 金主（被邀请的AI）的弹幕样式 */
+.live-comment-bubble.guest-comment .username {
+    color: #FFD700; /* 尊贵的金色 */
+    font-weight: 700;
+    /* 【核心优化】添加一层细微的深色文字阴影来“描边”，增强对比度 */
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+.live-comment-bubble.guest-comment {
+    background-color: rgba(80, 65, 0, 0.4); /* 背景色稍微加深，增加与文字的对比 */
+    border: 1px solid rgba(255, 215, 0, 0.6);
+}
+
+/* 2. 富豪路人粉丝的弹幕样式 */
+.live-comment-bubble.rich-fan-comment .username {
+    color: #FF85B3; /* 浪漫的粉色 */
+    /* 【核心优化】同样添加文字阴影来“描边” */
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 2. 用这整块新代码,替换掉旧的“设置页面样式”代码 ▼▼▼ */
 
 /* === 【全新】外观设置页面精致化布局 === */
@@ -3186,6 +3215,91 @@ input[type="color"]::-webkit-color-swatch {
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新V2】直播间功能样式 ▼▼▼ */
+
+/* 1. 直播间主屏幕布局 */
+#live-stream-screen {
+    background-color: #1c1c1e;
+    color: white;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 15px;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+/* 2. 顶部信息栏 (已修复选择器) */
+#live-top-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 10px 15px;
+    padding-top: calc(15px + env(safe-area-inset-top));
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+.streamer-info { display: flex; align-items: center; gap: 8px; background-color: rgba(0,0,0,0.4); padding: 5px 10px 5px 5px; border-radius: 20px; }
+.streamer-info .avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.streamer-info .details { display: flex; flex-direction: column; }
+.streamer-info .streamer-name { font-size: 13px; font-weight: 600; }
+.streamer-info .viewer-count { font-size: 11px; color: #ccc; }
+.live-stats { display: flex; align-items: center; gap: 15px; font-size: 13px; font-weight: 500; background-color: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 20px; }
+
+/* 3. 【新增】主播对话/旁白框 */
+#live-host-narration-box {
+    padding: 12px 15px;
+    background-color: rgba(0,0,0,0.25);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#live-host-narration-content {
+    font-size: 14px;
+    line-height: 1.6;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+    max-height: 80px; /* 约4-5行的高度 */
+    overflow-y: auto;
+}
+
+/* 4. 粉丝评论区域 (保持不变) */
+#live-comments-feed {
+    height: 35%; /* 调整高度以适应新的对话框 */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-bottom: 15px;
+    -webkit-mask-image: linear-gradient(transparent, black 15%);
+    mask-image: linear-gradient(transparent, black 15%);
+}
+.live-comment-bubble { display: inline-block; max-width: 85%; padding: 6px 12px; background-color: rgba(0,0,0,0.35); border-radius: 12px; font-size: 14px; line-height: 1.5; animation: fade-in-up 0.3s ease-out; }
+.live-comment-bubble .username { color: #82c8f9; font-weight: 600; margin-right: 6px; }
+.live-comment-bubble.host-comment .username { color: #ffda77; }
+.live-system-notification { display: inline-block; padding: 5px 12px; background-color: rgba(255, 215, 0, 0.2); border-left: 3px solid #ffd700; color: #ffd700; border-radius: 8px; font-size: 13px; font-weight: 500; animation: fade-in-up 0.3s ease-out; }
+
+/* 5. 底部控制栏 (保持不变) */
+#live-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.live-input-wrapper { flex-grow: 1; display: flex; background-color: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; }
+#live-comment-input { flex-grow: 1; border: none; background: none; padding: 10px 15px; color: white; font-size: 14px; outline: none; }
+#live-comment-input::placeholder { color: #aaa; }
+#live-send-comment-btn { background: none; border: none; color: white; font-weight: 600; padding: 0 15px; cursor: pointer; }
+.live-action-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background-color: rgba(0,0,0,0.3); color: white; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+.live-action-btn.end-call { background-color: #ff3b30; }
+
+/* 6. 点赞动画 (保持不变) */
+@keyframes like-burst { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+.like-burst-effect { position: absolute; bottom: 80px; right: 25px; font-size: 30px; pointer-events: none; animation: like-burst 0.5s ease-out forwards; }
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* === 聊天界面多选操作栏优化 === */
 #chat-interface-screen .header .selection-controls {
     display: flex;
@@ -3932,7 +4046,77 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
-
+/* ▼▼▼ 【全新】开播前设置界面样式 ▼▼▼ */
+#live-pre-start-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 20;
+    display: none; /* 默认隐藏 */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.live-pre-start-content {
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    padding: 25px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+.live-pre-start-content .title {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+.live-pre-start-content .form-group {
+    margin-bottom: 20px;
+}
+.live-pre-start-content .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+.live-pre-start-content .form-group input[type="text"],
+.live-pre-start-content .form-group input[type="datetime-local"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+/* 特殊对齐样式 */
+#live-invite-ai-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#live-invite-ai-section label:first-child {
+    margin-bottom: 0;
+}
+.start-live-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新】联系人选择器样式 ▼▼▼ */
 .contact-picker-item {
@@ -4864,6 +5048,47 @@ input[type="color"]::-webkit-color-swatch {
     text-align: left; /* 确保用户气泡内的文字是左对齐的 */
 }
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】直播间人设选择器样式 ▼▼▼ */
+#live-streamer-persona-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.persona-preview-box {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+#phone-screen.dark-mode .persona-preview-box {
+    background-color: #2c2c2e;
+}
+.persona-preview-box img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.persona-preview-box span {
+    font-weight: 500;
+}
+#live-select-persona-btn {
+    flex-shrink: 0;
+    margin-top: 0;
+}
+#live-streamer-info-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#live-streamer-info-clickable:hover {
+    background-color: rgba(0,0,0,0.6);
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新添加】正在呼叫界面样式 ▼▼▼ */
 #outgoing-call-screen {
@@ -7466,6 +7691,11 @@ input:checked + .slider:before {
     <div class="nav-item" data-view="qzone-screen">
         <span>动态</span>
     </div>
+<!-- ▼▼▼ 【新增】直播间页签 ▼▼▼ -->
+<div class="nav-item" data-view="live-stream-screen">
+    <span>直播</span>
+</div>
+<!-- ▲▲▲ 添加结束 ▲▲▲ -->
     <!-- ▼▼▼ 在“动态”和“收藏”之间,加入这个新页签 ▼▼▼ -->
     <div class="nav-item" data-view="memories-view">
         <span>纪念</span>
@@ -7496,7 +7726,6 @@ input:checked + .slider:before {
     <input type="file" id="wallpaper-upload-input-library" accept="image/*" multiple hidden>
 </div>
 <!-- ▲▲▲ 壁纸库屏幕结束 ▲▲▲ -->
-
 
 <!-- ▼▼▼ 【全新】壁纸应用目标选择模态框 ▼▼▼ -->
 <div id="wallpaper-apply-modal" class="modal">
@@ -8174,6 +8403,84 @@ input:checked + .slider:before {
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新V3 - 人设库版】开播前设置界面 ▼▼▼ -->
+<div id="live-pre-start-overlay">
+    <div class="live-pre-start-content">
+        <h2 class="title">准备开启直播</h2>
+        
+        <!-- 【核心修改】主播选择改为调用人设库 -->
+        <div class="form-group">
+            <label>选择我的直播人设</label>
+            <div id="live-streamer-persona-selector">
+                <div id="live-streamer-persona-preview" class="persona-preview-box">
+                    <img id="live-streamer-avatar-preview" src="">
+                    <span id="live-streamer-name-preview"></span>
+                </div>
+                <button id="live-select-persona-btn" class="form-button-secondary">从人设库选择</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="live-theme-input">直播主题</label>
+            <input type="text" id="live-theme-input" placeholder="例如：深夜杂谈、禁忌游戏">
+        </div>
+        
+        <div class="form-group">
+            <label>开播时间</label>
+            <input type="datetime-local" id="live-start-time-input">
+        </div>
+
+<!-- ▼▼▼ 用下面这块【全新的HTML】，替换掉旧的 id="live-invite-ai-section" ▼▼▼ -->
+<div class.form-group" id="live-invite-ai-section" style="display: none;">
+    <label for="live-invite-ai-select">邀请一位金主连麦？</label>
+    <select id="live-invite-ai-select" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        <!-- AI嘉宾选项将由JS动态生成 -->
+    </select>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+        <button id="confirm-start-live-stream-btn" class="start-live-btn">立即开播</button>
+        <button id="cancel-start-live-stream-btn" class="form-button form-button-secondary" style="margin-top: 10px;">取消</button>
+    </div>
+</div>
+<!-- ▲▲▲ 开播前界面结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新V3 - 带修改入口】直播间屏幕 ▼▼▼ -->
+<div id="live-stream-screen" class="screen">
+    <div id="live-top-bar">
+        <div class="streamer-info" id="live-streamer-info-clickable"> <!-- 【新增】ID -->
+            <img id="live-streamer-avatar" src="" class="avatar">
+            <div class="details">
+                <span id="live-streamer-name" class="streamer-name"></span>
+                <span id="live-viewer-count" class="viewer-count">0 人正在看</span>
+            </div>
+        </div>
+        <div class="live-stats">
+            <span id="live-like-count">❤️ 0</span>
+            <span id="live-duration">00:00</span>
+        </div>
+    </div>
+    
+    <div id="live-host-narration-box">
+        <div id="live-host-narration-content"></div>
+    </div>
+
+    <div id="live-comments-feed"></div>
+
+    <div id="live-controls">
+        <div class="live-input-wrapper">
+            <input type="text" id="live-comment-input" placeholder="和主播说点什么...">
+            <button id="live-send-comment-btn">发送</button>
+        </div>
+        <button class="live-action-btn" id="live-send-gift-btn">🎁</button>
+        <button class="live-action-btn" id="live-like-btn">❤️</button>
+        <button class="live-action-btn end-call" id="end-live-stream-btn">×</button>
+    </div>
+    
+    <input type="file" id="live-background-upload-input" accept="image/*" hidden>
+</div>
+<!-- ▲▲▲ 直播间屏幕结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新修复版】全屏聊天设置界面 ▼▼▼ -->
 <div id="chat-settings-screen" class="screen">
@@ -9140,6 +9447,26 @@ input:checked + .slider:before {
         let isAiGenerating = false; // 用于跟踪AI是否正在生成内容
 let avatarEditorContext = { target: null, newAvatarSrc: null, newFrameSrc: null };
 let wallpaperLibraryContext = { from: null, activeChatId: null }; // 用于记录壁纸库的打开来源
+let liveStreamState = {
+    isActive: false,
+    activeChatId: null,
+    streamerId: null,
+    streamerPersona: '',
+    streamerAvatar: '', // 新增：主播头像
+    streamerNickname: '', // 新增：主播昵称
+    invitedAiId: null,
+    theme: '',
+    mode: 'solo',
+    startTime: null,
+    scheduledTime: null,
+    viewerCount: 0,
+    likes: 0,
+    backgroundUrl: '',
+    simulationIntervalId: null,
+    lastAudienceActionTime: 0,
+    commentHistory: [], // 新增：完整的弹幕历史
+    hostNarration: ''   // 修改：只存最新的旁白
+};
         let canRegenerate = false; // 用于跟踪是否可以执行“重新生成”操作
         let abortController = null; // 用于存储和调用fetch的中断控制器
 
@@ -9593,64 +9920,62 @@ db.version(27).stores({ // <-- Increment the version number by 1 (e.g., from 23 
         window.updateListenTogetherIconProxy = () => {};
 
         function switchToChatListView(viewId) {
-            const chatListScreen = document.getElementById('chat-list-screen');
-            const views = {
-                'messages-view': document.getElementById('messages-view'),
-                'qzone-screen': document.getElementById('qzone-screen'),
-                'favorites-view': document.getElementById('favorites-view'),
-        'memories-view': document.getElementById('memories-view') // <-- 新增这一行
+    if (viewId === 'live-stream-screen') {
+        handleLiveTabClick(); // 调用新的总入口函数
+        return; 
+    }
+
+    const chatListScreen = document.getElementById('chat-list-screen');
+    // 【核心修复2】从 views 对象中移除 live-stream-screen
+    const views = {
+        'messages-view': document.getElementById('messages-view'),
+        'qzone-screen': document.getElementById('qzone-screen'),
+        'favorites-view': document.getElementById('favorites-view'),
+        'memories-view': document.getElementById('memories-view')
     };
-            const mainHeader = document.getElementById('main-chat-list-header');
-            const mainBottomNav = document.getElementById('chat-list-bottom-nav'); // 获取主导航栏
+    const mainHeader = document.getElementById('main-chat-list-header');
+    const mainBottomNav = document.getElementById('chat-list-bottom-nav');
 
-            if (isFavoritesSelectionMode) {
-                document.getElementById('favorites-edit-btn').click(); 
-            }
+    if (isFavoritesSelectionMode) {
+        document.getElementById('favorites-edit-btn').click(); 
+    }
 
-            // 隐藏所有视图
-            Object.values(views).forEach(v => v.classList.remove('active'));
-            // 显示目标视图
-            if (views[viewId]) {
-                views[viewId].classList.add('active');
-            }
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    if (views[viewId]) {
+        views[viewId].classList.add('active');
+    }
 
-            // 更新底部导航栏高亮
-            document.querySelectorAll('#chat-list-bottom-nav .nav-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.view === viewId);
-            });
-            
-            // ▼▼▼ 【核心修正】在这里统一管理所有UI元素的显隐 ▼▼▼
-            if (viewId === 'messages-view') {
-                mainHeader.style.display = 'flex';
-                mainBottomNav.style.display = 'flex';
-            } else {
-                mainHeader.style.display = 'none';
-                mainBottomNav.style.display = 'none';
-            }
-            // ▲▲▲ 修正结束 ▲▲▲
+    document.querySelectorAll('#chat-list-bottom-nav .nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.view === viewId);
+    });
+    
+    if (viewId === 'messages-view') {
+        mainHeader.style.display = 'flex';
+        mainBottomNav.style.display = 'flex';
+    } else {
+        mainHeader.style.display = 'none';
+        mainBottomNav.style.display = 'none';
+    }
 
     if (viewId !== 'memories-view') {
         activeCountdownTimers.forEach(timerId => clearInterval(timerId));
         activeCountdownTimers = [];
     }
 
-            // 根据视图ID执行特定的渲染/更新逻辑
-            switch (viewId) {
-                case 'qzone-screen':
-                    views['qzone-screen'].style.backgroundColor = '#f0f2f5';
-                    updateUnreadIndicator(0);
-                    renderQzoneScreen();
-                    renderQzonePosts();
-                    break;
-                case 'favorites-view':
-                    views['favorites-view'].style.backgroundColor = '#f9f9f9';
-                    renderFavoritesScreen();
-                    break;
-                case 'messages-view':
-                    // 如果需要,可以在这里添加返回消息列表时要执行的逻辑
-                    break;
-            }
-        }
+    switch (viewId) {
+        case 'qzone-screen':
+            views['qzone-screen'].style.backgroundColor = '#f0f2f5';
+            updateUnreadIndicator(0);
+            renderQzoneScreen();
+            renderQzonePosts();
+            break;
+        case 'favorites-view':
+            views['favorites-view'].style.backgroundColor = '#f9f9f9';
+            renderFavoritesScreen();
+            break;
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
         
         function renderQzoneScreen() {
             if (state && state.qzoneSettings) {
@@ -11543,6 +11868,18 @@ else if (msg.type === 'interactive_html') {
 }
 // ▲▲▲ 粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】添加对直播开始卡片的渲染逻辑 ▼▼▼
+else if (msg.type === 'live_stream_start') {
+    bubble.classList.add('is-sticker'); // 复用无背景样式
+    contentHtml = `
+        <div style="width: 220px; background: linear-gradient(135deg, #ff7e5f, #feb47b); color: white; padding: 15px; border-radius: 12px; text-align: center;">
+            <p style="font-weight: 600; margin: 0 0 8px 0;">🔴 直播已开始</p>
+            <p style="font-size: 14px; margin: 0;">主题: ${msg.liveData.theme}</p>
+        </div>
+    `;
+}
+// ▲▲▲ 粘贴结束 ▲▲▲
+
 // ▼▼▼ 【全新】添加对礼物卡片的渲染逻辑 ▼▼▼
 else if (msg.type === 'gift_card') {
     bubble.classList.add('is-gift-card');
@@ -13261,6 +13598,22 @@ case 'quote_reply':
     break;
 // ▲▲▲ 新增 case 结束 ▲▲▲
 
+// ▼▼▼ 【修正】AI开启直播的指令处理 ▼▼▼
+case 'live_stream_start': {
+    if (liveStreamState.isActive) continue;
+    
+    // 直接调用新的开播函数，并标记为非用户发起
+    startLiveStream(false, { 
+        theme: msgData.theme, 
+        mode: msgData.mode,
+        chatId: chatId // 传递当前聊天的ID
+    });
+    
+    // 由于 startLiveStream 已经处理了UI，这里不再需要重复逻辑
+    continue;
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
                 // ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼
                 case 'change_user_nickname':
                     // 这是一个单聊专属的功能
@@ -14312,6 +14665,7 @@ async function triggerInactiveAiAction(chatId) {
 2.  **发布动态**: 分享你的心情或想法到“动态”区。
 3.  **与动态互动**: 去看看别人的帖子并进行评论或点赞。
 4.  **发起视频通话**: 如果你觉得时机合适,可以主动给用户打一个视频电话。
+5.  **开启直播**: 如果你觉得无聊或想分享什么，可以开启一场直播。
 
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
@@ -14321,6 +14675,7 @@ async function triggerInactiveAiAction(chatId) {
 -   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
+-   **开直播**: \`[{"type": "live_stream_start", "theme": "直播的主题", "mode": "solo"}]\`
 
 # 【【【全新】发布可交互模块/生图动态】】】
 -   **功能说明**: 这允许你在动态中发布一个和聊天时类似的、可交互的、视觉丰富的HTML模块,用于展示心情、小游戏或特殊事件。
@@ -14632,6 +14987,541 @@ async function deleteGroup(groupId) {
     }
 }
 
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
+// ▼▼▼ 【全新重构版 V3 - 真实互动生态】直播间核心功能 ▼▼▼
+
+// ▼▼▼ 请用这段【修正后】的代码，完整替换旧的 handleLiveTabClick 函数 ▼▼▼
+/**
+ * 【总入口 V2 - 状态重置版】当用户点击底部导航栏“直播”时触发
+ */
+async function handleLiveTabClick() {
+    // 【核心修复】如果当前有正在进行的直播，先询问用户是否要结束
+    if (liveStreamState.isActive) {
+        const confirmed = await showCustomConfirm(
+            "提示",
+            "当前有一场直播正在进行中。您要先结束这场直播，再准备新的吗？",
+            { confirmButtonClass: 'btn-danger' }
+        );
+        
+        if (confirmed) {
+            await endLiveStream(); // 等待旧直播完全结束后再继续
+        } else {
+            // 如果用户选择不结束，就直接显示当前直播间，不做任何操作
+            showScreen('live-stream-screen');
+            return;
+        }
+    }
+
+    // 无论之前是否有直播，现在都进入“准备开播”的流程
+    // 确保所有状态都已重置
+    liveStreamState = { isActive: false };
+    
+    // 清理UI
+    document.getElementById('live-comments-feed').innerHTML = '';
+    document.getElementById('live-host-narration-content').innerHTML = '';
+
+    // 准备并显示“开播前设置”界面
+    await prepareLiveStreamSetup(); 
+    document.getElementById('live-pre-start-overlay').style.display = 'flex';
+    showScreen('live-stream-screen'); // 仍然需要显示这个屏幕，因为设置界面是它的一个遮罩层
+}
+
+// ▼▼▼ 【功能修复版 V2 - 修复人设替换】应用人设预设 ▼▼▼
+async function applyPersonaPreset(presetId) {
+    const preset = state.personaPresets.find(p => p.id === presetId);
+    if (!preset) return;
+    
+    // 判断当前是在哪个界面调用的
+    if (document.getElementById('live-pre-start-overlay').style.display === 'flex') {
+        // 【核心修复】在直播设置界面，调用专用的更新函数
+        await updateStreamerPersonaPreview(preset.id);
+    } else {
+        // 在聊天设置界面 (这部分逻辑保持不变)
+        const chat = state.chats[state.activeChatId];
+        if(chat) {
+            chat.settings.myPersona = preset.persona;
+            document.getElementById('my-persona').value = preset.persona;
+        }
+        const previewImg = document.getElementById('my-editor-preview-img');
+        if (previewImg) previewImg.src = preset.avatar;
+        avatarEditorContext.newAvatarSrc = preset.avatar;
+    }
+    closePersonaLibrary(); 
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 请用这块【全新的代码】完整替换旧的 prepareLiveStreamSetup 函数 ▼▼▼
+async function prepareLiveStreamSetup() {
+    // --- 人设选择部分保持不变 ---
+    const userPresets = await db.personaPresets.toArray();
+    if (userPresets.length > 0) {
+        await updateStreamerPersonaPreview(userPresets[0].id);
+    } else {
+        const previewBox = document.getElementById('live-streamer-persona-preview');
+        previewBox.dataset.presetId = '';
+        document.getElementById('live-streamer-avatar-preview').src = state.qzoneSettings.avatar || defaultAvatar;
+        document.getElementById('live-streamer-name-preview').textContent = '我 (请先创建人设)';
+    }
+
+    // --- 主题和时间部分保持不变 ---
+    document.getElementById('live-theme-input').value = '';
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 1);
+    document.getElementById('live-start-time-input').value = now.toISOString().slice(0, 16);
+
+    // --- 【核心修改】填充AI嘉宾选择器 ---
+    const inviteSection = document.getElementById('live-invite-ai-section');
+    const inviteSelect = document.getElementById('live-invite-ai-select');
+    inviteSelect.innerHTML = ''; // 清空旧选项
+    
+    const aiChats = Object.values(state.chats).filter(c => !c.isGroup);
+
+    if (aiChats.length > 0) {
+        inviteSection.style.display = 'block';
+        // 添加一个“不邀请”的选项
+        const noneOption = document.createElement('option');
+        noneOption.value = 'none';
+        noneOption.textContent = '-- 单人直播 --';
+        inviteSelect.appendChild(noneOption);
+        
+        // 添加所有可选的AI嘉宾
+        aiChats.forEach(ai => {
+            const option = document.createElement('option');
+            option.value = ai.id;
+            option.textContent = ai.name;
+            inviteSelect.appendChild(option);
+        });
+    } else {
+        inviteSection.style.display = 'none';
+    }
+}
+/**
+ * 更新开播前的人设预览
+ */
+async function updateStreamerPersonaPreview(presetId) {
+    const preset = await db.personaPresets.get(presetId);
+    if (!preset) return;
+    const previewBox = document.getElementById('live-streamer-persona-preview');
+    previewBox.dataset.presetId = preset.id;
+    document.getElementById('live-streamer-avatar-preview').src = preset.avatar;
+    // 假设人设第一行为昵称
+    const nickname = (preset.persona || '').split('\n')[0].trim() || '我';
+    document.getElementById('live-streamer-name-preview').textContent = nickname;
+}
+
+/**
+ * 【核心】用户或AI确认开启直播
+ */
+async function startLiveStream(isUserInitiated = true, aiLiveData = null) {
+    let theme, startTime, streamerId, streamerPersona, streamerAvatar, streamerNickname, invitedAiId = null;
+
+    if (isUserInitiated) {
+        theme = document.getElementById('live-theme-input').value.trim();
+        if (!theme) { alert('请输入直播主题！'); return; }
+        startTime = new Date(document.getElementById('live-start-time-input').value).getTime();
+        if (isNaN(startTime)) { alert('请输入有效的开播时间！'); return; }
+
+        const presetId = document.getElementById('live-streamer-persona-preview').dataset.presetId;
+        const preset = await db.personaPresets.get(presetId);
+        if (!preset) { alert('请先从人设库选择一个直播人设！'); return; }
+        
+        streamerId = 'user'; // 用户开播，ID就是 'user'
+        streamerPersona = preset.persona;
+        streamerAvatar = preset.avatar;
+        streamerNickname = document.getElementById('live-streamer-name-preview').textContent;
+        
+// ▼▼▼ 用下面这行【全新的代码】替换掉旧的 inviteToggle 相关代码 ▼▼▼
+invitedAiId = document.getElementById('live-invite-ai-select').value;
+if (invitedAiId === 'none') invitedAiId = null; // 如果选择的是“不邀请”，则设为null
+
+    } else { // AI主动开播
+        theme = aiLiveData.theme;
+        startTime = Date.now();
+        streamerId = aiLiveData.chatId;
+        const chat = state.chats[streamerId];
+        streamerPersona = chat.settings.aiPersona;
+        streamerAvatar = chat.settings.aiAvatar;
+        streamerNickname = chat.name;
+    }
+
+    liveStreamState = {
+        isActive: true,
+        activeChatId: invitedAiId || streamerId,
+        streamerId, streamerPersona, streamerAvatar, streamerNickname,
+        invitedAiId, theme,
+        mode: invitedAiId ? 'duo' : 'solo',
+        startTime: Date.now(),
+        scheduledTime: startTime,
+        viewerCount: Math.floor(Math.random() * 200) + 50,
+        likes: 0,
+        backgroundUrl: (state.chats[streamerId] && state.chats[streamerId].settings.offlineVideoBackground) || '',
+        simulationIntervalId: null, // 我们不再使用定时器
+        lastAudienceActionTime: Date.now(),
+        commentHistory: [],
+        hostNarration: ''
+    };
+
+    // ▼▼▼ 在这里添加下面这行代码 ▼▼▼
+    if (liveStreamState.timerId) clearInterval(liveStreamState.timerId); // 先清除旧的以防万一
+    liveStreamState.timerId = setInterval(updateLiveStats, 1000); // 每秒更新一次统计数据
+    // ▲▲▲ 添加结束 ▲▲▲
+
+    const startMessageContent = `${streamerNickname} 开启了直播: ${theme}`;
+    const liveStartMessage = { role: 'system', type: 'live_stream_start', content: startMessageContent, timestamp: Date.now(), liveData: { theme, streamerName: streamerNickname } };
+    
+    // 如果是AI或被邀请，需要更新对应聊天记录
+    if (streamerId !== 'user') {
+        state.chats[streamerId].history.push(liveStartMessage);
+        await db.chats.put(state.chats[streamerId]);
+    }
+    if (invitedAiId) {
+        state.chats[invitedAiId].history.push(liveStartMessage);
+        await db.chats.put(state.chats[invitedAiId]);
+    }
+
+    document.getElementById('live-pre-start-overlay').style.display = 'none';
+    renderLiveStreamScreen();
+    showScreen('live-stream-screen');
+    renderChatList();
+    
+    // 首次触发AI（主播或粉丝）互动
+    triggerAiInLiveStream(streamerId === 'user' ? 'audience' : 'host');
+}
+
+/**
+ * 渲染直播间UI
+ */
+function renderLiveStreamScreen() {
+    document.getElementById('live-streamer-avatar').src = liveStreamState.streamerAvatar;
+    document.getElementById('live-streamer-name').textContent = liveStreamState.streamerNickname;
+    document.getElementById('live-stream-screen').style.backgroundImage = liveStreamState.backgroundUrl ? `url(${liveStreamState.backgroundUrl})` : 'none';
+    updateLiveStats();
+}
+
+// ▼▼▼ 请用这块【全新的、带总结汇报功能】的代码，完整替换旧的 endLiveStream 函数 ▼▼▼
+async function endLiveStream() {
+    if (!liveStreamState.isActive) return;
+    const confirmed = await showCustomConfirm('结束直播', '确定要结束本次直播吗？');
+    if (!confirmed) return;
+
+    if (liveStreamState.simulationIntervalId) clearInterval(liveStreamState.simulationIntervalId);
+    if (liveStreamState.timerId) clearInterval(liveStreamState.timerId);
+
+    const { activeChatId, startTime, likes, commentHistory, invitedAiId, streamerId } = liveStreamState;
+    const duration = Math.floor((Date.now() - startTime) / 1000);
+    const durationText = `${Math.floor(duration / 60)}分${duration % 60}秒`;
+    const endMessageContent = `直播已结束，总时长 ${durationText}，共获得 ${likes} 个赞。`;
+
+    // --- 【核心新增】直播后互动逻辑 ---
+    // 判断是否有AI嘉宾需要发送后续消息
+    const guestAiChatId = streamerId === 'user' ? invitedAiId : null;
+
+    if (guestAiChatId && state.chats[guestAiChatId]) {
+        const guestChat = state.chats[guestAiChatId];
+        
+        // 1. 创建对用户可见的“直播结束”消息
+        const endMessage = { role: 'system', type: 'pat_message', content: endMessageContent, timestamp: Date.now() };
+        guestChat.history.push(endMessage);
+
+        // 2. 创建对用户隐藏的“总结汇报”指令
+        const liveSummary = commentHistory.join('\n');
+        const hiddenReportInstruction = {
+            role: 'system',
+            content: `[系统指令: 刚刚你和用户的连麦直播结束了。这是本次直播的完整互动记录:\n---直播记录开始---\n${liveSummary}\n---直播记录结束---\n现在直播已经关闭，请你根据直播中发生的事情，主动给用户发一条私信，可以是对直播内容的延续、感受的分享，或是提出新的话题。]`,
+            timestamp: Date.now() + 1,
+            isHidden: true
+        };
+        guestChat.history.push(hiddenReportInstruction);
+
+        // 3. 保存更新
+        await db.chats.put(guestChat);
+        
+        // 4. 重置状态并打开与该AI的聊天
+        liveStreamState = { isActive: false };
+        openChat(guestAiChatId);
+        triggerAiResponse(); // 【关键】触发AI读取总结并发送私信
+
+    } else {
+        // --- 如果没有AI嘉宾，执行旧的简单逻辑 ---
+        if (activeChatId && activeChatId !== 'user_solo_live' && state.chats[activeChatId]) {
+            const chat = state.chats[activeChatId];
+            const endMessage = { role: 'system', type: 'pat_message', content: endMessageContent, timestamp: Date.now() };
+            chat.history.push(endMessage);
+            await db.chats.put(chat);
+            openChat(chat.id);
+        } else {
+            showScreen('chat-list-screen');
+        }
+        liveStreamState = { isActive: false };
+    }
+}
+
+// ▼▼▼ 请用这块【全新的、互动逻辑增强版】代码，完整替换旧的 triggerAiInLiveStream 函数 ▼▼▼
+/**
+ * 【全新V3 - 轮流互动版】AI直播总控中心
+ * @param {string} actor - 'host' (主播发言) 或 'audience' (粉丝互动)
+ */
+async function triggerAiInLiveStream(actor = 'host') {
+    if (!liveStreamState.isActive) return;
+    
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+    const { streamerId, streamerPersona, theme, mode, invitedAiId, commentHistory, hostNarration, streamerNickname } = liveStreamState;
+
+    // 确定当前行动的AI和它的人设
+    let currentActorId = actor === 'host' ? streamerId : invitedAiId;
+    if (!currentActorId || currentActorId === 'user') return;
+    
+    const currentActorChat = state.chats[currentActorId];
+    const currentActorPersona = actor === 'host' ? streamerPersona : currentActorChat.settings.aiPersona;
+    
+    // NSFW风格判断 (保持不变)
+    const hour = new Date(liveStreamState.scheduledTime).getHours();
+    const isLateNight = hour >= 22 || hour < 5;
+    const nsfwKeywords = ['深夜', '私密', '禁忌', '魅惑', '诱惑', '成人', '色情', '变态', '露骨', '羞耻'];
+    const isNsfwTheme = nsfwKeywords.some(kw => theme.includes(kw));
+    const audienceTone = (isLateNight || isNsfwTheme) 
+        ? '必须是极其直白露骨、极端色情、充满变态想法和极限羞辱意味的。' 
+        : '正常、友好、有趣的。';
+
+    let systemPrompt = '';
+    let messagesForApi = [];
+    
+    if (actor === 'host') {
+        // --- 主播发言逻辑 ---
+        const streamerName = streamerNickname; 
+        systemPrompt = `
+# 你的任务
+你现在是直播中的主播“${streamerName}”。你的任务是根据直播主题和粉丝的互动，生成一段符合你人设的对话或旁白。
+# 核心规则
+1.  **角色扮演**: 严格遵守你的人设: ${streamerPersona}
+2.  **【【【真实互动铁律】】】**: 你的发言【必须】是对下方“最近的弹幕历史”中粉丝的评论或礼物做出回应。你需要感谢礼物、回答问题、或者对挑逗性的要求做出反应（可以是顺从、害羞、讨价还价或抗拒，但必须有反应）。
+3.  **推动剧情**: 在回应粉丝的同时，也要推动直播主题的进展。
+4.  **格式**: 你的回复必须是一段纯文本，不能是JSON。
+# 直播信息
+-   **直播主题**: "${theme}"
+-   **模式**: ${mode === 'duo' ? `双人直播 (你正在和金主观众 ${state.chats[invitedAiId]?.name || '神秘富豪'} 一起)` : '单人直播'}
+-   **最近的弹幕历史 (这是你回应的依据!)**:
+    ${commentHistory.slice(-5).join('\n') || '(还没有弹幕)'}
+`;
+        messagesForApi.push({ role: 'user', content: '现在轮到你说话了，继续直播吧。' });
+
+    } else { // actor === 'audience'
+        // --- 粉丝互动逻辑 ---
+        let mainActorName = streamerId === 'user' ? (streamerNickname || '我') : state.chats[streamerId].name;
+        let invitedAiName = invitedAiId ? state.chats[invitedAiId].name : null;
+        systemPrompt = `
+# 你的任务
+你是一个直播间粉丝模拟器。你的任务是扮演被邀请的金主观众“${invitedAiName || '神秘富豪'}”以及多个随机路人粉丝，并生成他们的互动行为。
+# 核心规则
+1.  **角色扮演**: 你必须同时扮演好金主“${invitedAiName || '神秘富豪'}”(人设: ${currentActorPersona})和普通粉丝。金主的发言要符合其人设，且更有分量。
+2.  **互动风格**: 你的所有互动内容【必须】是【${audienceTone}】风格。
+3.  **互动类型**: 你可以生成评论(\`comment\`)和送高额礼物(\`gift\`)。
+4.  **【【【NSFW递进铁律】】】**: 如果风格是NSFW，你的要求【必须】有强烈的递进性。从高额礼物开始，逐步提出越来越色情、变态、露骨的表演要求，不断试探和突破主播的底线，制造强烈的羞耻感。所有要求必须具体细致，禁止重复和模板化。
+5.  **【【【真实互动铁律】】】**: 你的评论应该是对【主播最新旁白/发言】或【其他弹幕】的回应，而不是自说自话。
+6.  **【【【输出格式铁律】】】**: 你的回复【必须且只能】是一个包含【10到15个】互动对象的纯净JSON数组字符串。
+    *   **评论**: \`{"type": "comment", "username": "粉丝昵称", "content": "评论内容"}\`
+    *   **礼物**: \`{"type": "gift", "username": "粉丝昵称", "giftName": "礼物名称(跑车, 火箭等)"}\`
+    *   **【新增】点赞**: \`{"type": "like", "username": "粉丝昵称"}\` (这个指令只会增加爱心数量，不会显示文字)
+# 直播信息
+-   **主播**: ${mainActorName}
+-   **直播主题**: "${theme}"
+-   **主播最新旁白/发言**: "${hostNarration || '(主播还未说话)'}"
+-   **最近的弹幕历史**:
+    ${commentHistory.slice(-5).join('\n')}
+`;
+        messagesForApi.push({ role: 'user', content: '请生成一些粉丝互动。' });
+    }
+
+    try {
+        let isGemini = proxyUrl === GEMINI_API_URL;
+        let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi, isGemini);
+        const response = isGemini 
+            ? await fetch(geminiConfig.url, geminiConfig.data) 
+            : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{role:'system', content: systemPrompt}, ...messagesForApi],
+                    temperature: 1.2
+                })
+            });
+
+        if (!response.ok) throw new Error(await response.text());
+        
+        const data = await response.json();
+        const responseText = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+        
+        if (actor === 'host') {
+            const narrationContent = document.getElementById('live-host-narration-content');
+            const formattedText = responseText.replace(/\n/g, '<br>');
+            narrationContent.innerHTML = formattedText;
+            narrationContent.scrollTop = 0;
+            liveStreamState.hostNarration = responseText;
+            liveStreamState.commentHistory.push(`[主播旁白]: ${responseText}`);
+            
+            // 【核心修改】主播说完话后，延迟一段时间，触发粉丝的回应
+            setTimeout(() => {
+                triggerAiInLiveStream('audience');
+            }, 1000 + Math.random() * 2000); // 随机延迟1-3秒
+
+        } else { // audience
+            const actions = parseAiResponse(responseText);
+            if (Array.isArray(actions)) {
+                // 使用 for...of 循环和 await new Promise 来实现弹幕的逐条显示
+                for (const action of actions) {
+                    addLiveComment(action);
+                    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 500)); // 每条弹幕之间随机间隔0.3-0.8秒
+                }
+                
+                // 【核心修改】所有粉丝弹幕都发完后，轮到主播回应
+                // 只有在主播是AI的情况下才触发
+                if (liveStreamState.streamerId !== 'user') {
+                    setTimeout(() => {
+                        triggerAiInLiveStream('host');
+                    }, 1000 + Math.random() * 2000);
+                }
+            }
+        }
+    } catch (error) {
+        console.error(`生成 ${actor} 互动失败:`, error);
+        // 如果出错，也尝试在一段时间后让另一方继续，防止直播卡死
+        const nextActor = actor === 'host' ? 'audience' : 'host';
+        setTimeout(() => triggerAiInLiveStream(nextActor), 5000);
+    }
+}
+
+// ▼▼▼ 请用这块【全新的、带样式判断】的代码，完整替换旧的 addLiveComment 函数 ▼▼▼
+/**
+ * 在直播间屏幕上添加一条新的评论或通知 (V2 - 带样式判断)
+ * @param {object} action - AI生成的互动对象
+ * @param {boolean} fromUser - 是否是用户自己发送的
+ */
+function addLiveComment(action, fromUser = false) {
+    const feed = document.getElementById('live-comments-feed');
+    const bubble = document.createElement('div');
+    
+    // 1. 【核心修改】在这里添加身份判断逻辑
+    if (action.type === 'comment') {
+        bubble.className = 'live-comment-bubble';
+        
+        // a. 如果是用户自己发的言
+        if (fromUser) {
+            bubble.classList.add('host-comment'); // 主播的特殊高亮样式
+        } 
+        // b. 如果是AI发的言
+        else {
+            // 检查发言人是否是“金主”（被邀请的AI嘉宾）
+            const invitedAiChat = liveStreamState.invitedAiId ? state.chats[liveStreamState.invitedAiId] : null;
+            if (invitedAiChat && action.username === invitedAiChat.name) {
+                bubble.classList.add('guest-comment');
+            }
+            // 检查发言人是否是“富豪路人”（名字里带“老板”或“富婆”等关键词）
+            else if (/(老板|富婆|神豪|董事长)/.test(action.username)) {
+                bubble.classList.add('rich-fan-comment');
+            }
+        }
+        
+        // 拼接HTML的逻辑保持不变
+        bubble.innerHTML = `<span class="username">${action.username}:</span><span class="content">${action.content}</span>`;
+
+    } else if (action.type === 'gift') {
+        bubble.className = 'live-system-notification';
+        bubble.innerHTML = `✨ <strong>${action.username}</strong> 送出了 ${action.giftName}`;
+    } else {
+        return; // 未知类型
+    }
+
+    // 2. 后续的渲染逻辑保持不变
+    const isAtBottom = feed.scrollTop <= -feed.scrollHeight + feed.clientHeight + 1;
+    feed.prepend(bubble);
+    if (isAtBottom) {
+        feed.scrollTop = 0;
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+/**
+ * 更新直播间的统计数据（在线人数、点赞、时长）
+ */
+function updateLiveStats() {
+    document.getElementById('live-viewer-count').textContent = `${liveStreamState.viewerCount} 人正在看`;
+    document.getElementById('live-like-count').innerHTML = `❤️ ${liveStreamState.likes}`;
+    const elapsed = Math.floor((Date.now() - liveStreamState.startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    document.getElementById('live-duration').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+/**
+ * 处理用户点赞
+ */
+function handleUserLike() {
+    liveStreamState.likes++;
+    updateLiveStats();
+    // 创建一个爱心动画
+    const heart = document.createElement('span');
+    heart.textContent = '❤️';
+    heart.className = 'like-burst-effect';
+    heart.style.left = `${Math.random() * 40 + 65}%`; // 在右侧随机位置
+    document.getElementById('live-stream-screen').appendChild(heart);
+    setTimeout(() => heart.remove(), 600); // 动画结束后移除
+}
+
+// ▼▼▼ 请用这段【全新的、角色分离版】代码，完整替换旧的 sendLiveComment 函数 ▼▼▼
+const sendLiveComment = () => {
+    const liveCommentInput = document.getElementById('live-comment-input');
+    const text = liveCommentInput.value.trim();
+    if (!text || !liveStreamState.isActive) return;
+    
+    // 【核心逻辑】判断当前用户是主播还是观众
+    if (liveStreamState.streamerId === 'user') {
+        // --- 情况1: 我是主播 ---
+        
+        // a. 将我的发言更新到主播旁白区
+        const narrationContent = document.getElementById('live-host-narration-content');
+        narrationContent.innerHTML = text.replace(/\n/g, '<br>');
+        narrationContent.scrollTop = 0;
+        
+        // b. 更新直播状态，让AI粉丝能看到我的最新发言
+        liveStreamState.hostNarration = text;
+        const commentLog = `[主播 ${liveStreamState.streamerNickname}]: ${text}`;
+        liveStreamState.commentHistory.push(commentLog);
+        
+        // c. 清空输入框
+        liveCommentInput.value = '';
+
+        // d. 【关键】触发AI粉丝对我发言的回应
+        triggerAiInLiveStream('audience');
+
+    } else {
+        // --- 情况2: 我是观众 ---
+        
+        // a. 确定我的昵称
+        let commenterName = '';
+        const { invitedAiId } = liveStreamState;
+        // 如果我是被邀请的金主
+        if (invitedAiId && state.chats[invitedAiId]) {
+            const invitedAiChat = state.chats[invitedAiId];
+            commenterName = invitedAiChat.settings.myNickname || '我';
+        } else { // 如果我是普通观众（比如AI开播，我点进去看）
+            commenterName = state.qzoneSettings.nickname || '我';
+        }
+
+        // b. 将我的发言添加到评论区
+        addLiveComment({ type: 'comment', username: commenterName, content: text }, true);
+        
+        // c. 更新弹幕历史
+        liveStreamState.commentHistory.push(`${commenterName}: ${text}`);
+        
+        // d. 清空输入框
+        liveCommentInput.value = '';
+
+        // e. 【关键】触发AI主播对我发言的回应
+        triggerAiInLiveStream('host');
+    }
+};
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 // ▼▼▼ 请将这【一整块】全新的五子棋游戏逻辑代码，粘贴到您的JS功能函数定义区 ▼▼▼
@@ -21553,6 +22443,74 @@ document.getElementById('gomoku-user-avatar').addEventListener('click', () => ha
 document.getElementById('gomoku-ai-avatar').addEventListener('click', () => handleAvatarPat('ai'));
 
 // ▲▲▲ 五子棋事件绑定结束 ▲▲▲
+// ▼▼▼ 【最终修复版 V4】直播间及人设库事件绑定 ▼▼▼
+document.body.addEventListener('click', (e) => {
+    const targetId = e.target.id || e.target.closest('[id]')?.id;
+    switch (targetId) {
+        case 'confirm-start-live-stream-btn': startLiveStream(true); break;
+        case 'cancel-start-live-stream-btn':
+            document.getElementById('live-pre-start-overlay').style.display = 'none';
+            showScreen('chat-list-screen'); 
+            break;
+        case 'live-select-persona-btn': openPersonaLibrary(); break; // 打开人设库
+        case 'live-streamer-info-clickable': openPersonaLibrary(); break; // 点击主播信息也打开
+        case 'end-live-stream-btn': endLiveStream(); break;
+        case 'live-like-btn': handleUserLike(); break;
+        case 'live-send-gift-btn': alert('礼物功能正在开发中！'); break;
+        case 'live-send-comment-btn': sendLiveComment(); break;
+    }
+});
+
+// 2. 直播间更换背景的逻辑 (保持不变)
+document.getElementById('live-stream-screen').addEventListener('click', (e) => {
+    if (e.target.id === 'live-stream-screen') {
+        document.getElementById('live-background-upload-input').click();
+    }
+});
+// ▼▼▼ 请用这段【修正后】的代码，完整替换旧的 live-background-upload-input 事件监听器 ▼▼▼
+document.getElementById('live-background-upload-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = async (re) => {
+            const base64Url = re.target.result;
+            
+            // 1. 更新临时状态 (保持不变)
+            liveStreamState.backgroundUrl = base64Url;
+            
+            // 2. 实时应用新背景 (保持不变)
+            document.getElementById('live-stream-screen').style.backgroundImage = `url(${base64Url})`;
+
+            // 3. 【【【核心修复】】】将新背景URL保存到数据库
+            // 我们需要判断当前主播是谁，并将背景图保存到TA的聊天设置中
+            const streamerChatId = liveStreamState.streamerId;
+            if (streamerChatId && streamerChatId !== 'user' && state.chats[streamerChatId]) {
+                const streamerChat = state.chats[streamerChatId];
+                // 我们复用 offlineVideoBackground 字段来存储
+                if (!streamerChat.settings) streamerChat.settings = {};
+                streamerChat.settings.offlineVideoBackground = base64Url;
+                await db.chats.put(streamerChat);
+                console.log(`已为AI主播“${streamerChat.name}”保存了新的直播背景。`);
+            } else if (streamerChatId === 'user') {
+                // 如果主播是“我”，可以将背景保存到全局设置或一个特定的地方
+                // 这里我们暂定不为用户保存，因为用户的直播人设是临时的
+                console.log("用户主播更换了背景，本次直播有效。");
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+});
+// ▲▲▲ 替换结束 ▲▲▲
+
+// 3. 监听评论框的回车事件 (保持不变)
+document.getElementById('live-comment-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        sendLiveComment();
+    }
+});
+// ▲▲▲ 新事件绑定结束 ▲▲▲
 
 // ▼▼▼ 请将这段【新代码】粘贴到 init() 的事件监听器区域末尾 ▼▼▼
 document.getElementById('manage-groups-btn').addEventListener('click', openGroupManager);
