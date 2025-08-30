@@ -15201,25 +15201,34 @@ if (invitedAiId === 'none') invitedAiId = null; // 如果选择的是“不邀�
         scheduledTime: startTime,
         viewerCount: Math.floor(Math.random() * 200) + 50,
         likes: 0,
-        backgroundUrl: (state.chats[streamerId] && state.chats[streamerId].settings.offlineVideoBackground) || '',
-        simulationIntervalId: null, // 我们不再使用定时器
-        lastAudienceActionTime: Date.now(),
+        backgroundUrl: (streamerId !== 'user' && state.chats[streamerId]?.settings?.offlineVideoBackground) || '',
         commentHistory: [],
-        hostNarration: ''
+        hostNarration: '',
+        peakViewers: 0,
+        totalGiftValue: 0.0,
+        simulationIntervalId: null, // 先设为null
+        timerId: null, // 先设为null
     };
-
-    // ▼▼▼ 在这里添加下面这行代码 ▼▼▼
-    if (liveStreamState.timerId) clearInterval(liveStreamState.timerId); // 先清除旧的以防万一
-    liveStreamState.timerId = setInterval(updateLiveStats, 1000); // 每秒更新一次统计数据
-    // ▲▲▲ 添加结束 ▲▲▲
+    
+    // 【【【核心修复1：在这里启动所有定时器】】】
+    if (liveStreamState.timerId) clearInterval(liveStreamState.timerId);
+    liveStreamState.timerId = setInterval(updateLiveStats, 1000); // 启动总状态更新计时器
 
     function simulateLiveAudience() {
     if (!liveStreamState.isActive) return;
+        // 【核心修复2：现在这个函数只负责更新人数和触发AI，不负责显示】
+    // 1. 更新观众人数
+    liveStreamState.viewerCount += Math.floor(Math.random() * 10) - 4; // 波动稍微大一点
+    if (liveStreamState.viewerCount < 10) liveStreamState.viewerCount = 10;
+
+    // 2. 检查并记录最高人气
+    if (liveStreamState.viewerCount > liveStreamState.peakViewers) {
+        liveStreamState.peakViewers = liveStreamState.viewerCount;
+    }
+
     if (Math.random() > 0.4) {
         triggerAiInLiveStream('audience');
     }
-    liveStreamState.viewerCount += Math.floor(Math.random() * 7) - 3;
-    if (liveStreamState.viewerCount < 10) liveStreamState.viewerCount = 10;
 
     // ▼▼▼ 在这里添加下面这行代码 ▼▼▼
     // 检查当前人气是否超过了峰值，如果是，则更新
@@ -15289,13 +15298,18 @@ async function endLiveStream() {
     const confirmed = await showCustomConfirm('结束直播', '确定要结束本次直播吗？');
     if (!confirmed) return;
 
-    // 1. 捕获所有需要的数据
-    const { startTime, likes, commentHistory, invitedAiId, streamerId, theme, streamerNickname, peakViewers, totalGiftValue } = liveStreamState;
+    // 1. 【修改点1】只捕获需要用于后台任务的、不会再变的数据
+    const { startTime, likes, commentHistory, invitedAiId, streamerId, theme, streamerNickname } = liveStreamState;
 
     // 2. 立即清理所有定时器并重置状态
     if (liveStreamState.simulationIntervalId) clearInterval(liveStreamState.simulationIntervalId);
     if (liveStreamState.timerId) clearInterval(liveStreamState.timerId);
-    liveStreamState = { isActive: false };
+    
+    // 【修改点2】在重置前，将最后的数据捕获到局部变量中，供弹窗使用
+    const finalPeakViewers = liveStreamState.peakViewers || 0;
+    const finalTotalGiftValue = liveStreamState.totalGiftValue || 0.0;
+    
+    liveStreamState = { isActive: false }; // 现在可以安全重置了
 
     // 3. 准备直播结束的通用信息
     const duration = Math.floor((Date.now() - startTime) / 1000);
@@ -15383,12 +15397,12 @@ async function endLiveStream() {
     showScreen('chat-list-screen');
     // ▲▲▲ 修改结束 ▲▲▲
     
-    // 7. 【最后】在所有后台操作和界面跳转都完成后，再显示总结弹窗
+    // 6. 【修改点3】使用我们刚刚捕获到的、最准确的最终数据来构建弹窗
     const summaryMessage = `
         <p style="font-size: 18px; font-weight: 600; margin-bottom: 15px;">🎉 直播圆满结束！🎉</p>
         <div style="text-align: left; line-height: 1.8;">
-            <strong>本场最高人气：</strong> ${peakViewers} 人<br>
-            <strong>收到礼物总额：</strong> ¥${totalGiftValue.toFixed(2)}
+            <strong>本场最高人气：</strong> ${finalPeakViewers} 人<br>
+            <strong>收到礼物总额：</strong> ¥${finalTotalGiftValue.toFixed(2)}
         </div>
     `;
     await showCustomAlert('本场直播总结', summaryMessage);
@@ -15671,10 +15685,21 @@ function addLiveComment(action, fromUser = false) {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
+// ▼▼▼ 请用这块【全新的、精简版】的代码，完整替换旧的 updateLiveStats 函数 ▼▼▼
 /**
  * 更新直播间的统计数据（在线人数、点赞、时长）
  */
 function updateLiveStats() {
+    // 1. 【核心修改】将人数波动逻辑直接移到这里
+    if (liveStreamState.isActive) {
+        liveStreamState.viewerCount += Math.floor(Math.random() * 10) - 4;
+        if (liveStreamState.viewerCount < 10) liveStreamState.viewerCount = 10;
+        if (liveStreamState.viewerCount > liveStreamState.peakViewers) {
+            liveStreamState.peakViewers = liveStreamState.viewerCount;
+        }
+    }
+    
+    // 2. 更新UI的逻辑保持不变
     document.getElementById('live-viewer-count').textContent = `${liveStreamState.viewerCount} 人正在看`;
     document.getElementById('live-like-count').innerHTML = `❤️ ${liveStreamState.likes}`;
     const elapsed = Math.floor((Date.now() - liveStreamState.startTime) / 1000);
@@ -15682,6 +15707,7 @@ function updateLiveStats() {
     const seconds = elapsed % 60;
     document.getElementById('live-duration').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
+// ▲▲▲ 替换结束 ▲▲▲
 
 /**
  * 处理用户点赞
