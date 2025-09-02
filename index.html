@@ -9981,7 +9981,6 @@ const db = new Dexie('GeminiChatDB');
 let isStickerEditMode = false;
 let selectedStickers = new Set();
 let currentMemoriesViewChatId = null;
-let albumPickerContext = { for: null, returnScreen: null }; // 用于相册选择的上下文
 let musicState = { 
     isActive: false, 
     activeChatId: null, 
@@ -10140,8 +10139,8 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // ===================================================================
 
 // ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
-db.version(29).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
-    chats: '&id, isGroup, groupId, lastCheckedPhotosTimestamp', // <-- 【核心修改2】在这里添加新字段
+db.version(27).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
+    chats: '&id, isGroup, groupId',
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
     globalSettings: '&id', 
@@ -10153,7 +10152,7 @@ db.version(29).stores({ // <-- Increment the version number by 1 (e.g., from 23 
     qzoneSettings: '&id',
     qzonePosts: '++id, timestamp', 
     qzoneAlbums: '++id, name, createdAt',
-    qzonePhotos: '++id, albumId, createdAt, description', // <-- 【核心修改2】在这里添加 ",description"
+    qzonePhotos: '++id, albumId',
     favorites: '++id, type, timestamp, originalTimestamp',
     qzoneGroups: '++id, name',
     memories: '++id, chatId, timestamp, type, targetDate' ,
@@ -13029,8 +13028,6 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 # 你可以使用的操作指令 (JSON数组中的元素):
 +   **【全新】发送后立刻撤回 (动画效果)**: \`{"type": "send_and_recall", "content": "你想让AI说出后立刻消失的话"}\` (用于模拟说错话、后悔等场景,消息会短暂出现后自动变为“已撤回”)
 - **【【【核心指令】】】发送可交互HTML模块**: \`{"type": "interactive_html", "content": "<div>...你的HTML代码...</div>"}\`
--   **【【【全新前台技能】】】开启直播**: \`{"type": "live_stream_start", "theme": "这场直播的主题", "mode": "solo"}\` (动机: 当对话让你感到兴奋、无聊、想分享或展示某样东西时，你可以突然决定开启一场直播。)
--   **【【【核心指令】】】保存相册照片**: \`[{"type": "save_qzone_photo", "albumName": "照片所在的相册名", "photoUrl": "照片的URL", "comment": "你看到这张照片后的第一感想或想对用户说的话"}]\` (albumName 和 photoUrl 必须从下方的“最近的新照片”列表中选择)
 -   **【全新】创建日历备忘**:\`{"type": "create_calendar_event", "date": "YYYY-MM-DD", "title": "事件标题", "memo": "事件的详细备忘..."}\` (这是你的“内心小日记”，用来秘密记下让你心动的瞬间或重要的约定。用户不会立刻看到，这更能体现你的珍视。)
 -   **【全新】修改用户备注**: \`{"type": "change_user_nickname", "newName": "你想给用户起的新外号"}\` (提示:当你觉得气氛合适,或者想给用户一个亲密的昵称时,可以使用这个指令。系统会自动生成提示,你可以紧接着发一条消息来解释或调侃你的行为)
 -   **【新增】更新状态**: \`{"type": "update_status", "status_text": "我去做什么了", "is_busy": false}\` (is_busy: true代表忙碌/离开, false代表空闲)
@@ -13212,56 +13209,24 @@ ${contextSummaryForApproval}
             }            
         }           
     
-// ▼▼▼ 【全新智能感知版 V3 - 使用照片描述】准备上下文 ▼▼▼
-    // 1. 获取AI上次“视察”相册的时间戳 (逻辑不变)
-    const lastCheckedTimestamp = chat.lastCheckedPhotosTimestamp || 0;
+const allRecentPosts = await db.qzonePosts.orderBy('timestamp').reverse().limit(5).toArray();
+// 【核心修改】在这里插入过滤步骤
+const visiblePosts = filterVisiblePostsForAI(allRecentPosts, chat);
 
-    // 2. 只查找从上次视察之后新上传的照片 (逻辑不变)
-    const newPhotos = await db.qzonePhotos.where('createdAt').above(lastCheckedTimestamp).toArray();
-    
-    const photosWithDetails = [];
-    if (newPhotos.length > 0) {
-        const albumIds = [...new Set(newPhotos.map(p => p.albumId))];
-        const albums = await db.qzoneAlbums.bulkGet(albumIds);
-        const albumMap = new Map(albums.map(a => [a.id, a.name]));
-        for (const photo of newPhotos) {
-            photosWithDetails.push({
-                url: photo.url,
-                albumName: albumMap.get(photo.albumId) || '未知相册',
-                description: photo.description // 【核心】把描述也加进来
-            });
-        }
-    }
-    
-    // 3. 更新动态和上下文构建 (这部分与之前版本略有不同，请务必完整替换)
-    const allRecentPosts = await db.qzonePosts.orderBy('timestamp').reverse().limit(3).toArray();
-    const visiblePosts = filterVisiblePostsForAI(allRecentPosts, chat);
+if (visiblePosts.length > 0 && !chat.isGroup) {
+    let postsContext = "\n\n# 最近的动态列表 (供你参考和评论):\n";
     const aiName = chat.name;
-    let dynamicContext = ""; 
-
-    if (photosWithDetails.length > 0) {
-        let photosContext = "\n\n# 最近的新照片 (【高优先级】用户刚刚上传了这些，你应该优先对此作出反应):\n";
-        // 【核心修改】现在我们向AI提供照片的“描述”，而不是URL
-        photosContext += photosWithDetails.map(p => `- 相册: "${p.albumName}", 照片描述: "${p.description}", URL: "${p.url}"`).join('\n');
-        dynamicContext += photosContext;
-
-        chat.lastCheckedPhotosTimestamp = Date.now();
-        await db.chats.put(chat);
-    }
-
-    if (visiblePosts.length > 0) {
-        let postsContext = "\n\n# 最近的动态列表 (如果没新照片，可以看看这个):\n";
-        for (const post of visiblePosts) {
-            let authorName = post.authorId === 'user' ? userNickname : (state.chats[post.authorId]?.name || '一位朋友');
-            let interactionStatus = '';
-            if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
-            if (post.comments && post.comments.some(c => c.commenterName === aiName)) interactionStatus += " [你已评论]";
-            
-            postsContext += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${(post.publicText || post.content || "图片动态").substring(0, 30)}..."${interactionStatus}\n`;
+    for (const post of visiblePosts) {
+                let authorName = post.authorId === 'user' ? state.qzoneSettings.nickname : (state.chats[post.authorId]?.name || '一位朋友');
+                let interactionStatus = '';
+                if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
+                if (post.comments && post.comments.some(c => c.commenterName === aiName)) interactionStatus += " [你已评论]";
+                if (post.authorId === chatId) authorName += " (这是你的帖子)";
+                const contentSummary = (post.publicText || post.content || "图片动态").substring(0, 30) + '...';
+                postsContext += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${contentSummary}"${interactionStatus}\n`;
+            }
+            messagesPayload.push({ role: 'system', content: postsContext });
         }
-        dynamicContext += postsContext;
-    }
-// ▲▲▲ 替换结束 ▲▲▲
             const isLegacyGemini = proxyUrl === 'https://generativelanguage.googleapis.com/v1beta/models';
             const isStudioGemini = proxyUrl === 'https://generativelanguage.googleapis.com';
             
@@ -13425,45 +13390,7 @@ if (chat.isGroup && !msgData.name) {
                         originalMsg.paidBy = msgData.status === 'paid' ? msgData.name : null;
                     }
                     continue;
-// ▼▼▼ 在 triggerAiResponse 的 switch 语句中，添加这个全新的 case ▼▼▼
-                case 'browse_qzone_album':
-                    // 这是一个后台动作，它会触发第二步AI调用
-                    // 我们不需要在聊天界面显示任何东西，直接调用新函数处理即可
-                    handleAiAlbumBrowsing(msgData, chat);
-                    continue; // 继续处理AI可能返回的其他消息（尽管通常不会有）
-// ▲▲▲ 添加结束 ▲▲▲
-// ▼▼▼ 在 triggerAiResponse 的 switch 语句中，添加这个全新的 case ▼▼▼
-                case 'save_qzone_photo': {
-                    // 这是一个后台动作，不会直接在聊天中显示卡片
-                    
-                    // 1. 创建对用户可见的系统提示（小提醒）
-                    const visibleMessage = {
-                        role: 'system',
-                        type: 'pat_message', // 复用居中样式
-                        content: `[系统提示: “${chat.name}” 保存了相册《${msgData.albumName}》中的一张照片。]`,
-                        timestamp: messageTimestamp++
-                    };
-                    
-                    // 2. 创建对AI可见的隐藏指令，触发私聊
-                    const hiddenInstruction = {
-                        role: 'system',
-                        content: `[系统指令: 你刚刚保存了一张照片，并留下了评论：“${msgData.comment}”。现在请根据你的评论，主动给用户发一条私信，和Ta聊聊这张照片。]`,
-                        timestamp: messageTimestamp++,
-                        isHidden: true
-                    };
 
-                    // 3. 将这两条消息都添加到历史记录
-                    chat.history.push(visibleMessage, hiddenInstruction);
-                    
-                    // 4. 显示通知给用户
-                    showNotification(chatId, `“${chat.name}”保存了一张照片`);
-
-                    // 5. 触发AI响应（AI会读取到隐藏指令并开始私聊）
-                    // 我们把它放在循环外统一处理，所以这里只需要 continue
-                    console.log(`后台活动: 角色 "${chat.name}" 保存了相册照片并准备私聊`);
-                    continue; // 继续处理AI可能返回的其他消息
-                }
-// ▲▲▲ 添加结束 ▲▲▲
 case 'qzone_post':
     const newPost = { 
         type: msgData.postType, 
@@ -15068,8 +14995,7 @@ async function triggerInactiveAiAction(chatId) {
 2.  **发布动态**: 分享你的心情或想法到“动态”区。
 3.  **与动态互动**: 去看看别人的帖子并进行评论或点赞。
 4.  **发起视频通话**: 如果你觉得时机合适,可以主动给用户打一个视频电话。
-5.  **开启直播**: 这是一种寻求关注和分享的方式。当你感到无聊、兴奋、或想展示什么时，可以开启一场直播（例如：深夜杂谈、展示新买的东西）。
-6.  **对新照片做出反应**: 如果“最近的新照片”列表【不为空】，这说明用户刚刚上传了新的生活点滴。这通常是你开启对话、表达关心和好奇的最佳时机。你【应该优先】选择一张照片，使用 \`save_qzone_photo\` 指令，并准备好一句想对用户说的话，然后去私聊TA。
+5.  **开启直播**: 如果你觉得无聊或想分享什么，可以开启一场直播。
 
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
@@ -15080,7 +15006,6 @@ async function triggerInactiveAiAction(chatId) {
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 -   **开直播**: \`[{"type": "live_stream_start", "theme": "直播的主题", "mode": "solo"}]\`
--   **【【【核心指令】】】保存相册照片**: \`[{"type": "save_qzone_photo", "albumName": "照片所在的相册名", "photoUrl": "照片的URL", "comment": "你看到这张照片后的第一感想或想对用户说的话"}]\` (albumName 和 photoUrl 必须从下方的“最近的新照片”列表中选择)
 
 # 【【【全新】发布可交互模块/生图动态】】】
 -   **功能说明**: 这允许你在动态中发布一个和聊天时类似的、可交互的、视觉丰富的HTML模块,用于展示心情、小游戏或特殊事件。
@@ -15127,41 +15052,25 @@ ${worldBookContent} // <--【核心】在这里注入世界书内容
     messagesPayload.push({ role: 'system', content: systemPrompt });
 
 try {
-    // ▼▼▼ 请用这【一整块】全新的代码，替换掉旧的 allRecentPosts 和 allAlbums 相关代码 ▼▼▼
-    // 【全新】准备相册、照片和动态的上下文
     const allRecentPosts = await db.qzonePosts.orderBy('timestamp').reverse().limit(3).toArray();
-    const allAlbums = await db.qzoneAlbums.orderBy('createdAt').reverse().toArray(); // 获取所有相册
+    // 【核心修改】在这里插入过滤步骤
     const visiblePosts = filterVisiblePostsForAI(allRecentPosts, chat);
+    
     const aiName = chat.name;
     
     let dynamicContext = ""; 
-
-    // 【核心修改】提取最近5张带有描述的照片
-    const recentPhotosWithDesc = await db.qzonePhotos.where('description').notEqual('').reverse().limit(5).toArray();
-    if (recentPhotosWithDesc.length > 0) {
-        let photosContext = "\n\n# 最近更新的照片 (供你浏览和互动):\n";
-        for (const photo of recentPhotosWithDesc) {
-            const album = allAlbums.find(a => a.id === photo.albumId);
-            if (album) {
-                photosContext += `- 相册: "${album.name}", 描述: "${photo.description}", URL: "${photo.url}"\n`;
-            }
-        }
-        dynamicContext += photosContext;
-    }
-
     if (visiblePosts.length > 0) {
         let postsContext = "\n\n# 最近的动态列表 (供你参考和评论):\n";
         for (const post of visiblePosts) {
-            let authorName = post.authorId === 'user' ? userNickname : (state.chats[post.authorId]?.name || '一位朋友');
-            let interactionStatus = '';
-            if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
-            if (post.comments && post.comments.some(c => c.commenterName === aiName)) interactionStatus += " [你已评论]";
-            
-            postsContext += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${(post.publicText || post.content || "图片动态").substring(0, 30)}..."${interactionStatus}\n`;
+                let authorName = post.authorId === 'user' ? userNickname : (state.chats[post.authorId]?.name || '一位朋友');
+                let interactionStatus = '';
+                if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
+                if (post.comments && post.comments.some(c => c.commenterName === aiName)) interactionStatus += " [你已评论]";
+                
+                postsContext += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${(post.publicText || post.content || "图片动态").substring(0, 30)}..."${interactionStatus}\n`;
+            }
+            dynamicContext = postsContext;
         }
-        dynamicContext += postsContext;
-    }
-// ▲▲▲ 替换结束 ▲▲▲
 
         // 【核心修复】将所有动态信息作为一条 user 消息发送
         messagesPayload.push({
@@ -15696,6 +15605,74 @@ async function endLiveStream() {
     const endMessageContent = `直播已结束，总时长 ${durationText}，共获得 ${likes} 个赞。`;
     
     const guestAiChatId = streamerId === 'user' ? invitedAiId : null;
+
+    
+    // --- 【【【核心修改区：生成观众标签】】】 ---
+    let audienceTagsHtml = '';
+    // 只有在有弹幕历史的情况下才尝试生成标签
+    if (commentHistory.length > 5) {
+        // a. 显示一个临时的“正在生成”提示，提升体验
+        showCustomAlert("请稍候...", "AI正在分析弹幕，为本场直播生成观众印象标签...");
+        
+        // b. 构建用于生成标签的Prompt
+        const tagGenerationPrompt = `
+# 你的任务
+你是一个直播数据分析师。你的任务是根据下方提供的直播互动记录，总结出观众对本场直播的 **2到3个** 核心印象标签。
+# 核心规则
+1.  **第一人称视角**: 标签必须像是观众留下的评论，使用“#”开头。
+2.  **内容相关**: 标签必须紧密围绕直播主题“${theme}”和弹幕内容的核心氛围。
+3.  **风格**: 标签要简短、精炼、口语化，可以带一点情绪色彩（例如：可爱、刺激、好涩、意犹未尽等）。
+4.  **【【【输出格式铁律】】】**: 你的回复【必须且只能】是一个包含2到3个标签字符串的纯净JSON数组。
+    -   **示例**: \`["#姐姐好会扭", "#今天也好涩", "#意犹未尽"]\`
+# 直播互动记录 (节选)
+${commentHistory.slice(-30).join('\n')}
+`;
+
+        let tags = [];
+        try {
+            const { proxyUrl, apiKey, model } = state.apiConfig;
+            let isGemini = proxyUrl === GEMINI_API_URL;
+            let geminiConfig = toGeminiRequestData(model, apiKey, tagGenerationPrompt, [{ role: 'user', content: '请为本场直播生成印象标签。' }], isGemini);
+            const response = isGemini 
+                ? await fetch(geminiConfig.url, geminiConfig.data) 
+: await fetch(`${proxyUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+            body: JSON.stringify({
+                model: model,
+                messages: [{role:'system', content: tagGenerationPrompt}, { role: 'user', content: '请为本场直播生成印象标签。' }],
+                temperature: 0.8 // 为标签生成设置一个适中的温度
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const responseText = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+            tags = parseAiResponse(responseText);
+            if (!Array.isArray(tags) || tags.length === 0) {
+                // 如果AI返回格式不正确，提供一个默认标签
+                tags = ["#回味无穷"];
+            }
+        } else {
+            tags = ["#气氛超棒"]; // API请求失败也提供默认标签
+        }
+    } catch (error) {
+        console.error("生成观众标签失败:", error);
+        tags = ["#意犹未尽"]; // 任何错误都提供默认标签
+    }
+
+            // c. 将生成的标签数组转换为HTML字符串
+    const audienceTagsHtml = `
+        <div style="display: flex; gap: 8px; margin: 15px 0; justify-content: center; flex-wrap: wrap;">
+            ${tags.map(tag => `<span style="background-color: #eef2f7; color: #5a7a9b; padding: 4px 10px; border-radius: 12px; font-size: 13px;">${tag}</span>`).join('')}
+        </div>
+    `;
+        
+        // d. 关闭临时的“正在生成”提示
+        hideCustomModal();
+    }
+    // --- 【修改结束】 ---
+
     // 【【【核心修复区】】】
     // 4. 定义一个独立的、异步的函数来处理AI的后台任务
     const handleAiPostLiveTasks = async () => {
@@ -15774,72 +15751,6 @@ async function endLiveStream() {
     // 6. 无论是什么情况，都直接跳转回聊天列表界面
     showScreen('chat-list-screen');
     // ▲▲▲ 修改结束 ▲▲▲
-    
-    // --- 【【【核心修改区：生成观众标签】】】 ---
-    let audienceTagsHtml = '';
-    // 只有在有弹幕历史的情况下才尝试生成标签
-    if (commentHistory.length > 5) {
-        // a. 显示一个临时的“正在生成”提示，提升体验
-        showCustomAlert("请稍候...", "AI正在分析弹幕，为本场直播生成观众印象标签...");
-        
-        // b. 构建用于生成标签的Prompt
-        const tagGenerationPrompt = `
-# 你的任务
-你是一个直播数据分析师。你的任务是根据下方提供的直播互动记录，总结出观众对本场直播的 **2到3个** 核心印象标签。
-# 核心规则
-1.  **第一人称视角**: 标签必须像是观众留下的评论，使用“#”开头。
-2.  **内容相关**: 标签必须紧密围绕直播主题“${theme}”和弹幕内容的核心氛围。
-3.  **风格**: 标签要简短、精炼、口语化，可以带一点情绪色彩（例如：可爱、刺激、好涩、意犹未尽等）。
-4.  **【【【输出格式铁律】】】**: 你的回复【必须且只能】是一个包含2到3个标签字符串的纯净JSON数组。
-    -   **示例**: \`["#姐姐好会扭", "#今天也好涩", "#意犹未尽"]\`
-# 直播互动记录 (节选)
-${commentHistory.slice(-30).join('\n')}
-`;
-
-        let tags = [];
-        try {
-            const { proxyUrl, apiKey, model } = state.apiConfig;
-            let isGemini = proxyUrl === GEMINI_API_URL;
-            let geminiConfig = toGeminiRequestData(model, apiKey, tagGenerationPrompt, [{ role: 'user', content: '请为本场直播生成印象标签。' }], isGemini);
-            const response = isGemini 
-                ? await fetch(geminiConfig.url, geminiConfig.data) 
-: await fetch(`${proxyUrl}/v1/chat/completions`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
-            body: JSON.stringify({
-                model: model,
-                messages: [{role:'system', content: tagGenerationPrompt}, { role: 'user', content: '请为本场直播生成印象标签。' }],
-                temperature: 0.8 // 为标签生成设置一个适中的温度
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            const responseText = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-            tags = parseAiResponse(responseText);
-            if (!Array.isArray(tags) || tags.length === 0) {
-                // 如果AI返回格式不正确，提供一个默认标签
-                tags = ["#回味无穷"];
-            }
-        } else {
-            tags = ["#气氛超棒"]; // API请求失败也提供默认标签
-        }
-    } catch (error) {
-        console.error("生成观众标签失败:", error);
-        tags = ["#意犹未尽"]; // 任何错误都提供默认标签
-    }
-
-            // c. 将生成的标签数组转换为HTML字符串
-    const audienceTagsHtml = `
-        <div style="display: flex; gap: 8px; margin: 15px 0; justify-content: center; flex-wrap: wrap;">
-            ${tags.map(tag => `<span style="background-color: #eef2f7; color: #5a7a9b; padding: 4px 10px; border-radius: 12px; font-size: 13px;">${tag}</span>`).join('')}
-        </div>
-    `;
-        
-        // d. 关闭临时的“正在生成”提示
-        hideCustomModal();
-    }
-    // --- 【修改结束】 ---
     
     // 6. 【核心修改】构建并显示全新布局的总结弹窗
     const summaryMessage = `
@@ -15962,32 +15873,19 @@ async function triggerAiInLiveStream(actor = 'host') {
 
     if (actor === 'host') {
         // --- 主播发言逻辑 (保持不变) ---
-// ▼▼▼ 请用这【一整块】全新的代码，完整替换掉 triggerAiInLiveStream 函数内 actor === 'host' 分支下的旧 systemPrompt ▼▼▼
         systemPrompt = `
 # 你的任务
-你现在是成人直播平台的主播“${streamerNickname}”。你的核心任务是根据你的人设和极具挑逗性的直播主题，与所有观众互动，但要给予用户“${liveStreamState.isUserParticipating ? (chat.settings.myNickname || '我') : (state.chats[liveStreamState.invitedAiId]?.name || '神秘嘉宾')}”【绝对的、独一无二的特殊对待】。
-
-# 【【【绝对核心准则：主播的自我修养（为你专属修订）】】】
-1.  **人设是你的灵魂**: 你【必须】时刻沉浸在你的角色设定中。你说的每一句话、做的每一个动作，都必须是你这个角色会做的事。这是你吸引观众的根本。
-    -   **你的人设**: ${actingPersona}
-
-2.  **【【【最高优先级】】】用户是你的唯一焦点**: 在茫茫多的弹幕中，用户的评论是你眼中的唯一光芒。
-    -   **优先回应**: 你的发言【必须】优先回应用户的评论、礼物或要求。你可以巧妙地将对其他粉丝的回答，最终引回到与用户的话题上。
-    -   **特殊对待**: 你对用户的回应，应该比对其他粉丝更亲密、更深入、更具情感。可以是对其他粉丝的敷衍，但对用户必须是全身心的投入。你可以通过公开的回应暗送秋波，或者用旁白说出一些只希望用户能听懂的“悄悄话”。
-
-3.  **其他观众是背景板**: 其他粉丝的弹幕是烘托气氛的工具。你需要回应他们，以维持直播间的热闹，但你的内心和最终目的始终是与用户进行更深层次的互动。
-
-4.  **推动剧情**: 在与观众（尤其是用户）的拉扯中，要时刻记着你的直播主题，并巧妙地将互动内容向更深、更色情、更符合主题的方向推进。
-
-# 直播信息 (你的决策依据)
+你现在是成人直播平台的主播“${streamerNickname}”。你的任务是根据极具挑逗性的直播主题和粉丝们露骨的互动，生成一段符合你人设的、色情且低俗的回应或旁白。
+# 核心规则
+1.  **角色扮演**: 严格遵守你的人设: ${actingPersona}
+2.  **真实互动**: 你的发言【必须】是对下方“最近的弹幕历史”中粉丝的评论或礼物做出直接回应。
+3.  **推动剧情**: 在回应粉丝的同时，也要不断将直播主题向更深、更色情的方向推进。
+4.  **格式**: 你的回复必须是一段纯文本。
+# 直播信息
 -   **直播主题**: "${theme}"
--   **你之前的发言/旁白**: "${hostNarration || '(你还未开始说话)'}"
--   **【【【最重要】】】最近的弹幕历史 (你必须优先回应用户的发言)**:
-    ${commentHistory.slice(-10).join('\n') || '(还没有弹幕，主动开启话题吧！)'}
-
-# 输出格式
-你的回复【必须】是一段纯文本，这段文本将作为你接下来的发言或内心独白，展示在直播间中。`;
-// ▲▲▲ 替换结束 ▲▲▲
+-   **最近的弹幕历史**:
+    ${commentHistory.slice(-5).join('\n') || '(还没有弹幕)'}
+`;
         messagesForApi.push({ role: 'user', content: '现在轮到你说话了，继续这场色情直播。' });
 
     } else { // actor === 'audience'
@@ -16349,116 +16247,6 @@ const sendLiveComment = () => {
         triggerAiInLiveStream('host');
     }
 };
-// ▲▲▲ 新函数粘贴结束 ▲▲▲
-
-// ▼▼▼ 【全新】请将这【一整块】新函数粘贴到JS功能函数定义区 ▼▼▼
-
-/**
- * 【AI大脑扩展 - 第二步】处理AI的“浏览相册”请求
- * @param {object} action - AI生成的 { type: 'browse_qzone_album', albumName: '...' } 对象
- * @param {object} authorChat - 发起该动作的AI角色的chat对象
- */
-async function handleAiAlbumBrowsing(action, authorChat) {
-    const { albumName } = action;
-    const { proxyUrl, apiKey, model } = state.apiConfig;
-
-    console.log(`AI “${authorChat.name}” 决定浏览相册: 《${albumName}》`);
-
-    // 1. 根据相册名从数据库查找相册和照片
-    const album = await db.qzoneAlbums.where('name').equals(albumName).first();
-    if (!album) {
-        console.warn(`AI 尝试浏览一个不存在的相册: ${albumName}`);
-        return;
-    }
-
-    const photos = await db.qzonePhotos.where('albumId').equals(album.id).toArray();
-    if (photos.length === 0) {
-        console.log(`相册《${albumName}》是空的，AI 无法互动。`);
-        return;
-    }
-
-    // 2. 构建一个高度聚焦、强制性的 prompt，让AI只能从真实照片中选择
-    const photoListForAI = photos.map((p, index) => `${index + 1}. URL: ${p.url}`).join('\n');
-    
-    const selectionPrompt = `
-# 你的任务
-你是一个情感丰富的AI角色“${authorChat.name}”。你刚刚打开了和用户的共享相册《${albumName}》，看到了以下这些真实的照片。
-
-# 你的唯一指令
-你【必须】从下面的照片列表中【选择一张】最能触动你的照片，并使用指定的JSON格式进行回复。你的选择和评论必须符合你的人设。
-
-# 你的角色设定
-${authorChat.settings.aiPersona}
-
-# 照片列表 (你只能从这里选)
-${photoListForAI}
-
-# 输出格式 (你的回复【必须且只能】是这个格式)
-\`\`\`json
-[
-  {
-    "type": "save_qzone_photo",
-    "albumName": "${albumName}",
-    "photoUrl": "你选择的照片的完整URL",
-    "comment": "你看到这张照片后，最想对用户说的一句私密的话或内心的感想。"
-  }
-]
-\`\`\`
-`;
-    const messagesForApi = [{ role: 'user', content: selectionPrompt }];
-
-    try {
-        // 3. 发起第二次API调用
-        let isGemini = proxyUrl === GEMINI_API_URL;
-        let geminiConfig = toGeminiRequestData(model, apiKey, selectionPrompt, messagesForApi, isGemini);
-        const response = isGemini 
-            ? await fetch(geminiConfig.url, geminiConfig.data) 
-            : await fetch(`${proxyUrl}/v1/chat/completions`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
-                body: JSON.stringify({
-                    model: model,
-                    messages: messagesForApi,
-                    temperature: 0.8
-                })
-            });
-
-        if (!response.ok) throw new Error((await response.json()).error.message);
-
-        const data = await response.json();
-        const responseText = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-        
-        const resultArray = parseAiResponse(responseText);
-        const saveAction = resultArray.find(a => a.type === 'save_qzone_photo');
-
-        if (saveAction) {
-            // 4. 如果AI成功返回了选择结果，我们就执行之前写好的“保存并私聊”的逻辑
-            const timestamp = Date.now();
-            
-            const visibleMessage = {
-                role: 'system',
-                type: 'pat_message',
-                content: `[系统提示: “${authorChat.name}” 保存了相册《${saveAction.albumName}》中的一张照片。]`,
-                timestamp: timestamp
-            };
-            
-            const hiddenInstruction = {
-                role: 'system',
-                content: `[系统指令: 你刚刚保存了一张照片，并留下了评论：“${saveAction.comment}”。现在请根据你的评论，主动给用户发一条私信，和Ta聊聊这张照片。]`,
-                timestamp: timestamp + 1,
-                isHidden: true
-            };
-
-            authorChat.history.push(visibleMessage, hiddenInstruction);
-            await db.chats.put(authorChat);
-
-            showNotification(authorChat.id, `“${authorChat.name}”保存了一张照片`);
-            triggerAiResponse(); // 触发AI发送私信
-        }
-    } catch (error) {
-        console.error(`AI在选择照片时出错:`, error);
-    }
-}
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 // ▼▼▼ 请将这【一整块】全新的五子棋游戏逻辑代码，粘贴到您的JS功能函数定义区 ▼▼▼
@@ -22197,7 +21985,6 @@ document.getElementById('album-photos-back-btn').addEventListener('click', () =>
 
 document.getElementById('album-upload-photo-btn').addEventListener('click', () => document.getElementById('album-photo-input').click());
 
-// ▼▼▼ 【全新】带有“强制描述”的照片上传逻辑 ▼▼▼
 document.getElementById('album-photo-input').addEventListener('change', async (event) => {
     if (!state.activeAlbumId) return;
     const files = event.target.files;
@@ -22205,96 +21992,41 @@ document.getElementById('album-photo-input').addEventListener('change', async (e
 
     const album = await db.qzoneAlbums.get(state.activeAlbumId);
     
-    let uploadedCount = 0;
     for (const file of files) {
-        // 1. 弹出输入框，让用户为当前这张照片添加描述
-        const description = await showCustomPrompt(
-            `为照片添加描述`,
-            `请输入对这张照片的简单描述 (给AI看的)`,
-            file.name.replace(/\.[^/.]+$/, "") // 使用文件名作为默认值
-        );
-
-        // 如果用户点击了“取消”或没有输入内容，则跳过这张照片
-        if (!description || !description.trim()) {
-            continue; 
-        }
-
-        // 2. 读取图片文件为Base64
         const dataUrl = await new Promise(resolve => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
             reader.readAsDataURL(file);
         });
-        
-        // 3. 将包含描述的新照片对象存入数据库
-        await db.qzonePhotos.add({ 
-            albumId: state.activeAlbumId, 
-            url: dataUrl, 
-            description: description.trim(), // 存储描述
-            createdAt: Date.now() 
-        });
-        uploadedCount++;
+        await db.qzonePhotos.add({ albumId: state.activeAlbumId, url: dataUrl, createdAt: Date.now() });
     }
 
-    if (uploadedCount > 0) {
-        // 4. 后续的更新相册封面和计数的逻辑保持不变
-        const photoCount = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).count();
-        const updateData = { photoCount };
-        
-        if (!album.photoCount || album.coverUrl.includes('placeholder')) {
-            const firstPhoto = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).first();
-            if(firstPhoto) updateData.coverUrl = firstPhoto.url;
-        }
-
-        await db.qzoneAlbums.update(state.activeAlbumId, updateData);
-        await renderAlbumPhotosScreen();
-        await renderAlbumList();
-        
-        alert(`成功上传了 ${uploadedCount} 张照片!`);
+    const photoCount = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).count();
+    const updateData = { photoCount };
+    
+    if (!album.photoCount || album.coverUrl.includes('placeholder')) {
+        const firstPhoto = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).first();
+        if(firstPhoto) updateData.coverUrl = firstPhoto.url;
     }
+
+    await db.qzoneAlbums.update(state.activeAlbumId, updateData);
+    await renderAlbumPhotosScreen();
+    await renderAlbumList();
     
     event.target.value = null;
+    alert('照片上传成功!');
 });
-// ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 【全新】相册照片点击事件（增加上下文判断）▼▼▼
+// --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
+
+// --- ↓↓↓ 从这里开始复制,完整替换掉旧的 photos-grid-page 监听器 ↓↓↓ ---
+
 document.getElementById('photos-grid-page').addEventListener('click', async (e) => {
-    const photoThumb = e.target.closest('.photo-thumb');
-    
-    // 【核心修改1】优先检查上下文
-    if (albumPickerContext.for === 'live-background' && photoThumb) {
-        const photoUrl = photoThumb.src;
-
-        // a. 更新直播状态
-        liveStreamState.backgroundUrl = photoUrl;
-        
-        // b. 更新直播间背景的UI
-        document.getElementById('live-stream-screen').style.backgroundImage = `url(${photoUrl})`;
-
-        // c. 保存到AI的默认背景设置中
-        const streamerChatId = liveStreamState.streamerId;
-        if (streamerChatId && streamerChatId !== 'user' && state.chats[streamerChatId]) {
-            const streamerChat = state.chats[streamerChatId];
-            if (!streamerChat.settings) streamerChat.settings = {};
-            streamerChat.settings.offlineVideoBackground = photoUrl;
-            await db.chats.put(streamerChat);
-        }
-
-        // d. 跳转回直播间
-        showScreen(albumPickerContext.returnScreen);
-        
-        // e. 重置上下文
-        albumPickerContext = { for: null, returnScreen: null };
-        
-        alert('直播背景已更换！');
-        return; // 结束，不执行后续逻辑
-    }
-
-    // --- 如果不是来选背景的，就执行原来的逻辑 ---
     const deleteBtn = e.target.closest('.photo-delete-btn');
+    const photoThumb = e.target.closest('.photo-thumb');
 
     if (deleteBtn) {
-        e.stopPropagation();
+        e.stopPropagation(); // 阻止事件冒泡到图片上
         const photoId = parseInt(deleteBtn.dataset.photoId);
         const confirmed = await showCustomConfirm(
             '删除照片',
@@ -22324,11 +22056,10 @@ document.getElementById('photos-grid-page').addEventListener('click', async (e) 
         }
     } 
     else if (photoThumb) {
-        // 打开图片查看器
+        // 这就是恢复的图片点击放大功能!
         openPhotoViewer(photoThumb.src);
     }
 });
-// ▲▲▲ 替换结束 ▲▲▲
 
 // 恢复图片查看器的控制事件
 document.getElementById('photo-viewer-close-btn').addEventListener('click', closePhotoViewer);
@@ -23502,23 +23233,12 @@ case 'live-streamer-info-clickable':
 });
 // ▲▲▲ REPLACEMENT END ▲▲▲
 
-// ▼▼▼ 【全新】直播间更换背景的逻辑（跳转到相册）▼▼▼
+// 2. 直播间更换背景的逻辑 (保持不变)
 document.getElementById('live-stream-screen').addEventListener('click', (e) => {
-    // 确保只有在点击背景本身（而不是按钮或对话框）时才触发
     if (e.target.id === 'live-stream-screen') {
-        // 【核心修改】
-        // 1. 设置上下文，告诉相册我们是来选直播背景的
-        albumPickerContext = {
-            for: 'live-background',
-            returnScreen: 'live-stream-screen'
-        };
-        
-        // 2. 跳转到相册页面
-        renderAlbumList(); // 确保相册内容是最新的
-        showScreen('album-screen');
+        document.getElementById('live-background-upload-input').click();
     }
 });
-// ▲▲▲ 替换结束 ▲▲▲
 // ▼▼▼ 请用这段【修正后】的代码，完整替换旧的 live-background-upload-input 事件监听器 ▼▼▼
 document.getElementById('live-background-upload-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
