@@ -15872,8 +15872,30 @@ async function triggerAiInLiveStream(actor = 'host') {
     let systemPrompt = '';
     let messagesForApi = [];
 
+
+// ▼▼▼ 请用这【一整块】全新的代码，完整替换掉 triggerAiInLiveStream 函数内旧的 if (actor === 'host') 代码块 ▼▼▼
     if (actor === 'host') {
-        // --- 主播发言逻辑 (保持不变) ---
+        // --- 主播发言逻辑 (已注入“特殊对待”逻辑) ---
+
+        // 【核心修改1】在生成 prompt 前，预处理弹幕历史，标记出“我”的评论
+        const myNicknameForThisStream = liveStreamState.streamerId === 'user' 
+            ? streamerNickname 
+            : (state.chats[invitedAiId] ? state.chats[invitedAiId].settings.myNickname : (state.qzoneSettings.nickname || '我'));
+
+        const recentHistory = commentHistory.slice(-10);
+        const processedHistoryForPrompt = recentHistory.map(comment => {
+            // 严谨的切分，防止评论内容中包含冒号而出错
+            const firstColonIndex = comment.indexOf(':');
+            if (firstColonIndex > -1) {
+                const commenter = comment.substring(0, firstColonIndex).trim();
+                if (commenter === myNicknameForThisStream) {
+                    return `【⭐ 这是我的评论 ⭐】 ${comment}`;
+                }
+            }
+            return comment;
+        }).join('\n');
+
+        // 【核心修改2】更新 systemPrompt，强制AI识别并优先回应带标记的评论
         systemPrompt = `
 # 你的任务
 你现在是成人直播平台的主播“${streamerNickname}”。你的核心任务是根据你的人设和极具挑逗性的直播主题，与所有观众互动，但要给予用户“${myNicknameForThisStream}”【绝对的、独一无二的特殊对待】。
@@ -21844,7 +21866,20 @@ document.getElementById('manage-stickers-btn').addEventListener('click', enterSt
 document.getElementById('done-managing-stickers-btn').addEventListener('click', exitStickerEditMode);
 document.getElementById('select-all-stickers-btn').addEventListener('click', selectAllStickers); // <-- 就是这一行
 document.getElementById('delete-selected-stickers-btn').addEventListener('click', deleteSelectedStickers);
-            document.getElementById('upload-image-btn').addEventListener('click', () => document.getElementById('image-upload-input').click());
+// ▼▼▼ 【全新】聊天界面的“相册”按钮，现在会跳转到空间相册 ▼▼▼
+document.getElementById('upload-image-btn').addEventListener('click', () => {
+    // 1. 设置上下文，告诉相册我们是来选照片发给聊天的
+    albumPickerContext = {
+        for: 'chat-photo', // 设置一个独特的目的
+        returnScreen: 'chat-interface-screen', // 告诉相册选完后要返回哪里
+        chatId: state.activeChatId // 记录下当前是在哪个聊天
+    };
+    
+    // 2. 跳转到相册主页面
+    renderAlbumList(); // 确保相册列表是最新的
+    showScreen('album-screen');
+});
+// ▲▲▲ 替换结束 ▲▲▲
             document.getElementById('image-upload-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (!file || !state.activeChatId) return; const reader = new FileReader(); reader.onload = async (e) => { const base64Url = e.target.result; const chat = state.chats[state.activeChatId]; const msg = { role: 'user', content: [{ type: 'image_url', image_url: { url: base64Url } }], timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); }; reader.readAsDataURL(file); event.target.value = null; });
             document.getElementById('voice-message-btn').addEventListener('click', async () => { if (!state.activeChatId) return; const text = await showCustomPrompt("发送语音", "请输入你想说的内容:"); if (text && text.trim()) { const chat = state.chats[state.activeChatId]; const msg = { role: 'user', type: 'voice_message', content: text.trim(), timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); } });
             document.getElementById('send-photo-btn').addEventListener('click', async () => { if (!state.activeChatId) return; const description = await showCustomPrompt("发送照片", "请用文字描述您要发送的照片:"); if (description && description.trim()) { const chat = state.chats[state.activeChatId]; const msg = { role: 'user', type: 'user_photo', content: description.trim(), timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); } });
@@ -22032,21 +22067,16 @@ document.getElementById('album-photo-input').addEventListener('change', async (e
 
 // --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
 
-// ▼▼▼ 【全新】相册照片点击事件（增加上下文判断）▼▼▼
+// ▼▼▼ 【最终版】相册照片点击事件（整合了发送到聊天、设置直播背景和放大查看）▼▼▼
 document.getElementById('photos-grid-page').addEventListener('click', async (e) => {
     const photoThumb = e.target.closest('.photo-thumb');
     
-    // 【核心修改1】优先检查上下文
+    // --- 逻辑分支1: 如果我们是从直播间来选背景的 ---
     if (albumPickerContext.for === 'live-background' && photoThumb) {
         const photoUrl = photoThumb.src;
-
-        // a. 更新直播状态
         liveStreamState.backgroundUrl = photoUrl;
-        
-        // b. 更新直播间背景的UI
         document.getElementById('live-stream-screen').style.backgroundImage = `url(${photoUrl})`;
 
-        // c. 保存到AI的默认背景设置中
         const streamerChatId = liveStreamState.streamerId;
         if (streamerChatId && streamerChatId !== 'user' && state.chats[streamerChatId]) {
             const streamerChat = state.chats[streamerChatId];
@@ -22055,17 +22085,46 @@ document.getElementById('photos-grid-page').addEventListener('click', async (e) 
             await db.chats.put(streamerChat);
         }
 
-        // d. 跳转回直播间
+        showScreen(albumPickerContext.returnScreen);
+        albumPickerContext = { for: null, returnScreen: null };
+        alert('直播背景已更换！');
+        return;
+    }
+
+    // --- 【【【全新逻辑分支2】】】: 如果我们是从聊天界面来选照片发送的 ---
+    if (albumPickerContext.for === 'chat-photo' && photoThumb) {
+        const photoUrl = photoThumb.src;
+        const chatId = albumPickerContext.chatId;
+        const chat = state.chats[chatId];
+        if (!chat) return;
+
+        // a. 创建一个图片消息对象
+        const msg = {
+            role: 'user',
+            content: [{ type: 'image_url', image_url: { url: photoUrl } }],
+            timestamp: Date.now()
+        };
+
+        // b. 将消息保存到数据库
+        chat.history.push(msg);
+        await db.chats.put(chat);
+        
+        // c. 跳转回聊天界面
         showScreen(albumPickerContext.returnScreen);
         
-        // e. 重置上下文
-        albumPickerContext = { for: null, returnScreen: null };
+        // d. 在聊天界面上渲染出刚刚发送的图片
+        appendMessage(msg, chat);
         
-        alert('直播背景已更换！');
+        // e. 刷新聊天列表
+        renderChatList();
+        
+        // f. 重置上下文，完成本次操作
+        albumPickerContext = { for: null, returnScreen: null, chatId: null };
+        
         return; // 结束，不执行后续逻辑
     }
 
-    // --- 如果不是来选背景的，就执行原来的逻辑 ---
+    // --- 默认逻辑分支: 删除照片 或 放大查看 ---
     const deleteBtn = e.target.closest('.photo-delete-btn');
 
     if (deleteBtn) {
@@ -22099,7 +22158,7 @@ document.getElementById('photos-grid-page').addEventListener('click', async (e) 
         }
     } 
     else if (photoThumb) {
-        // 打开图片查看器
+        // 如果没有任何上下文，就执行默认的放大查看操作
         openPhotoViewer(photoThumb.src);
     }
 });
