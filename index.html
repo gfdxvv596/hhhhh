@@ -1501,6 +1501,103 @@ body:not(.bordered-mode) .nav-item {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【最终整合版 V5 - 容器样式法】动态页面终极美化布局 ▼▼▼ */
+
+/* --- 1. 整体与顶部浮动栏 (保持不变) --- */
+#phone-screen:has(#qzone-screen.active) #status-bar,
+#phone-screen:has(#qzone-screen.active) #qzone-screen > .qzone-header {
+    display: none !important;
+}
+
+.qzone-floating-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 20 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding: 15px 20px !important;
+    padding-top: calc(15px + env(safe-area-inset-top)) !important;
+    box-sizing: border-box !important;
+}
+
+.top-right-cluster {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+}
+
+/* --- 2. 【【【核心修复区】】】 --- */
+
+/* a. 返回按钮 (保持不变) */
+.qzone-floating-header .back-btn { background-color: transparent !important; color: white !important; width: 32px !important; height: 32px !important; border-radius: 50% !important; display: flex !important; justify-content: center !important; align-items: center !important; font-size: 24px !important; cursor: pointer !important; text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important; }
+
+/* b. 【全新】为所有按钮的父容器设置基础样式 */
+#qzone-normal-actions, #qzone-edit-actions {
+    display: flex;
+    align-items: center;
+    background-color: rgba(240, 240, 240, 0.1) !important; /* 统一的半透明浅灰色背景 */
+    border-radius: 16px !important; /* 统一的胶囊圆角 */
+    padding: 2px !important; /* 给容器一点内边距，让按钮看起来更协调 */
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+/* c. 【全新】为容器内部的所有按钮设置统一样式 */
+#qzone-normal-actions .action-btn,
+#qzone-edit-actions .action-btn {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #333 !important; /* 统一的深色文字 */
+    background-color: transparent !important; /* 按钮本身背景透明 */
+    border: none !important;
+    padding: 6px 6px !important; /* 按钮的内边距 */
+    cursor: pointer !important;
+    white-space: nowrap; /* 防止文字换行 */
+}
+
+/* d. 单独为“删除”按钮设置红色文字 */
+#qzone-delete-selected-btn {
+    color: #ff3b30 !important;
+}
+
+/* --- 3. 个人资料与背景布局 (保持不变) --- */
+.qzone-profile-header { padding-bottom: 0 !important; margin-bottom: 0 !important; }
+.qzone-banner-container { height: 280px !important; position: relative !important; }
+.qzone-user-info { display: block !important; text-align: center !important; padding: 0 20px !important; margin-top: -170px !important; position: relative !important; z-index: 5 !important; }
+.qzone-avatar-container { margin: 0 auto 12px auto !important; display: inline-block !important; position: relative !important; }
+.qzone-banner-container::after { content: '' !important; position: absolute !important; bottom: -1px !important; left: 0 !important; width: 100% !important; height: 120px !important; background: linear-gradient(to top, #ffffff, rgba(255, 255, 255, 0)) !important; }
+#phone-screen.dark-mode .qzone-banner-container::after { background: linear-gradient(to top, #000000, rgba(0, 0, 0, 0)) !important; }
+#qzone-avatar-img { width: 90px !important; height: 90px !important; border-width: 4px !important; }
+.qzone-user-details { display: block !important; width: 100% !important; }
+#qzone-nickname { font-size: 22px !important; font-weight: 700 !important; color: var(--text-primary) !important; text-shadow: 0 1px 3px rgba(0,0,0,0.3) !important; cursor: pointer !important; text-align: center !important; margin: 0 !important; }
+#qzone-signature { font-size: 14px !important; color: var(--text-secondary) !important; margin: 5px 0 0 0 !important; cursor: pointer !important; text-align: center !important; }
+#qzone-visitor-info { font-size: 12px !important; color: white !important; background-color: rgba(0, 0, 0, 0.25) !important; backdrop-filter: blur(5px) !important; -webkit-backdrop-filter: blur(5px) !important; border-radius: 12px !important; padding: 4px 10px !important; cursor: pointer !important; gap: 6px !important; align-items: center !important; display: inline-flex !important; }
+
+/* --- 4. 功能栏与帖子列表 (保持不变) --- */
+.qzone-actions-bar { margin: 10px 15px 20px 15px !important; background-color: transparent !important; box-shadow: none !important; }
+.qzone-post-container { border-bottom: 1px solid #e9e9e9 !important; background-color: transparent !important; }
+#phone-screen.dark-mode .qzone-post-container { border-bottom-color: #2c2c2e !important; }
+#qzone-posts-list .qzone-post-container:last-child { border-bottom: none !important; }
+.qzone-post-item { padding: 15px 15px 0 15px !important; background-color: var(--secondary-bg) !important; border: none !important; position: relative !important; z-index: 2 !important; }
+#phone-screen.dark-mode .qzone-post-item { background-color: #000000 !important; }
+
+/* --- 5. 评论区等 (保持不变) --- */
+.post-likes-section, .post-comments-container { background-color: transparent !important; padding: 0 !important; margin: 10px 0 0 0 !important; border: none !important; }
+.post-footer { position: relative !important; margin-top: 15px !important; padding-bottom: 15px !important; border-top: none !important;}
+.comment-section .comment-avatar { position: absolute !important; left: 10px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 5 !important; width: 32px !important; height: 32px !important;}
+.comment-input { background-color: #f0f2f5 !important; border-radius: 18px !important; padding: 10px 15px 10px 50px !important; font-size: 14px !important; width: 100% !important; box-sizing: border-box !important;}
+#phone-screen.dark-mode .comment-input { background-color: #2c2c2e !important; }
+.qzone-post-delete-action span { background-color: #ff3b30; color: white; padding: 8px 15px; border-radius: 20px; }
+.action-item { color: var(--text-secondary) !important; }
+.action-item:not(:last-child)::after { height: 16px !important; background-color: var(--border-color) !important; }
+
+/* ▲▲▲ 最终版CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 【全新】线下模式图标美化 ▼▼▼ */
 
 /* 专门为线下模式的“行动”按钮设置新的图标和颜色 */
@@ -1717,10 +1814,11 @@ body:not(.bordered-mode) .comment-input {
     font-weight: 600;
 }
 
-/* === 动态界面 (QZone) 样式 (这是新添加的) === */
+/* ▼▼▼ 用这【一段】新代码，替换旧的 #qzone-screen ▼▼▼ */
 #qzone-screen {
-    background-color: #f0f2f5;
+    background-color: #ffffff !important; /* 【核心修改】背景色改为纯白色 */
 }
+/* ▲▲▲ 替换结束 ▲▲▲ */
 
 .qzone-header {
     /* position: absolute;  <-- 把这个改成 relative */
@@ -1776,18 +1874,26 @@ body:not(.bordered-mode) .comment-input {
     object-fit: cover;
 }
 
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .qzone-user-info ▼▼▼ */
 .qzone-user-info {
-    position: absolute;
-    bottom: -30px; /* 让头像和昵称区域向下偏移,一半在背景板内,一半在外 */
-    left: 20px;
-    display: flex;
-    align-items: flex-end; /* 让昵称和头像底部对齐 */
-    gap: 10px;
-}
-
-.qzone-avatar-container {
+    /* 【核心修改1】移除flex布局，改为默认的块级布局，并让内容居中 */
+    display: block;
+    text-align: center;
+    
+    padding: 0 20px;
+    margin-top: -60px; /* 保持向上提拉的效果 */
     position: relative;
+    z-index: 5;
 }
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 #qzone-avatar-container ▼▼▼ */
+.qzone-avatar-container {
+    margin: 0 auto 12px auto; /* 【核心修改】移除右边距，改为自动水平居中，并增加下边距 */
+    display: inline-block; /* 确保margin: auto生效 */
+    position: relative; /* 确保z-index生效 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
 
 #qzone-avatar-img {
     width: 70px;
@@ -2783,7 +2889,6 @@ input[type="color"]::-webkit-color-swatch {
 .post-footer {
     margin-top: 15px;
     padding-top: 10px;
-    border-top: 1px solid #f0f0f0; /* 用一条浅色线分隔 */
     display: flex;
     align-items: center;
     gap: 8px; /* 调整整体间距 */
@@ -3322,6 +3427,175 @@ input[type="color"]::-webkit-color-swatch {
 .live-system-notification strong {
     font-weight: 700;
     color: #ad6e1b;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【最终强制版】动态与评论区美化 (参考图风格) ▼▼▼ */
+
+/* --- 1. 帖子卡片整体调整 --- */
+.qzone-post-item {
+    padding: 15px 15px 0 15px !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+#phone-screen.dark-mode .qzone-post-item {
+    border-bottom-color: #2c2c2e !important;
+}
+
+/* --- 2. 帖子头部 (头像、昵称、三点菜单) --- */
+.post-header {
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+}
+.post-avatar {
+    width: 42px !important;
+    height: 42px !important;
+}
+.post-info {
+    gap: 2px !important;
+}
+.post-nickname {
+    font-size: 16px !important;
+    color: var(--accent-color) !important;
+    font-weight: 600 !important;
+}
+.post-actions-btn {
+    margin-left: auto !important;
+    color: #b0b0b0 !important;
+    font-size: 24px !important;
+}
+.post-header .post-timestamp {
+    display: none !important;
+}
+
+/* --- 3. 帖子内容与新的底部信息区 --- */
+.post-main-content {
+    margin-bottom: 12px !important;
+}
+.post-content {
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+    color: var(--text-primary) !important;
+}
+
+.post-meta-bar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    color: var(--text-secondary) !important;
+}
+.post-meta-bar .post-timestamp {
+    font-size: 13px !important;
+}
+.post-feedback-icons {
+    padding: 0 !important;
+    gap: 18px !important;
+}
+.action-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+/* --- 4. 点赞和评论区域 (去背景 + 分隔线) --- */
+/* ▼▼▼ 【最终版 - 彻底移除内部分割线】用这【一整块】全新的代码，替换旧的 .post-likes-section, .post-comments-container ▼▼▼ */
+.post-likes-section, .post-comments-container {
+    background-color: transparent !important;
+    padding: 0 !important; /* 【核心修改1】将上下内边距也移除 */
+    margin: 0 !important;   /* 【核心修改2】将外边距也移除，由子元素自己控制 */
+    border-radius: 0 !important;
+    border: none !important; /* 【核心修改3】使用 border: none 彻底清除所有边框 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+#phone-screen.dark-mode .post-likes-section,
+#phone-screen.dark-mode .post-comments-container {
+    background-color: transparent !important;
+}
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .post-likes-section ▼▼▼ */
+.post-likes-section {
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    line-height: 1.5 !important;
+    /* 【新增】增加一点上边距，与上方内容拉开距离 */
+    margin-top: 5px !important;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+.post-likes-section .like-icon {
+    display: none !important;
+}
+.post-likes-section::before {
+    content: '♡' !important;
+    color: var(--accent-color) !important;
+    margin-right: 8px !important;
+    font-weight: bold !important;
+}
+.post-likes-section span {
+    color: var(--accent-color) !important;
+    font-weight: 500 !important;
+}
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .post-comments-container ▼▼▼ */
+.post-comments-container {
+    /* 【新增】如果同时有点赞区，就增加一点上边距；如果没有，则与内容区保持10px间距 */
+    margin-top: 5px !important; 
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+.comment-item {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    padding: 5px 0 !important;
+}
+.commenter-name {
+    color: var(--accent-color) !important;
+    font-weight: 600 !important;
+}
+.comment-item .reply-indicator {
+    color: var(--text-primary) !important;
+    font-weight: normal !important;
+    font-size: 14px !important;
+    margin: 0 4px !important;
+}
+.comment-text {
+    color: var(--text-primary) !important;
+}
+
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .post-footer ▼▼▼ */
+.post-footer {
+    border-top: none;
+    margin-top: 15px;
+    padding-bottom: 15px;
+    /* 【核心修改】为输入框和头像的相对定位提供基准 */
+    position: relative; 
+}
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .comment-section .comment-avatar ▼▼▼ */
+.comment-section .comment-avatar {
+    width: 32px;
+    height: 32px;
+    /* 【核心修改1】使用绝对定位 */
+    position: absolute;
+    left: 10px; /* 距离左边缘10px */
+    top: 50%;   /* 垂直居中对齐 */
+    transform: translateY(-50%);
+    z-index: 5; /* 确保在输入框之上 */
+}
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .comment-input ▼▼▼ */
+.comment-input {
+    background-color: #f0f2f5 !important;
+    border-radius: 18px !important;
+    /* 【核心修改】增加左内边距，为头像留出空间 */
+    padding: 10px 15px 10px 50px !important; 
+    font-size: 14px !important;
+    width: 100%; /* 【新增】确保输入框撑满父容器 */
+    box-sizing: border-box; /* 【新增】确保内边距不会导致宽度溢出 */
+}
+#phone-screen.dark-mode .comment-input {
+    background-color: #2c2c2e !important;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+/* 隐藏发送按钮 */
+.comment-send-btn {
+    display: none;
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
@@ -5414,31 +5688,82 @@ input[type="color"]::-webkit-color-swatch {
     overflow: hidden;   /* 隐藏掉超出部分的删除按钮 */
     border-radius: 12px;/* 和内部卡片保持一致的圆角 */
 }
-
-/* 2. 可滑动的内容卡片,增加一个平滑的过渡效果 */
-.qzone-post-item {
-    transition: transform 0.3s ease;
-    background-color: var(--secondary-bg); /* 确保它有背景色,能盖住下面的删除按钮 */
-    position: relative; /* 确保它在最上层 */
-    z-index: 2;
+/* ▼▼▼ 【全新添加】这个CSS规则 ▼▼▼ */
+.qzone-post-container {
+    position: relative;
+    border-radius: 0; /* 确保没有圆角 */
+    overflow: visible; /* 【重要】允许内容溢出，虽然这里用不到 */
+    
+    /* 【核心修改3】将分割线应用到这里 */
+    border-bottom: 1px solid #e9e9e9; 
+    width: 100% !important;
 }
 
-/* 3. 【核心】这就是那个“删除”按钮的样式!*/
+/* 【新增】为最后一个容器移除底部分割线，避免列表末尾有多余的线 */
+#qzone-posts-list .qzone-post-container:last-child {
+    border-bottom: none;
+}
+
+#phone-screen.dark-mode .qzone-post-container {
+    border-bottom-color: #2c2c2e; /* 夜间模式的分割线颜色 */
+}
+/* ▲▲▲ 添加结束 ▲▲▲ */
+
+/* ▼▼▼ 【最终分割线修复版】请用这【一整块】全新的代码，替换所有旧的 qzone-post-item 相关规则 ▼▼▼ */
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .qzone-post-item ▼▼▼ */
+.qzone-post-item {
+    /* 【核心修改1】将内边距的上下部分分开设置，顶部为0，底部增加 */
+    padding: 0 15px 15px 15px !important; 
+    
+    background-color: #fff !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    
+    /* 【核心修改2】移除这里的所有边框属性 */
+    border: none !important;
+    border-top: none !important;
+    
+    position: relative !important;
+    z-index: 2 !important;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+/* 夜间模式的样式 */
+#phone-screen.dark-mode .qzone-post-item {
+    background-color: #000000 !important;
+    /* 夜间模式下的分割线颜色 */
+    border-top-color: #2c2c2e !important;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .qzone-post-delete-action ▼▼▼ */
 .qzone-post-delete-action {
-    position: absolute; /* 绝对定位,脱离文档流 */
+    position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
-    width: 90px; /* 删除按钮的宽度 */
-    background-color: #ff3b30; /* 您想要的红色背景 */
-    color: white;
+    width: 90px;
+    
+    /* 【核心修改1】背景色改为完全透明 */
+    background-color: transparent;
+    
+    color: #ff3b30; /* 【核心修改2】文字颜色改为红色 */
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
     cursor: pointer;
-    z-index: 1; /* 确保它在卡片下面 */
+    z-index: 1;
+    
+    /* 【新增】为“删除”文字添加一个白色背景，使其更突出 */
+    font-size: 14px;
 }
+.qzone-post-delete-action span {
+    background-color: #ff3b30; /* 将背景色加在文字本身上 */
+    color: white; /* 文字颜色变回白色 */
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
 
 /* 4. 当卡片左滑时,把它向左移动,露出删除按钮 */
 .qzone-post-item.swiped {
@@ -7872,49 +8197,71 @@ input:checked + .slider:before {
         </div>
     </div>
 
-    <!-- 动态界面视图 -->
-    <div id="qzone-screen" class="chat-list-view">
-<div class="qzone-header">
+<!-- ▼▼▼ 用这【一整块】全新的代码，完整替换掉旧的 id="qzone-screen" 及其所有内容 ▼▼▼ -->
+<div id="qzone-screen" class="chat-list-view">
+<!-- ▼▼▼ 【最终HTML修复版 V2】用这【一整块】全新的代码，替换旧的 qzone-floating-header ▼▼▼ -->
+<div class="qzone-floating-header">
     <span class="back-btn" id="qzone-back-btn">‹</span>
-    <span>好友动态</span>
-
-    <!-- 这个容器将根据模式显示不同的按钮 -->
-    <div class="header-actions">
-        <!-- 默认模式下的按钮 -->
-        <div id="qzone-normal-actions">
-            <span class="action-btn" id="qzone-edit-btn">编辑</span>
+    
+    <!-- 【核心修改】创建一个新的集群容器 -->
+    <div class="top-right-cluster">
+        <!-- 1. 按钮的容器 -->
+        <div class="header-actions">
+            <!-- 正常模式下，只显示“编辑”按钮 -->
+            <div id="qzone-normal-actions">
+                <span class="action-btn" id="qzone-edit-btn">...</span>
+            </div>
+            <!-- 编辑模式下，显示“全选”、“删除”、“完成” -->
+            <div id="qzone-edit-actions" style="display: none;">
+                <span class="action-btn" id="qzone-select-all-btn">全选</span>
+                <span class="action-btn" id="qzone-delete-selected-btn" style="color: #ff3b30;">删除</span>
+                <span class="action-btn" id="qzone-done-btn">完成</span>
+            </div>
         </div>
-        <!-- 编辑模式下的按钮 (默认隐藏) -->
-        <div id="qzone-edit-actions" style="display: none;">
-            <span class="action-btn" id="qzone-select-all-btn">全选</span>
-            <span class="action-btn" id="qzone-delete-selected-btn" style="color: #ff3b30;">删除</span>
-            <span class="action-btn" id="qzone-done-btn">完成</span>
+        <!-- 2. 访客量信息 (现在是按钮的兄弟元素) -->
+        <div id="qzone-visitor-info">
+            <span>访客总量</span>
+            <span id="qzone-visitor-count-number">0</span>
         </div>
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
-        <div class="qzone-content">
-            <div class="qzone-profile-header">
-                <div id="qzone-banner-container" class="qzone-banner-container">
-                    <img id="qzone-banner-img" src="https://files.catbox.moe/r5heyt.gif" alt="背景">
-                    <input type="file" id="qzone-banner-input" accept="image/*" hidden>
-                </div>
-                <div class="qzone-user-info">
-                    <div id="qzone-avatar-container" class="qzone-avatar-container">
-                        <img id="qzone-avatar-img" src="https://files.catbox.moe/q6z5fc.jpeg" alt="头像">
-                        <input type="file" id="qzone-avatar-input" accept="image/*" hidden>
-                    </div>
-                    <span id="qzone-nickname">{{user}}</span>
-                </div>
+
+    <!-- 动态主内容区 -->
+    <div class="qzone-content">
+        <div class="qzone-profile-header">
+            <!-- 1. 背景板 -->
+            <div id="qzone-banner-container" class="qzone-banner-container">
+                <img id="qzone-banner-img" src="https://files.catbox.moe/r5heyt.gif" alt="背景">
+                <input type="file" id="qzone-banner-input" accept="image/*" hidden>
             </div>
-            <div class="qzone-actions-bar">
-                <div class="action-item" id="create-shuoshuo-btn"><span>说说</span></div>
-                <div class="action-item" id="create-post-btn"><span>动态</span></div>
-                <div class="action-item" id="open-album-btn"><span>相册</span></div>
-            </div>
-            <div id="qzone-posts-list"></div>
-        </div>
+<!-- ▼▼▼ 【最终版 - 头像上置】用这【一整块】全新的代码，替换旧的 id="qzone-user-info" ▼▼▼ -->
+<div class="qzone-user-info">
+    <!-- 【核心修改1】头像现在位于最顶部 -->
+    <div id="qzone-avatar-container" class="qzone-avatar-container">
+        <img id="qzone-avatar-img" src="https://files.catbox.moe/q6z5fc.jpeg" alt="头像">
+        <input type="file" id="qzone-avatar-input" accept="image/*" hidden>
     </div>
+    
+    <!-- 【核心修改2】昵称和签名现在位于头像下方 -->
+    <div class="qzone-user-details">
+        <h2 id="qzone-nickname">{{user}}</h2>
+        <p id="qzone-signature">编辑个签，展示我的与众不同。</p>
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+</div>
+        <!-- 3. 功能栏 (保持不变) -->
+        <div class="qzone-actions-bar">
+            <div class="action-item" id="create-shuoshuo-btn"><span>说说</span></div>
+            <div class="action-item" id="create-post-btn"><span>动态</span></div>
+            <div class="action-item" id="open-album-btn"><span>相册</span></div>
+        </div>
+        <!-- 4. 帖子列表 (保持不变) -->
+        <div id="qzone-posts-list"></div>
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
 
     <!-- 收藏界面视图 -->
     <div id="favorites-view" class="chat-list-view">
@@ -10317,27 +10664,36 @@ function showScreen(screenId) {
 
     switch (viewId) {
         case 'qzone-screen':
-            views['qzone-screen'].style.backgroundColor = '#f0f2f5';
-            updateUnreadIndicator(0);
-            renderQzoneScreen();
-            renderQzonePosts();
-            break;
-        case 'favorites-view':
-            views['favorites-view'].style.backgroundColor = '#f9f9f9';
-            renderFavoritesScreen();
-            break;
+    views['qzone-screen'].style.backgroundColor = '#f0f2f5';
+    updateUnreadIndicator(0);
+    
+    // 【新增】模拟访客增长
+    if (state.qzoneSettings) {
+        state.qzoneSettings.visitorCount = (state.qzoneSettings.visitorCount || 0) + 1;
+        saveQzoneSettings(); // 保存新的访客数
+    }
+
+    renderQzoneScreen();
+    renderQzonePosts();
+    break;
+// ▲▲▲ 添加结束 ▲▲▲
     }
 }
 // ▲▲▲ 替换结束 ▲▲▲
         
-        function renderQzoneScreen() {
-            if (state && state.qzoneSettings) {
-                const settings = state.qzoneSettings;
-                document.getElementById('qzone-nickname').textContent = settings.nickname;
-                document.getElementById('qzone-avatar-img').src = settings.avatar;
-                document.getElementById('qzone-banner-img').src = settings.banner;
-            }
-        }
+// ▼▼▼ 【全新】用这整块代码替换旧的 renderQzoneScreen 函数 ▼▼▼
+function renderQzoneScreen() {
+    if (state && state.qzoneSettings) {
+        const settings = state.qzoneSettings;
+        document.getElementById('qzone-nickname').textContent = settings.nickname;
+        document.getElementById('qzone-avatar-img').src = settings.avatar;
+        document.getElementById('qzone-banner-img').src = settings.banner;
+        // 【新增】渲染签名和访客量
+        document.getElementById('qzone-signature').textContent = settings.signature || '编辑个签...';
+        document.getElementById('qzone-visitor-count-number').textContent = settings.visitorCount || 0;
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
         window.renderQzoneScreenProxy = renderQzoneScreen;
 
         async function saveQzoneSettings() {
@@ -10562,21 +10918,17 @@ if (messagesForApi.length === 0) {
 }
 // ▲▲▲ 复制到这里结束 ▲▲▲
 
-// ▼▼▼ 【最终安全版】请用这【一整块】全新的代码，完整替换旧的 renderQzonePosts 函数 ▼▼▼
+// ▼▼▼ 【全新重构版 V2 - 参考图风格】请用这【一整块】全新的代码，完整替换旧的 renderQzonePosts 函数 ▼▼▼
 async function renderQzonePosts() {
     const postsListEl = document.getElementById('qzone-posts-list');
     if (!postsListEl) return;
 
-    // 【【【核心修复：添加安全卫士】】】
-    // 在使用 state.qzoneSettings 之前，先确保它已经被加载了。
     const userSettings = state.qzoneSettings;
     if (!userSettings) {
-        console.warn("renderQzonePosts 被调用，但 qzoneSettings 尚未加载，已中止本次渲染。");
-        // 可以选择显示一个加载中的提示，或者直接返回
+        console.warn("renderQzonePosts被调用，但 qzoneSettings 尚未加载，已中止本次渲染。");
         postsListEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 30px 0;">正在加载动态...</p>';
-        return; // 提前退出，防止报错
+        return;
     }
-    // ▲▲▲ 修复结束 ▲▲▲
 
     const [posts, favorites] = await Promise.all([
         db.qzonePosts.orderBy('timestamp').reverse().toArray(),
@@ -10587,10 +10939,14 @@ async function renderQzonePosts() {
     
     postsListEl.innerHTML = '';
 
-    // 【核心修改】根据是否处于编辑模式，切换顶部按钮的显示
-    document.getElementById('qzone-normal-actions').style.display = isQzoneEditMode ? 'none' : 'block';
-    document.getElementById('qzone-edit-actions').style.display = isQzoneEditMode ? 'flex' : 'none';
+    const normalActions = document.getElementById('qzone-normal-actions');
+    const editActions = document.getElementById('qzone-edit-actions');
 
+    if (normalActions && editActions) {
+        normalActions.style.display = isQzoneEditMode ? 'none' : 'block';
+        editActions.style.display = isQzoneEditMode ? 'flex' : 'none';
+    }
+    
     if (posts.length === 0) {
         postsListEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 30px 0;">这里空空如也,快来发布第一条说说吧!</p>';
         return;
@@ -10600,78 +10956,99 @@ async function renderQzonePosts() {
         const postContainer = document.createElement('div');
         postContainer.className = 'qzone-post-container';
         postContainer.dataset.postId = post.id;
-
-        // 【新增】根据模式和选中状态添加class
-        if (isQzoneEditMode) {
-            postContainer.classList.add('selection-mode');
-        }
-        if (selectedPosts.has(post.id)) {
-            postContainer.classList.add('selected');
-        }
-
-        if (index >= 7 && !isQzoneEditMode) { // 编辑模式下显示所有帖子
-            postContainer.classList.add('hidden-post');
-        }
-
+        if (isQzoneEditMode) { postContainer.classList.add('selection-mode'); }
+        if (selectedPosts.has(post.id)) { postContainer.classList.add('selected'); }
+        if (index >= 7 && !isQzoneEditMode) { postContainer.classList.add('hidden-post'); }
+        
         const postEl = document.createElement('div');
         postEl.className = 'qzone-post-item';
-
-        // --- 内部HTML拼接逻辑保持不变 ---
+        
+        // --- 【核心HTML结构修改区】 ---
         let authorAvatar = '', authorNickname = '', commentAvatar = userSettings.avatar; 
-        if (post.authorId === 'user') {
-            authorAvatar = userSettings.avatar;
-            authorNickname = userSettings.nickname;
-        } else if (state.chats[post.authorId]) {
-            const authorChat = state.chats[post.authorId];
-            authorAvatar = authorChat.settings.aiAvatar || defaultAvatar;
-            authorNickname = authorChat.name;
-        } else {
-            authorAvatar = defaultAvatar;
-            authorNickname = '{{char}}';
-        }
+        if (post.authorId === 'user') { authorAvatar = userSettings.avatar; authorNickname = userSettings.nickname; } 
+        else if (state.chats[post.authorId]) { const authorChat = state.chats[post.authorId]; authorAvatar = authorChat.settings.aiAvatar || defaultAvatar; authorNickname = authorChat.name; } 
+        else { authorAvatar = defaultAvatar; authorNickname = '{{char}}'; }
+
         let contentHtml = '';
         const publicTextHtml = post.publicText ? `<div class="post-content">${post.publicText.replace(/\n/g, '<br>')}</div>` : '';
-        if (post.type === 'shuoshuo') { contentHtml = `<div class="post-content" style="margin-bottom: 10px;">${post.content.replace(/\n/g, '<br>')}</div>`; } 
-        else if (post.type === 'image_post' && post.imageUrl) { contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${post.imageUrl}" class="chat-image"></div>` : `<img src="${post.imageUrl}" class="chat-image">`; } 
-        else if (post.type === 'text_image') { contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`; }
-        else if (post.type === 'interactive_html') { contentHtml = `<div class="post-content" style="display: flex; justify-content: center; margin-bottom: 10px;">${post.content}</div>`; }
+        if (post.type === 'shuoshuo') {
+                contentHtml = `<div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>`;
+            } else if (post.type === 'image_post' && post.imageUrl) {
+                contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${post.imageUrl}" class="chat-image"></div>` : `<img src="${post.imageUrl}" class="chat-image">`;
+        }else if (post.type === 'text_image') { 
+                   contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`; }
+        else if (post.type === 'interactive_html') { contentHtml = `<div class="post-content" style="display: flex; justify-content: center;">${post.content}</div>`; }
+        
+        const userNickname = state.qzoneSettings.nickname;
+        const isLikedByUser = post.likes && post.likes.includes(userNickname);
+        const isFavoritedByUser = favoritedPostIds.has(post.id);
+        
+        // 【新】构建点赞区域HTML
         let likesHtml = '';
-        if (post.likes && post.likes.length > 0) { likesHtml = `<div class="post-likes-section"><svg class="like-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span>${post.likes.join('、')} 觉得很赞</span></div>`; }
+        if (post.likes && post.likes.length > 0) {
+            likesHtml = `<div class="post-likes-section"><span>${post.likes.join('、 ')} 等${post.likes.length}人</span></div>`;
+        }
+
+        // 【新】构建评论区域HTML
         let commentsHtml = '';
         if (post.comments && post.comments.length > 0) {
             commentsHtml = '<div class="post-comments-container">';
             post.comments.forEach((comment, index) => {
                 let commentLineHtml = '';
                 const isUserCommenter = comment.commenterName === state.qzoneSettings.nickname;
-                const commenterNameClass = 'commenter-name';
-                if (comment.replyTo) { commentLineHtml = `<span class="${commenterNameClass}">${comment.commenterName}</span><span class="reply-indicator">回复了</span><span class="commenter-name">${comment.replyTo}:</span><span class="comment-text">${comment.text}</span>`; } 
-                else { commentLineHtml = `<span class="${commenterNameClass}">${comment.commenterName}:</span><span class="comment-text">${comment.text}</span>`; }
+                // 注意：这里我们不再需要commenterNameClass，因为新的CSS会处理
+                if (comment.replyTo) {
+                    commentLineHtml = `<span class="commenter-name">${comment.commenterName}</span><span class="reply-indicator">回复</span><span class="commenter-name">${comment.replyTo}</span>: <span class="comment-text">${comment.text}</span>`;
+                } else {
+                    commentLineHtml = `<span class="commenter-name">${comment.commenterName}</span>: <span class="comment-text">${comment.text}</span>`;
+                }
                 const deleteBtnHtml = isUserCommenter ? `<span class="comment-delete-btn" data-comment-index="${index}">×</span>` : '';
                 commentsHtml += `<div class="comment-item">${commentLineHtml}${deleteBtnHtml}</div>`;
             });
             commentsHtml += '</div>';
         }
-        const userNickname = state.qzoneSettings.nickname;
-        const isLikedByUser = post.likes && post.likes.includes(userNickname);
-        const isFavoritedByUser = favoritedPostIds.has(post.id);
-        postEl.innerHTML = `<div class="post-header"><img src="${authorAvatar}" class="post-avatar"><div class="post-info"><span class="post-nickname">${authorNickname}</span><span class="post-timestamp">${formatPostTimestamp(post.timestamp)}</span></div><div class="post-actions-btn">…</div></div><div class="post-main-content">${contentHtml}</div><div class="post-feedback-icons"><span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></span><span class="action-icon favorite ${isFavoritedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span></div>${likesHtml}${commentsHtml}<div class="post-footer"><div class="comment-section"><img src="${commentAvatar}" class="comment-avatar"><input type="text" class="comment-input" placeholder="友善的评论是交流的起点"><div class="at-mention-popup"></div></div><button class="comment-send-btn">发送</button></div>`;
+
+        // 【最终HTML拼接】
+        postEl.innerHTML = `
+            <div class="post-header">
+                <img src="${authorAvatar}" class="post-avatar">
+                <div class="post-info">
+                    <span class="post-nickname">${authorNickname}</span>
+                </div>
+                <div class="post-actions-btn">…</div>
+            </div>
+            <div class="post-main-content">${contentHtml}</div>
+            <div class="post-meta-bar">
+                <span class="post-timestamp">${formatPostTimestamp(post.timestamp)}</span>
+                <div class="post-feedback-icons">
+                    <span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></span>
+                    <span class="action-icon favorite ${isFavoritedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M21.17 12.83l-6.23 6.23a2.79 2.79 0 0 1-3.94 0l-6.23-6.23a5.58 5.58 0 0 1 0-7.9l7.73-7.74a.49.49 0 0 1 .7 0l7.73 7.74a5.58 5.58 0 0 1 0 7.9z"></path></svg></span>
+                    <span class="action-icon share"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
+                </div>
+            </div>
+            ${likesHtml}
+            ${commentsHtml}
+            <div class="post-footer">
+                <div class="comment-section">
+                    <img src="${commentAvatar}" class="comment-avatar">
+                    <input type="text" class="comment-input" placeholder="说点什么吧...">
+                </div>
+            </div>
+        `;
         
-const deleteAction = document.createElement('div');
+        // --- 这部分是滑动删除和选中覆盖层的HTML结构，保持不变 ---
+        const deleteAction = document.createElement('div');
         deleteAction.className = 'qzone-post-delete-action';
         deleteAction.innerHTML = '<span>删除</span>';
-        
-        // 【新增】创建并添加选中覆盖层
         const selectionOverlay = document.createElement('div');
         selectionOverlay.className = 'selection-overlay';
-
         postContainer.appendChild(postEl);
         postContainer.appendChild(deleteAction);
-        postContainer.appendChild(selectionOverlay); // 把覆盖层加进去
-
+        postContainer.appendChild(selectionOverlay);
         postsListEl.appendChild(postContainer);
     });
 
-    if (posts.length > 7 && !isQzoneEditMode) { // 编辑模式下不显示“加载更多”
+    if (posts.length > 7 && !isQzoneEditMode) {
         const loadMoreBtn = document.createElement('button');
         loadMoreBtn.id = 'qzone-load-more-btn';
         loadMoreBtn.textContent = '查看更早的动态...';
@@ -10682,7 +11059,6 @@ const deleteAction = document.createElement('div');
         postsListEl.appendChild(loadMoreBtn);
     }
 
-    // 【新增】更新删除按钮上的计数
     updateDeleteSelectedPostsButton();
 }
 // ▲▲▲ 替换结束 ▲▲▲
@@ -11084,7 +11460,16 @@ async function loadAllDataFromDB() {
     state.worldBooks = worldBooks || [];
     musicState.playlist = musicLib?.playlist || [];
     state.personaPresets = personaPresets || [];
-    state.qzoneSettings = qzoneSettings || { id: 'main', nickname: '{{user}}', avatar: 'https://files.catbox.moe/q6z5fc.jpeg', banner: 'https://files.catbox.moe/r5heyt.gif' };
+    // ▼▼▼ 在 loadAllDataFromDB 函数中，修改这一行 ▼▼▼
+state.qzoneSettings = qzoneSettings || { 
+    id: 'main', 
+    nickname: '{{user}}', 
+    avatar: 'https://files.catbox.moe/q6z5fc.jpeg', 
+    banner: 'https://files.catbox.moe/r5heyt.gif',
+    signature: '编辑个签，展示我的与众不同。', // <-- 新增
+    visitorCount: 0 // <-- 新增
+};
+// ▲▲▲ 修改结束 ▲▲▲
     allFavoriteItems = initialFavorites || [];
 }
 
@@ -15114,6 +15499,8 @@ async function triggerInactiveAiAction(chatId) {
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
 -   **发说说**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
+-   **【【【核心指令】】】发布图片动态**: \`[{"type": "qzone_post", "postType": "image_post", "publicText": "(可选)动态的公开文字", "imageDescription": "对于这张图的【中文】描述", "image_prompt_en": "a_cute_cat_on_the_grass"}]\` 
+    *   **image_prompt_en 规则**: 你【必须】将 \`imageDescription\` 的中文内容，提炼并翻译成一个【简短的、用下划线连接的、纯小写的英文短语】填入此字段。
 - **发布文字图**: \`{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}\`
 -   **发布可交互模块**: \`[{"type": "qzone_post", "postType": "interactive_html", "content": "<div>...你的HTML代码...</div>"}]\`
 -   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
@@ -15148,7 +15535,7 @@ async function triggerInactiveAiAction(chatId) {
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
 -   **【类型1:纯文字说说】**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
--   **【类型2:文字+真实图片】**: \`[{"type": "qzone_post", "postType": "image_post", "publicText": "可选的公开文字", "imageDescription": "对于这张图的【中文】描述", "thumbnail_url": "https://image.pollinations.ai/prompt/{按照上方美学铁律构建的英文prompt}?width=400&quality=50", "full_res_url": "https://image.pollinations.ai/prompt/{按照上方美学铁律构建的英文prompt}?width=1080&quality=90"}]\`
+-   **【类型2:文字+真实图片】**: \`[{"type": "qzone_post", "postType": "image_post", "publicText": "可选的公开文字", "imageUrl": "https://image.pollinations.ai/prompt/{按照上方美学铁律构建的英文prompt}", "imageDescription": "对于这张图的【中文】描述,方便用户理解"}]\`
 -   **【类型3:文字+描述图】**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "可选的公开文字", "hiddenContent": "点击占位图后显示的【中文】描述文字(关于人物的描写只能使用文字+描述图)..."}]\`
 -   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
@@ -15249,23 +15636,30 @@ chat.unreadCount = (chat.unreadCount || 0) + 1;
                 renderChatList();
                 console.log(`后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`);
             }
-if (action.type === 'qzone_post') {
-    const newPost = { 
-        type: action.postType, 
-        content: action.content || '', 
-        publicText: action.publicText || '', 
-        hiddenContent: action.hiddenContent || '', 
-        imageUrl: action.imageUrl || '',
-        imageDescription: action.imageDescription || '',
-        timestamp: Date.now(), 
-        authorId: chatId, 
-        authorGroupId: chat.groupId, // 【核心新增】记录作者的分组ID
-        visibleGroupIds: null 
-    };
-    await db.qzonePosts.add(newPost); 
-// ▼▼▼ 在这里添加新代码 ▼▼▼
+            // 【2. 确保JS处理逻辑是正确的】
+            if (action.type === 'qzone_post') {
+                let imageUrl = ''; // 默认为空
+
+                if (action.postType === 'image_post' && action.image_prompt_en) {
+                    const baseUrl = 'https://image.pollinations.ai/prompt/';
+                    const prompt = encodeURIComponent(action.image_prompt_en.replace(/_/g, ' '));
+                    imageUrl = `${baseUrl}${prompt}?width=600&height=800&quality=80`;
+                }
+
+                const newPost = { 
+                    type: action.postType, 
+                    content: action.content || '', 
+                    publicText: action.publicText || '', 
+                    hiddenContent: action.hiddenContent || '', 
+                    imageUrl: imageUrl,
+                    imageDescription: action.imageDescription || '',
+                    timestamp: Date.now(), 
+                    authorId: chatId, 
+                    authorGroupId: chat.groupId,
+                    visibleGroupIds: null 
+                };
+                await db.qzonePosts.add(newPost); 
                 await fabricateCommentsForPost(newPost, chat);
-                // ▲▲▲ 添加结束 ▲▲▲
                 updateUnreadIndicator(unreadPostsCount + 1);
                 console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
             } else if (action.type === 'qzone_comment') {
@@ -16223,15 +16617,24 @@ function togglePostSelection(postId) {
     updateDeleteSelectedPostsButton();
 }
 
+// ▼▼▼ 【Final Fortified Version】REPLACE your entire old updateDeleteSelectedPostsButton function with this block ▼▼▼
 /**
  * 更新“删除”按钮上的计数
  */
 function updateDeleteSelectedPostsButton() {
+    // 1. First, try to find the button.
     const deleteBtn = document.getElementById('qzone-delete-selected-btn');
-    deleteBtn.textContent = `删除(${selectedPosts.size})`;
-    deleteBtn.style.color = selectedPosts.size > 0 ? '#ff3b30' : '#8a8a8a';
+
+    // 2. 【【【CORE FIX: The Safety Check】】】
+    // Only proceed if the button actually exists in the DOM at this moment.
+    if (deleteBtn) {
+        // 3. If it exists, safely update its properties.
+        deleteBtn.textContent = `删除(${selectedPosts.size})`;
+        deleteBtn.style.color = selectedPosts.size > 0 ? '#ff3b30' : '#8a8a8a';
+    }
+    // 4. If it doesn't exist, the function simply does nothing and exits gracefully, preventing any errors.
 }
-// ▲▲▲ 新函数添加结束 ▲▲▲
+// ▲▲▲ Replacement End ▲▲▲
 
 // ▼▼▼ 请用这块【全新的、最终版本 V9】的代码，完整替换您现有的整个 addLiveComment 函数 ▼▼▼
 /**
@@ -22439,8 +22842,7 @@ document.getElementById('confirm-create-post-btn').addEventListener('click', asy
     } else { // 处理 'complex' 模式 (图片/文字图)
         const publicText = document.getElementById('post-public-text').value.trim();
         const isImageModeActive = document.getElementById('image-mode-content').classList.contains('active');
-
-        if (isImageModeActive) {
+if (isImageModeActive) {
             const imageUrl = document.getElementById('post-image-preview').src;
             const imageDescription = document.getElementById('post-image-description').value.trim();
             if (!imageUrl || !(imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) {
@@ -22472,7 +22874,6 @@ document.getElementById('confirm-create-post-btn').addEventListener('click', asy
             };
         }
     }
-
     // --- 3. 保存到数据库 ---
     const newPostId = await db.qzonePosts.add(newPost);
     let postSummary = newPost.content || newPost.publicText || newPost.imageDescription || newPost.hiddenContent || "(无文字内容)";
@@ -22554,7 +22955,7 @@ const handleSwipeStart = (e) => {
 
 const handleSwipeMove = (e) => {
     if (isQzoneEditMode || !swipeState.isDragging || !swipeState.activeContainer) return;
-    // (这部分滑动判断逻辑保持不变)
+    
     const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
     const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
     const diffX = currentX - swipeState.startX;
@@ -22577,11 +22978,16 @@ const handleSwipeMove = (e) => {
 
 const handleSwipeEnd = (e) => {
     if (isQzoneEditMode || swipeState.isClick || !swipeState.isDragging || !swipeState.activeContainer) {
+        if (!swipeState.isClick && swipeState.activeContainer) {
+             const postItem = swipeState.activeContainer.querySelector('.qzone-post-item');
+             postItem.style.transition = 'transform 0.3s ease';
+             postItem.style.transform = '';
+        }
         swipeState.isDragging = false;
         swipeState.activeContainer = null;
         return;
     }
-    // (这部分滑动结束逻辑保持不变)
+
     const postItem = swipeState.activeContainer.querySelector('.qzone-post-item');
     postItem.style.transition = 'transform 0.3s ease';
     const finalX = e.type.includes('touchend') ? e.changedTouches[0].pageX : (e.pageX || swipeState.currentX);
@@ -22605,6 +23011,12 @@ document.addEventListener('touchend', handleSwipeEnd);
 
 // --- 【核心】全新的总点击事件监听器 ---
 postsList.addEventListener('click', async (e) => {
+    // 如果滑动了很小的距离后释放，isClick 会是 false 但可能用户意图是点击，所以加一个判断
+    if (!swipeState.isClick && Math.abs(swipeState.currentX - swipeState.startX) < 10) {
+        swipeState.isClick = true;
+    }
+    if (!swipeState.isClick) return; // 如果确定是滑动，则不执行点击逻辑
+
     const target = e.target;
     const postContainer = target.closest('.qzone-post-container');
     if (!postContainer) return;
@@ -22618,7 +23030,7 @@ postsList.addEventListener('click', async (e) => {
     }
 
     // --- 分支2: 如果当前是正常模式 ---
-    e.stopPropagation(); // 阻止事件冒泡
+    e.stopPropagation();
 
     const commentDeleteBtn = target.closest('.comment-delete-btn');
     const postActionsBtn = target.closest('.post-actions-btn');
@@ -22627,8 +23039,7 @@ postsList.addEventListener('click', async (e) => {
     const feedbackIcon = target.closest('.action-icon');
     const sendCommentBtn = target.closest('.comment-send-btn');
     
-    // 【正常模式下的点击行为】
-    // (这里是您之前的所有旧的点击逻辑，现在被整合到了这个分支里)
+    // 【行为1】点击滑动后出现的删除按钮
     if (deleteActionBtn) {
         const confirmed = await showCustomConfirm('删除动态', '确定要永久删除这条动态吗？', { confirmButtonClass: 'btn-danger' });
         if (confirmed) {
@@ -22640,14 +23051,19 @@ postsList.addEventListener('click', async (e) => {
                  const notificationIdentifier = `(ID: ${postId})`;
                  for (const chatId in state.chats) {
                      const chat = state.chats[chatId];
+                     const originalHistoryLength = chat.history.length;
                      chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
-                     await db.chats.put(chat);
+                     if (chat.history.length < originalHistoryLength) {
+                         await db.chats.put(chat);
+                     }
                  }
                  await renderQzonePosts();
                  alert('动态已删除。');
             }, 300);
         }
-    } else if (commentDeleteBtn) {
+    } 
+    // 【行为2】点击评论旁的删除按钮
+    else if (commentDeleteBtn) {
         const commentIndex = parseInt(commentDeleteBtn.dataset.commentIndex);
         const post = await db.qzonePosts.get(postId);
         if (!post || !post.comments || !post.comments[commentIndex]) return;
@@ -22659,27 +23075,48 @@ postsList.addEventListener('click', async (e) => {
             await renderQzonePosts();
             alert('评论已删除。');
         }
-    } else if (postActionsBtn) {
+    } 
+    // 【行为3】点击帖子右上角的三点菜单
+    else if (postActionsBtn) {
         showPostActions(postId);
-    } else if (hiddenTextImage) {
+    } 
+    // 【行为4】点击文字图
+    else if (hiddenTextImage) {
         showCustomAlert("图片内容", hiddenTextImage.dataset.hiddenText.replace(/<br>/g, '\n'));
-    } else if (feedbackIcon) {
-        // ... (点赞和收藏的逻辑)
+    } 
+    // 【行为5】点击点赞或收藏
+    else if (feedbackIcon) {
         if (feedbackIcon.classList.contains('like')) {
             const post = await db.qzonePosts.get(postId);
             if (!post.likes) post.likes = [];
             const userNickname = state.qzoneSettings.nickname;
             const userLikeIndex = post.likes.indexOf(userNickname);
-            if (userLikeIndex > -1) { post.likes.splice(userLikeIndex, 1); } else { post.likes.push(userNickname); feedbackIcon.classList.add('animate-like'); feedbackIcon.addEventListener('animationend', () => feedbackIcon.classList.remove('animate-like'), { once: true }); }
+            if (userLikeIndex > -1) { 
+                post.likes.splice(userLikeIndex, 1); 
+            } else { 
+                post.likes.push(userNickname); 
+                feedbackIcon.classList.add('animate-like'); 
+                feedbackIcon.addEventListener('animationend', () => feedbackIcon.classList.remove('animate-like'), { once: true }); 
+            }
             await db.qzonePosts.update(postId, { likes: post.likes });
         }
         if (feedbackIcon.classList.contains('favorite')) {
             const existingFavorite = await db.favorites.where({ type: 'qzone_post', 'content.id': postId }).first();
-            if (existingFavorite) { await db.favorites.delete(existingFavorite.id); await showCustomAlert('提示', '已取消收藏'); } else { const postToSave = await db.qzonePosts.get(postId); if (postToSave) { await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() }); await showCustomAlert('提示', '收藏成功!'); } }
+            if (existingFavorite) { 
+                await db.favorites.delete(existingFavorite.id); 
+                await showCustomAlert('提示', '已取消收藏'); 
+            } else { 
+                const postToSave = await db.qzonePosts.get(postId); 
+                if (postToSave) { 
+                    await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() }); 
+                    await showCustomAlert('提示', '收藏成功!'); 
+                } 
+            }
         }
         await renderQzonePosts();
-    } else if (sendCommentBtn) {
-        // ... (发送评论的逻辑)
+    } 
+    // 【行为6】点击发送评论按钮
+    else if (sendCommentBtn) {
         const commentInput = postContainer.querySelector('.comment-input');
         const commentText = commentInput.value.trim();
         if (!commentText) return alert('评论内容不能为空哦!');
@@ -22688,7 +23125,13 @@ postsList.addEventListener('click', async (e) => {
         const newComment = { commenterName: state.qzoneSettings.nickname, timestamp: Date.now() };
         const mentionRegex = /^@([\p{L}\w]+)\s*(.*)$/u;
         const match = commentText.match(mentionRegex);
-        if (match) { newComment.replyTo = match[1].trim(); newComment.text = match[2]; } else { newComment.replyTo = null; newComment.text = commentText; }
+        if (match) { 
+            newComment.replyTo = match[1].trim(); 
+            newComment.text = match[2]; 
+        } else { 
+            newComment.replyTo = null; 
+            newComment.text = commentText; 
+        }
         post.comments.push(newComment);
         await db.qzonePosts.update(postId, { comments: post.comments });
         if (newComment.replyTo) {
@@ -22697,7 +23140,7 @@ postsList.addEventListener('click', async (e) => {
                 const hiddenInstruction = { role: 'system', content: `[系统指令:用户“${state.qzoneSettings.nickname}”刚刚在动态(ID: ${postId})下回复了【你】。TA说:“${newComment.text}”。请你根据你的人设,使用 qzone_comment 指令,并以“@${state.qzoneSettings.nickname}”开头,来回应TA。]`, timestamp: Date.now(), isHidden: true };
                 repliedToAI.history.push(hiddenInstruction);
                 await db.chats.put(repliedToAI);
-                triggerAiResponse(repliedToAI.id);
+                // 注意：这里我们不再需要 await triggerAiResponse，因为后台活动会处理
             }
         }
         for (const chatId in state.chats) {
@@ -22713,59 +23156,122 @@ postsList.addEventListener('click', async (e) => {
 });
 
 
-// --- 【全新】为动态页头部的新按钮绑定事件 ---
-document.getElementById('qzone-edit-btn').addEventListener('click', toggleQzoneEditMode);
-document.getElementById('qzone-done-btn').addEventListener('click', toggleQzoneEditMode);
+// ▼▼▼ 【Final Fix - Unified Event Delegation】REPLACE all old qzone-screen event listeners with this ENTIRE block ▼▼▼
 
-document.getElementById('qzone-select-all-btn').addEventListener('click', async () => {
-    if (!isQzoneEditMode) return;
-    const allPosts = await db.qzonePosts.toArray();
-    const allPostIds = allPosts.map(p => p.id);
-    
-    // 如果已全选，则取消全选
-    if (selectedPosts.size === allPostIds.length) {
-        selectedPosts.clear();
-    } else { // 否则，全选
-        allPostIds.forEach(id => selectedPosts.add(id));
-    }
-    renderQzonePosts(); // 重新渲染以更新所有帖子的选中状态
-});
+// ▼▼▼ 【最终修复版 V3】请用这【一整块】全新的代码，替换旧的 qzone-screen 事件监听器 ▼▼-▼
+// --- Master Event Listener for the ENTIRE QZone Screen ---
+document.getElementById('qzone-screen').addEventListener('click', async (e) => {
+    const target = e.target;
+    const targetId = target.id;
 
-document.getElementById('qzone-delete-selected-btn').addEventListener('click', async () => {
-    if (selectedPosts.size === 0) {
-        alert('请先选择要删除的动态。');
-        return;
-    }
-
-    const confirmed = await showCustomConfirm(
-        '批量删除动态',
-        `确定要永久删除选中的 ${selectedPosts.size} 条动态吗？此操作不可恢复。`,
-        { confirmButtonClass: 'btn-danger' }
-    );
-
-    if (confirmed) {
-        const idsToDelete = Array.from(selectedPosts);
-        await db.qzonePosts.bulkDelete(idsToDelete);
-        
-        // 同时清理AI的后台通知
-        for (const postId of idsToDelete) {
-             const notificationIdentifier = `(ID: ${postId})`;
-             for (const chatId in state.chats) {
-                 const chat = state.chats[chatId];
-                 const originalHistoryLength = chat.history.length;
-                 chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
-                 if (chat.history.length < originalHistoryLength) {
-                     await db.chats.put(chat);
-                 }
-             }
+    // --- Action 1: Handle clicks on profile elements (Signature, Nickname, etc.) ---
+    // (这部分个人信息点击逻辑保持不变，我已完整复制过来)
+    switch (targetId) {
+        case 'qzone-nickname': {
+            const newNickname = await showCustomPrompt("修改昵称", "请输入新的昵称", state.qzoneSettings.nickname);
+            if (newNickname && newNickname.trim()) { state.qzoneSettings.nickname = newNickname.trim(); await saveQzoneSettings(); renderQzoneScreen(); }
+            return;
         }
-        
-        // 退出编辑模式并刷新
-        toggleQzoneEditMode();
-        alert('选中的动态已全部删除。');
+        case 'qzone-signature': {
+            const newSignature = await showCustomPrompt("修改个性签名", "请输入新的签名", state.qzoneSettings.signature);
+            if (newSignature !== null) { state.qzoneSettings.signature = newSignature.trim(); await saveQzoneSettings(); renderQzoneScreen(); }
+            return;
+        }
+        case 'qzone-visitor-info':
+        case 'qzone-visitor-count-number': {
+            const newCount = await showCustomPrompt("修改访客总量", "请输入新的数值", state.qzoneSettings.visitorCount, "number");
+            if (newCount && !isNaN(parseInt(newCount))) { state.qzoneSettings.visitorCount = parseInt(newCount); await saveQzoneSettings(); renderQzoneScreen(); }
+            return;
+        }
+        case 'qzone-avatar-container':
+            document.getElementById('qzone-avatar-input').click();
+            return;
+        case 'qzone-banner-container':
+            document.getElementById('qzone-banner-input').click();
+            return;
+    }
+
+    // 【【【核心修复区】】】
+    // --- Action 2: Handle the top-right action buttons ---
+    const actionBtn = target.closest('.action-btn');
+    if (actionBtn) {
+        switch (actionBtn.id) {
+            // a. 点击“编辑”或“完成”按钮，都调用切换模式的函数
+            case 'qzone-edit-btn':
+            case 'qzone-done-btn':
+                toggleQzoneEditMode();
+                break;
+
+            // b. 点击“全选”按钮
+            case 'qzone-select-all-btn': {
+                if (!isQzoneEditMode) return;
+                const allPosts = await db.qzonePosts.toArray();
+                const allPostIds = allPosts.map(p => p.id);
+                if (selectedPosts.size === allPostIds.length) {
+                    selectedPosts.clear();
+                } else {
+                    allPostIds.forEach(id => selectedPosts.add(id));
+                }
+                renderQzonePosts();
+                break;
+            }
+
+            // c. 点击“删除”按钮
+            case 'qzone-delete-selected-btn': {
+                if (!isQzoneEditMode || selectedPosts.size === 0) return;
+                const confirmed = await showCustomConfirm('批量删除动态', `确定要永久删除选中的 ${selectedPosts.size} 条动态吗？`, { confirmButtonClass: 'btn-danger' });
+                if (confirmed) {
+                    const idsToDelete = Array.from(selectedPosts);
+                    await db.qzonePosts.bulkDelete(idsToDelete);
+                    // 清理AI通知
+                    for (const postId of idsToDelete) {
+                         const notificationIdentifier = `(ID: ${postId})`;
+                         for (const chatId in state.chats) {
+                             const chat = state.chats[chatId];
+                             if (chat.history.some(msg => msg.role === 'system' && msg.content.includes(notificationIdentifier))) {
+                                 chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
+                                 await db.chats.put(chat);
+                             }
+                         }
+                    }
+                    toggleQzoneEditMode(); // 退出编辑模式并刷新
+                    alert('选中的动态已全部删除。');
+                }
+                break;
+            }
+        }
     }
 });
 // ▲▲▲ 替换结束 ▲▲▲
+
+// --- Master Event Listener for the INDIVIDUAL POST action menu (P2) ---
+document.getElementById('post-actions-modal').addEventListener('click', (e) => {
+    const targetId = e.target.id;
+    switch (targetId) {
+        case 'edit-post-btn':
+            openPostEditor();
+            break;
+        case 'copy-post-btn':
+            copyPostContent();
+            break;
+        case 'cancel-post-action-btn':
+            hidePostActions();
+            break;
+    }
+});
+
+// --- Global Listener to close the dropdown when clicking outside ---
+window.addEventListener('click', (e) => {
+    const qzoneDropdown = document.getElementById('qzone-actions-dropdown');
+    const qzoneMenuBtn = document.getElementById('qzone-actions-menu-btn');
+    if (qzoneDropdown && qzoneMenuBtn) {
+        if (qzoneDropdown.classList.contains('visible') && !qzoneDropdown.contains(e.target) && !qzoneMenuBtn.contains(e.target)) {
+            qzoneDropdown.classList.remove('visible');
+        }
+    }
+});
+// ▲▲▲ 替换结束 ▲▲▲
+
 
 // ▼▼▼ 【最终修复】请将这整块【全新】的代码，粘贴到 init() 函数的事件监听器区域末尾 ▼▼▼
 
