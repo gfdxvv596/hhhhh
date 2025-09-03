@@ -1179,6 +1179,52 @@ body.bordered-mode #status-bar {
 
 /* ▲▲▲ 替换结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】动态多选模式样式 ▼▼▼ */
+
+/* 1. 给帖子容器添加相对定位，以便定位覆盖层 */
+.qzone-post-container {
+    position: relative;
+    border-radius: 12px; /* 确保圆角能裁剪覆盖层 */
+    overflow: hidden;
+}
+
+/* 2. 选中状态的半透明覆盖层 */
+.qzone-post-container .selection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 123, 255, 0.3); /* 使用主题蓝色作为覆盖色 */
+    border: 3px solid var(--accent-color); /* 添加一个蓝色边框，更醒目 */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none; /* 确保不会干扰下层元素的点击 */
+    z-index: 5; /* 确保在最上层 */
+}
+.qzone-post-container.selected .selection-overlay {
+    opacity: 1;
+}
+
+/* 3. 覆盖层上的“✓”对勾图标 */
+.qzone-post-container .selection-overlay::after {
+    content: '✓';
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* 4. 在编辑模式下，让整个容器看起来可点击 */
+.qzone-post-container.selection-mode {
+    cursor: pointer;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▲▲▲ (粘贴到这里结束) ▲▲▲ */
 
 /* ▼▼▼ 1. 【全新】消息操作菜单美化 (参考P2) ▼▼▼ */
@@ -7828,10 +7874,25 @@ input:checked + .slider:before {
 
     <!-- 动态界面视图 -->
     <div id="qzone-screen" class="chat-list-view">
-        <div class="qzone-header">
-            <span class="back-btn" id="qzone-back-btn">‹</span> <!-- 这个按钮现在只负责从动态返回 -->
-            <span>好友动态</span>
+<div class="qzone-header">
+    <span class="back-btn" id="qzone-back-btn">‹</span>
+    <span>好友动态</span>
+
+    <!-- 这个容器将根据模式显示不同的按钮 -->
+    <div class="header-actions">
+        <!-- 默认模式下的按钮 -->
+        <div id="qzone-normal-actions">
+            <span class="action-btn" id="qzone-edit-btn">编辑</span>
         </div>
+        <!-- 编辑模式下的按钮 (默认隐藏) -->
+        <div id="qzone-edit-actions" style="display: none;">
+            <span class="action-btn" id="qzone-select-all-btn">全选</span>
+            <span class="action-btn" id="qzone-delete-selected-btn" style="color: #ff3b30;">删除</span>
+            <span class="action-btn" id="qzone-done-btn">完成</span>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
         <div class="qzone-content">
             <div class="qzone-profile-header">
                 <div id="qzone-banner-container" class="qzone-banner-container">
@@ -10028,6 +10089,11 @@ let simulationIntervalId = null;
         const defaultGroupAvatar = 'https://i.postimg.cc/gc3QYCDy/1-NINE7-Five.jpg';
         let notificationTimeout;
 
+// ▼▼▼ 在JS顶部，变量定义区，添加这两个新变量 ▼▼▼
+let isQzoneEditMode = false;
+let selectedPosts = new Set();
+// ▲▲▲ 添加结束 ▲▲▲
+
 // ▼▼▼ 在JS顶部,变量定义区,添加这个新常量 ▼▼▼
 const DEFAULT_APP_ICONS = {
     'world-book': 'https://i.postimg.cc/HWf1JKzn/IMG-6435.jpg',
@@ -10496,11 +10562,21 @@ if (messagesForApi.length === 0) {
 }
 // ▲▲▲ 复制到这里结束 ▲▲▲
 
-// ▼▼▼ 请用这个【最终修复版】的函数，完整替换旧的 renderQzonePosts 函数 ▼▼▼
-
+// ▼▼▼ 【最终安全版】请用这【一整块】全新的代码，完整替换旧的 renderQzonePosts 函数 ▼▼▼
 async function renderQzonePosts() {
     const postsListEl = document.getElementById('qzone-posts-list');
     if (!postsListEl) return;
+
+    // 【【【核心修复：添加安全卫士】】】
+    // 在使用 state.qzoneSettings 之前，先确保它已经被加载了。
+    const userSettings = state.qzoneSettings;
+    if (!userSettings) {
+        console.warn("renderQzonePosts 被调用，但 qzoneSettings 尚未加载，已中止本次渲染。");
+        // 可以选择显示一个加载中的提示，或者直接返回
+        postsListEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 30px 0;">正在加载动态...</p>';
+        return; // 提前退出，防止报错
+    }
+    // ▲▲▲ 修复结束 ▲▲▲
 
     const [posts, favorites] = await Promise.all([
         db.qzonePosts.orderBy('timestamp').reverse().toArray(),
@@ -10511,21 +10587,29 @@ async function renderQzonePosts() {
     
     postsListEl.innerHTML = '';
 
+    // 【核心修改】根据是否处于编辑模式，切换顶部按钮的显示
+    document.getElementById('qzone-normal-actions').style.display = isQzoneEditMode ? 'none' : 'block';
+    document.getElementById('qzone-edit-actions').style.display = isQzoneEditMode ? 'flex' : 'none';
+
     if (posts.length === 0) {
         postsListEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 30px 0;">这里空空如也,快来发布第一条说说吧!</p>';
         return;
     }
 
-    const userSettings = state.qzoneSettings;
-
-    // 1. 遍历所有帖子
     posts.forEach((post, index) => {
         const postContainer = document.createElement('div');
         postContainer.className = 'qzone-post-container';
         postContainer.dataset.postId = post.id;
 
-        // 2. 【核心修复】如果帖子索引大于等于10（即第11条及以后），就添加隐藏类
-        if (index >= 7) {
+        // 【新增】根据模式和选中状态添加class
+        if (isQzoneEditMode) {
+            postContainer.classList.add('selection-mode');
+        }
+        if (selectedPosts.has(post.id)) {
+            postContainer.classList.add('selected');
+        }
+
+        if (index >= 7 && !isQzoneEditMode) { // 编辑模式下显示所有帖子
             postContainer.classList.add('hidden-post');
         }
 
@@ -10572,32 +10656,34 @@ async function renderQzonePosts() {
         const isFavoritedByUser = favoritedPostIds.has(post.id);
         postEl.innerHTML = `<div class="post-header"><img src="${authorAvatar}" class="post-avatar"><div class="post-info"><span class="post-nickname">${authorNickname}</span><span class="post-timestamp">${formatPostTimestamp(post.timestamp)}</span></div><div class="post-actions-btn">…</div></div><div class="post-main-content">${contentHtml}</div><div class="post-feedback-icons"><span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></span><span class="action-icon favorite ${isFavoritedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span></div>${likesHtml}${commentsHtml}<div class="post-footer"><div class="comment-section"><img src="${commentAvatar}" class="comment-avatar"><input type="text" class="comment-input" placeholder="友善的评论是交流的起点"><div class="at-mention-popup"></div></div><button class="comment-send-btn">发送</button></div>`;
         
-        // --- 这部分是滑动删除的HTML结构 ---
-        const deleteAction = document.createElement('div');
+const deleteAction = document.createElement('div');
         deleteAction.className = 'qzone-post-delete-action';
         deleteAction.innerHTML = '<span>删除</span>';
+        
+        // 【新增】创建并添加选中覆盖层
+        const selectionOverlay = document.createElement('div');
+        selectionOverlay.className = 'selection-overlay';
 
         postContainer.appendChild(postEl);
         postContainer.appendChild(deleteAction);
+        postContainer.appendChild(selectionOverlay); // 把覆盖层加进去
 
         postsListEl.appendChild(postContainer);
     });
 
-    // 3. 【核心修复】在循环结束后，再检查是否需要添加“加载更多”按钮
-    if (posts.length > 10) {
+    if (posts.length > 7 && !isQzoneEditMode) { // 编辑模式下不显示“加载更多”
         const loadMoreBtn = document.createElement('button');
         loadMoreBtn.id = 'qzone-load-more-btn';
         loadMoreBtn.textContent = '查看更早的动态...';
         loadMoreBtn.addEventListener('click', () => {
-            // 点击按钮后，显示所有隐藏的帖子
-            document.querySelectorAll('.hidden-post').forEach(p => {
-                p.classList.remove('hidden-post');
-            });
-            // 然后移除按钮自己
+            document.querySelectorAll('.hidden-post').forEach(p => p.classList.remove('hidden-post'));
             loadMoreBtn.remove();
         });
         postsListEl.appendChild(loadMoreBtn);
     }
+
+    // 【新增】更新删除按钮上的计数
+    updateDeleteSelectedPostsButton();
 }
 // ▲▲▲ 替换结束 ▲▲▲
              
@@ -16106,6 +16192,46 @@ ${guestContext}
     }
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】添加这三个辅助函数到功能函数定义区 ▼▼▼
+/**
+ * 切换动态页面的编辑模式
+ */
+function toggleQzoneEditMode() {
+    isQzoneEditMode = !isQzoneEditMode;
+    if (!isQzoneEditMode) {
+        selectedPosts.clear(); // 退出时清空选择
+    }
+    renderQzonePosts(); // 重新渲染以更新整个页面的UI
+}
+
+/**
+ * 切换单条动态的选中状态
+ * @param {number} postId - 被点击的动态ID
+ */
+function togglePostSelection(postId) {
+    if (selectedPosts.has(postId)) {
+        selectedPosts.delete(postId);
+    } else {
+        selectedPosts.add(postId);
+    }
+    // 仅更新UI，不重新请求数据
+    const postContainer = document.querySelector(`.qzone-post-container[data-post-id="${postId}"]`);
+    if (postContainer) {
+        postContainer.classList.toggle('selected', selectedPosts.has(postId));
+    }
+    updateDeleteSelectedPostsButton();
+}
+
+/**
+ * 更新“删除”按钮上的计数
+ */
+function updateDeleteSelectedPostsButton() {
+    const deleteBtn = document.getElementById('qzone-delete-selected-btn');
+    deleteBtn.textContent = `删除(${selectedPosts.size})`;
+    deleteBtn.style.color = selectedPosts.size > 0 ? '#ff3b30' : '#8a8a8a';
+}
+// ▲▲▲ 新函数添加结束 ▲▲▲
 
 // ▼▼▼ 请用这块【全新的、最终版本 V9】的代码，完整替换您现有的整个 addLiveComment 函数 ▼▼▼
 /**
@@ -22396,8 +22522,9 @@ document.getElementById('close-avatar-frame-library-btn').addEventListener('clic
 document.getElementById('add-avatar-frame-btn').addEventListener('click', addAvatarFrames);
 // ▲▲▲ 绑定结束 ▲▲▲
 
-// ▼▼▼ 请用这【一整块】包含所有滑动和点击事件的完整代码,替换掉旧的 postsList 事件监听器 ▼▼▼
+// ▼▼▼ 【最终完整版】请用这【一整块】全新的代码，替换掉所有旧的 postsList 相关事件监听器 ▼▼▼
 
+// --- 动态列表的滑动删除与多选点击总控制器 ---
 const postsList = document.getElementById('qzone-posts-list');
 let swipeState = { isDragging: false, startX: 0, startY: 0, currentX: 0, activeContainer: null, swipeDirection: null, isClick: true };
 
@@ -22410,6 +22537,8 @@ function resetAllSwipes(exceptThisOne = null) {
 }
 
 const handleSwipeStart = (e) => {
+    // 【重要】在编辑模式下，禁用滑动删除功能
+    if (isQzoneEditMode) return;
     const targetContainer = e.target.closest('.qzone-post-container');
     if (!targetContainer) return;
 
@@ -22424,8 +22553,8 @@ const handleSwipeStart = (e) => {
 };
 
 const handleSwipeMove = (e) => {
-    if (!swipeState.isDragging || !swipeState.activeContainer) return;
-
+    if (isQzoneEditMode || !swipeState.isDragging || !swipeState.activeContainer) return;
+    // (这部分滑动判断逻辑保持不变)
     const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
     const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
     const diffX = currentX - swipeState.startX;
@@ -22433,20 +22562,9 @@ const handleSwipeMove = (e) => {
     const absDiffX = Math.abs(diffX);
     const absDiffY = Math.abs(diffY);
     const clickThreshold = 5;
-
-    if (absDiffX > clickThreshold || absDiffY > clickThreshold) {
-        swipeState.isClick = false;
-    }
-
-    if (swipeState.swipeDirection === null) {
-        if (absDiffX > clickThreshold || absDiffY > clickThreshold) {
-            swipeState.swipeDirection = absDiffX > absDiffY ? 'horizontal' : 'vertical';
-        }
-    }
-    if (swipeState.swipeDirection === 'vertical') {
-        handleSwipeEnd(e);
-        return;
-    }
+    if (absDiffX > clickThreshold || absDiffY > clickThreshold) { swipeState.isClick = false; }
+    if (swipeState.swipeDirection === null) { if (absDiffX > clickThreshold || absDiffY > clickThreshold) { swipeState.swipeDirection = absDiffX > absDiffY ? 'horizontal' : 'vertical'; } }
+    if (swipeState.swipeDirection === 'vertical') { handleSwipeEnd(e); return; }
     if (swipeState.swipeDirection === 'horizontal') {
         e.preventDefault();
         swipeState.currentX = currentX;
@@ -22458,32 +22576,25 @@ const handleSwipeMove = (e) => {
 };
 
 const handleSwipeEnd = (e) => {
-    if (swipeState.isClick) {
+    if (isQzoneEditMode || swipeState.isClick || !swipeState.isDragging || !swipeState.activeContainer) {
         swipeState.isDragging = false;
         swipeState.activeContainer = null;
         return;
     }
-    if (!swipeState.isDragging || !swipeState.activeContainer) return;
-
+    // (这部分滑动结束逻辑保持不变)
     const postItem = swipeState.activeContainer.querySelector('.qzone-post-item');
     postItem.style.transition = 'transform 0.3s ease';
-
-    const finalX = e.type.includes('touchend') ? e.changedTouches[0].pageX : e.pageX;
+    const finalX = e.type.includes('touchend') ? e.changedTouches[0].pageX : (e.pageX || swipeState.currentX);
     const diffX = finalX - swipeState.startX;
     const swipeThreshold = -40;
-
-    if (swipeState.swipeDirection === 'horizontal' && diffX < swipeThreshold) {
-        postItem.classList.add('swiped');
-    } else {
-        postItem.classList.remove('swiped');
-    }
-    postItem.style.transform = ''; // 清除行内样式，让class生效
-
+    if (swipeState.swipeDirection === 'horizontal' && diffX < swipeThreshold) { postItem.classList.add('swiped'); } 
+    else { postItem.classList.remove('swiped'); }
+    postItem.style.transform = '';
     swipeState.isDragging = false;
     swipeState.activeContainer = null;
 };
 
-// --- 绑定所有滑动事件 ---
+// --- 绑定滑动事件 ---
 postsList.addEventListener('mousedown', handleSwipeStart);
 document.addEventListener('mousemove', handleSwipeMove);
 document.addEventListener('mouseup', handleSwipeEnd);
@@ -22491,10 +22602,23 @@ postsList.addEventListener('touchstart', handleSwipeStart, { passive: false });
 document.addEventListener('touchmove', handleSwipeMove, { passive: false });
 document.addEventListener('touchend', handleSwipeEnd);
 
-// --- 绑定所有点击事件 ---
+
+// --- 【核心】全新的总点击事件监听器 ---
 postsList.addEventListener('click', async (e) => {
-    e.stopPropagation();
     const target = e.target;
+    const postContainer = target.closest('.qzone-post-container');
+    if (!postContainer) return;
+
+    const postId = parseInt(postContainer.dataset.postId);
+
+    // --- 分支1: 如果当前是编辑模式 ---
+    if (isQzoneEditMode) {
+        togglePostSelection(postId);
+        return; // 在编辑模式下，只处理选择逻辑，直接返回
+    }
+
+    // --- 分支2: 如果当前是正常模式 ---
+    e.stopPropagation(); // 阻止事件冒泡
 
     const commentDeleteBtn = target.closest('.comment-delete-btn');
     const postActionsBtn = target.closest('.post-actions-btn');
@@ -22503,51 +22627,27 @@ postsList.addEventListener('click', async (e) => {
     const feedbackIcon = target.closest('.action-icon');
     const sendCommentBtn = target.closest('.comment-send-btn');
     
-    // 【全新】处理删除按钮的点击
+    // 【正常模式下的点击行为】
+    // (这里是您之前的所有旧的点击逻辑，现在被整合到了这个分支里)
     if (deleteActionBtn) {
-        const container = deleteActionBtn.closest('.qzone-post-container');
-        if (!container) return;
-        
-        const postIdToDelete = parseInt(container.dataset.postId);
-        if (isNaN(postIdToDelete)) return;
-
         const confirmed = await showCustomConfirm('删除动态', '确定要永久删除这条动态吗？', { confirmButtonClass: 'btn-danger' });
-
         if (confirmed) {
-            container.style.transition = 'all 0.3s ease';
-            container.style.transform = 'scale(0.8)';
-            container.style.opacity = '0';
-        
+            postContainer.style.transition = 'all 0.3s ease';
+            postContainer.style.transform = 'scale(0.8)';
+            postContainer.style.opacity = '0';
             setTimeout(async () => {
-                 await db.qzonePosts.delete(postIdToDelete);
-                 
-                 // 同时清理掉AI的后台通知
-                 const notificationIdentifier = `(ID: ${postIdToDelete})`;
+                 await db.qzonePosts.delete(postId);
+                 const notificationIdentifier = `(ID: ${postId})`;
                  for (const chatId in state.chats) {
                      const chat = state.chats[chatId];
-                     const originalHistoryLength = chat.history.length;
                      chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
-                     if (chat.history.length < originalHistoryLength) {
-                         await db.chats.put(chat);
-                     }
+                     await db.chats.put(chat);
                  }
                  await renderQzonePosts();
                  alert('动态已删除。');
             }, 300);
         }
-        return;
-    }
-
-    // --- 其他点击事件逻辑（保持不变） ---
-    if (commentDeleteBtn) { /* ... */ }
-    if (postActionsBtn) { /* ... */ }
-    if (hiddenTextImage) { /* ... */ }
-    if (feedbackIcon) { /* ... */ }
-    if (sendCommentBtn) { /* ... */ }
-    // ... (省略未修改的点击事件代码,直接粘贴即可)
-    if (commentDeleteBtn) {
-        const postContainer = commentDeleteBtn.closest('.qzone-post-container');
-        const postId = parseInt(postContainer.dataset.postId);
+    } else if (commentDeleteBtn) {
         const commentIndex = parseInt(commentDeleteBtn.dataset.commentIndex);
         const post = await db.qzonePosts.get(postId);
         if (!post || !post.comments || !post.comments[commentIndex]) return;
@@ -22559,13 +22659,12 @@ postsList.addEventListener('click', async (e) => {
             await renderQzonePosts();
             alert('评论已删除。');
         }
-        return;
-    }
-    if (postActionsBtn) { showPostActions(parseInt(postActionsBtn.closest('.qzone-post-container').dataset.postId)); return; }
-    if (hiddenTextImage) { showCustomAlert("图片内容", hiddenTextImage.dataset.hiddenText.replace(/<br>/g, '\n')); return; }
-    if (feedbackIcon) {
-        const postContainer = feedbackIcon.closest('.qzone-post-container');
-        const postId = parseInt(postContainer.dataset.postId);
+    } else if (postActionsBtn) {
+        showPostActions(postId);
+    } else if (hiddenTextImage) {
+        showCustomAlert("图片内容", hiddenTextImage.dataset.hiddenText.replace(/<br>/g, '\n'));
+    } else if (feedbackIcon) {
+        // ... (点赞和收藏的逻辑)
         if (feedbackIcon.classList.contains('like')) {
             const post = await db.qzonePosts.get(postId);
             if (!post.likes) post.likes = [];
@@ -22579,11 +22678,8 @@ postsList.addEventListener('click', async (e) => {
             if (existingFavorite) { await db.favorites.delete(existingFavorite.id); await showCustomAlert('提示', '已取消收藏'); } else { const postToSave = await db.qzonePosts.get(postId); if (postToSave) { await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() }); await showCustomAlert('提示', '收藏成功!'); } }
         }
         await renderQzonePosts();
-        return;
-    }
-    if (sendCommentBtn) {
-        const postContainer = sendCommentBtn.closest('.qzone-post-container');
-        const postId = parseInt(postContainer.dataset.postId);
+    } else if (sendCommentBtn) {
+        // ... (发送评论的逻辑)
         const commentInput = postContainer.querySelector('.comment-input');
         const commentText = commentInput.value.trim();
         if (!commentText) return alert('评论内容不能为空哦!');
@@ -22613,10 +22709,62 @@ postsList.addEventListener('click', async (e) => {
         }
         commentInput.value = '';
         await renderQzonePosts();
-        return;
     }
 });
 
+
+// --- 【全新】为动态页头部的新按钮绑定事件 ---
+document.getElementById('qzone-edit-btn').addEventListener('click', toggleQzoneEditMode);
+document.getElementById('qzone-done-btn').addEventListener('click', toggleQzoneEditMode);
+
+document.getElementById('qzone-select-all-btn').addEventListener('click', async () => {
+    if (!isQzoneEditMode) return;
+    const allPosts = await db.qzonePosts.toArray();
+    const allPostIds = allPosts.map(p => p.id);
+    
+    // 如果已全选，则取消全选
+    if (selectedPosts.size === allPostIds.length) {
+        selectedPosts.clear();
+    } else { // 否则，全选
+        allPostIds.forEach(id => selectedPosts.add(id));
+    }
+    renderQzonePosts(); // 重新渲染以更新所有帖子的选中状态
+});
+
+document.getElementById('qzone-delete-selected-btn').addEventListener('click', async () => {
+    if (selectedPosts.size === 0) {
+        alert('请先选择要删除的动态。');
+        return;
+    }
+
+    const confirmed = await showCustomConfirm(
+        '批量删除动态',
+        `确定要永久删除选中的 ${selectedPosts.size} 条动态吗？此操作不可恢复。`,
+        { confirmButtonClass: 'btn-danger' }
+    );
+
+    if (confirmed) {
+        const idsToDelete = Array.from(selectedPosts);
+        await db.qzonePosts.bulkDelete(idsToDelete);
+        
+        // 同时清理AI的后台通知
+        for (const postId of idsToDelete) {
+             const notificationIdentifier = `(ID: ${postId})`;
+             for (const chatId in state.chats) {
+                 const chat = state.chats[chatId];
+                 const originalHistoryLength = chat.history.length;
+                 chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
+                 if (chat.history.length < originalHistoryLength) {
+                     await db.chats.put(chat);
+                 }
+             }
+        }
+        
+        // 退出编辑模式并刷新
+        toggleQzoneEditMode();
+        alert('选中的动态已全部删除。');
+    }
+});
 // ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 【最终修复】请将这整块【全新】的代码，粘贴到 init() 函数的事件监听器区域末尾 ▼▼▼
