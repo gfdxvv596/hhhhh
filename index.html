@@ -1569,7 +1569,7 @@ body:not(.bordered-mode) .nav-item {
 .qzone-profile-header { padding-bottom: 0 !important; margin-bottom: 0 !important; }
 .qzone-banner-container { height: 280px !important; position: relative !important; }
 .qzone-user-info { display: block !important; text-align: center !important; padding: 0 20px !important; margin-top: -170px !important; position: relative !important; z-index: 5 !important; }
-.qzone-avatar-container { margin: 0 auto 12px auto !important; display: inline-block !important; position: relative !important; }
+.qzone-avatar-container { margin: 0 auto 6px auto !important; display: inline-block !important; position: relative !important; }
 .qzone-banner-container::after { content: '' !important; position: absolute !important; bottom: -1px !important; left: 0 !important; width: 100% !important; height: 120px !important; background: linear-gradient(to top, #ffffff, rgba(255, 255, 255, 0)) !important; }
 #phone-screen.dark-mode .qzone-banner-container::after { background: linear-gradient(to top, #000000, rgba(0, 0, 0, 0)) !important; }
 #qzone-avatar-img { width: 90px !important; height: 90px !important; border-width: 4px !important; }
@@ -1880,8 +1880,8 @@ body:not(.bordered-mode) .comment-input {
     display: block;
     text-align: center;
     
-    padding: 0 20px;
-    margin-top: -60px; /* 保持向上提拉的效果 */
+    padding: 0 5px !important;
+    margin-top: -185px !important; /* 保持向上提拉的效果 */
     position: relative;
     z-index: 5;
 }
@@ -1889,27 +1889,34 @@ body:not(.bordered-mode) .comment-input {
 
 /* ▼▼▼ 用这【一整块】全新的代码，替换旧的 #qzone-avatar-container ▼▼▼ */
 .qzone-avatar-container {
-    margin: 0 auto 12px auto; /* 【核心修改】移除右边距，改为自动水平居中，并增加下边距 */
+    margin: 0 auto 6px auto !important;/* 【核心修改】移除右边距，改为自动水平居中，并增加下边距 */
     display: inline-block; /* 确保margin: auto生效 */
     position: relative; /* 确保z-index生效 */
 }
 /* ▲▲▲ 替换结束 ▲▲▲ */
 
+/* ▼▼▼ 用这【一整块】全新的代码，替换旧的 #qzone-avatar-img ▼▼▼ */
 #qzone-avatar-img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: 3px solid white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    object-fit: cover;
+    width: 90px !important;
+    height: 90px !important;
+    border-radius: 50% !important;
+    
+    /* 【核心修改1】移除或注释掉边框属性 */
+    border: none !important; 
+    
+    /* 【核心修改2】添加一个柔和的阴影来代替边框 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    
+    object-fit: cover !important;
 }
+/* ▲▲▲ 替换结束 ▲▲▲ */
 
 #qzone-nickname {
     font-size: 18px;
     font-weight: 600;
     color: #fff;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    padding-bottom: 5px; /* 微调位置 */
+    padding-bottom: 0px; /* 微调位置 */
 }
 
 /* 编辑按钮的通用样式 */
@@ -2975,16 +2982,16 @@ input[type="color"]::-webkit-color-swatch {
 
 /* === 评论列表容器 === */
 .post-comments-container {
-    padding: 10px 0; /* 上下留白 */
+    padding: 5px 0; /* 上下留白 */
     display: flex;
     flex-direction: column;
-    gap: 8px; /* 评论之间的间距 */
+    gap: 4px !important;/* 评论之间的间距 */
     font-size: 13px; /* 统一评论区字体大小 */
 }
 
 /* 每一条评论 */
 .comment-item {
-    line-height: 1.5;
+    line-height: 1.3;
 }
 
 /* 评论者的名字,加粗并使用主题色 */
@@ -3570,8 +3577,8 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▼▼▼ 用这【一整块】全新的代码，替换旧的 .comment-section .comment-avatar ▼▼▼ */
 .comment-section .comment-avatar {
-    width: 32px;
-    height: 32px;
+    width: 25px !important;
+    height: 25px !important;
     /* 【核心修改1】使用绝对定位 */
     position: absolute;
     left: 10px; /* 距离左边缘10px */
@@ -25112,23 +25119,31 @@ document.getElementById('selection-share-btn').addEventListener('click', () => {
     }
 });
 
-// ▼▼▼ 【全新】为评论输入框添加回车发送功能 (事件委托) ▼▼▼
-postsList.addEventListener('keydown', (e) => {
-    // 检查事件是否发生在评论输入框，并且按下的是Enter键（非Shift+Enter）
-    if (e.target.matches('.comment-input') && e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault(); // 阻止默认的回车换行行为
+// ▼▼▼ 【最终版 - 兼容移动端回车】请用这【一整块】全新的代码，替换旧的 postsList 'keydown' 监听器 ▼▼▼
+
+// --- 为整个动态列表添加键盘事件监听 (同时处理 keydown 和 keypress) ---
+postsList.addEventListener('keypress', (e) => {
+    // 检查事件是否发生在评论输入框，并且按下的是Enter键
+    // e.which === 13 是为了更好地兼容移动端浏览器
+    if (e.target.matches('.comment-input') && (e.key === 'Enter' || e.which === 13) && !e.shiftKey) {
         
-        // 找到该输入框旁边的发送按钮，并模拟一次点击
+        // 1. 阻止默认行为 (这是最关键的一步！)
+        //    它会阻止软键盘的回车键执行换行或跳转到下一个输入框的操作。
+        e.preventDefault(); 
+        
+        // 2. 找到该输入框旁边的发送按钮
         const postContainer = e.target.closest('.qzone-post-container');
         if (postContainer) {
             const sendBtn = postContainer.querySelector('.comment-send-btn');
             if (sendBtn) {
+                // 3. 模拟一次对发送按钮的点击
                 sendBtn.click();
             }
         }
     }
 });
-// ▲▲▲ 粘贴结束 ▲▲▲
+
+// ▲▲▲ 替换结束 ▲▲▲
 
 // 在 init() 的事件监听器区域添加
 document.getElementById('confirm-share-target-btn').addEventListener('click', async () => {
