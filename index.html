@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <title>🐇Phone</title>
+   <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
@@ -79,6 +80,117 @@
 }
 
 /* === 修正结束 === */
+
+/* ▼▼▼ 【全新】高对比度二维码导出弹窗样式 ▼▼▼ */
+.qr-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* 加深背景 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.qr-modal {
+    background-color: #ffffff; /* 强制白色背景，确保最大对比度 */
+    color: #1c1c1e; /* 深色文字 */
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#phone-screen.dark-mode .qr-modal {
+    background-color: #2c2c2e; /* 深色模式下用深灰色 */
+    color: #f2f2f7;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.qr-modal h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.qr-modal p {
+    font-size: 14px;
+    color: #8a8a8e;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+#phone-screen.dark-mode .qr-modal p {
+    color: #8d8d92;
+}
+
+
+#qrcode {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    background-color: #ffffff; /* 二维码背景必须是白色 */
+    border-radius: 8px;
+}
+
+.link-container {
+    display: flex;
+    margin-bottom: 15px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+#phone-screen.dark-mode .link-container {
+    border-color: #444;
+}
+
+#download-link-text {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 12px;
+    background-color: #f0f0f0;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+#phone-screen.dark-mode #download-link-text {
+    background-color: #1c1c1e;
+    color: #ccc;
+}
+
+
+.modal-button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.copy-button {
+    background-color: #007aff;
+    color: white;
+}
+.copy-button:hover {
+    background-color: #0056b3;
+}
+.copy-button:active {
+    transform: scale(0.98);
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
         
 /* 1. 重置 body,使其成为一个干净的画布 */
 body {
@@ -7058,6 +7170,48 @@ input[type="color"]::-webkit-color-swatch {
 }
 /* ▲▲▲ 壁纸库样式结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】加载提示框 (Loading Toast) 样式 ▼▼▼ */
+.loading-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+}
+
+.loading-toast {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.loading-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 3px solid #ffffff;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin-right: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 【全新】外观设置页面整合与美化样式 ▼▼▼ */
 
 /* 1. 开关并排布局的容器 */
@@ -11793,64 +11947,114 @@ function resetCreatePostModal() {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 【全新】请将这个函数完整地添加到 exportBackup 函数之前 ▼▼▼
-function showDownloadLinkModal(url) {
-    // 创建背景遮罩
+// ▼▼▼ 【第1块/共2块】全新的、用于显示二维码弹窗的辅助函数 ▼▼▼
+function showQrCodeModal(url) {
+    // 如果已存在弹窗，先移除
+    const existingModal = document.querySelector('.qr-modal-backdrop');
+    if (existingModal) existingModal.remove();
+
     const backdrop = document.createElement('div');
-    backdrop.className = 'export-link-backdrop';
+    backdrop.className = 'qr-modal-backdrop';
 
-    // 创建对话框主体
     const modal = document.createElement('div');
-    modal.className = 'export-link-modal';
-
+    modal.className = 'qr-modal';
     modal.innerHTML = `
-        <h3>导出链接已生成</h3>
-        <p>请复制下面的完整链接，然后在您的手机浏览器中打开它，即可下载备份文件。</p>
-        <textarea class="export-link-textarea" readonly></textarea>
-        <button class="modal-button copy-button">一键复制</button>
-        <button class="modal-button close-button">关闭</button>
+        <h3>备份文件已就绪</h3>
+        <p>请用其他设备扫描二维码，或复制短链接到浏览器下载。</p>
+        <div id="qrcode"></div>
+        <div class="link-container">
+            <span id="download-link-text">${url}</span>
+        </div>
+        <button class="modal-button copy-button">复制链接</button>
     `;
-    
-    // 填充链接内容
-    modal.querySelector('.export-link-textarea').value = url;
 
-    // "一键复制" 按钮的逻辑
+    backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) backdrop.remove();
+    });
+
     const copyButton = modal.querySelector('.copy-button');
     copyButton.addEventListener('click', () => {
         navigator.clipboard.writeText(url).then(() => {
-            copyButton.textContent = '已复制到剪贴板！';
-            copyButton.style.backgroundColor = '#4caf50'; // 绿色表示成功
+            copyButton.textContent = '复制成功!';
+            copyButton.style.backgroundColor = '#34c759';
             setTimeout(() => {
-                copyButton.textContent = '一键复制';
+                copyButton.textContent = '复制链接';
                 copyButton.style.backgroundColor = '#007aff';
             }, 2000);
-        }).catch(err => {
-            copyButton.textContent = '复制失败';
-            console.error('复制失败: ', err);
         });
-    });
-
-    // "关闭" 按钮的逻辑
-    const closeButton = modal.querySelector('.close-button');
-    closeButton.addEventListener('click', () => {
-        document.body.removeChild(backdrop);
     });
 
     backdrop.appendChild(modal);
     document.body.appendChild(backdrop);
+
+    // 使用我们引入的库来生成二维码
+    new QRCode(document.getElementById("qrcode"), {
+        text: url,
+        width: 180,
+        height: 180,
+    });
 }
+
+// ▼▼▼ 【第1步】请将这个全新的、基于XHR的辅助函数，添加到 exportBackup 函数之前 ▼▼▼
+
+/**
+ * 使用 XMLHttpRequest 来模拟 fetch 的功能，以绕过被污染的 fetch 环境。
+ * @param {string} url - 请求的 URL.
+ * @param {object} options - 请求的配置项，主要需要 method 和 body.
+ * @returns {Promise<object>} 返回一个模拟的 Response 对象.
+ */
+function xhrFetch(url, options) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // 1. 打开请求
+        xhr.open(options.method || 'GET', url, true);
+
+        // 2. 设置事件监听
+        xhr.onload = function () {
+            // 当请求成功完成时
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // 模拟 fetch 的 Response 对象
+                const mockResponse = {
+                    ok: true,
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    json: () => Promise.resolve(JSON.parse(xhr.responseText)),
+                    text: () => Promise.resolve(xhr.responseText)
+                };
+                resolve(mockResponse);
+            } else {
+                // 当服务器返回错误状态码时
+                reject(new Error(`HTTP error! status: ${xhr.status}`));
+            }
+        };
+
+        xhr.onerror = function () {
+            // 当发生网络层面的错误时 (例如，无法连接)
+            reject(new TypeError('Network request failed'));
+        };
+
+        xhr.ontimeout = function () {
+            // 当请求超时
+            reject(new Error('Request timed out'));
+        };
+        
+        // 3. 发送请求
+        // 对于 FormData，浏览器会自动设置正确的 Content-Type header
+        xhr.send(options.body);
+    });
+}
+
 // ▲▲▲ 新JS函数粘贴结束 ▲▲▲
 
-// ▼▼▼ 请用这【一整块】全新的代码，完整替换掉您文件中旧的 exportBackup 函数 ▼▼▼
+// ▼▼▼ 请用这【一整块】最终修复版的代码，完整替换旧的 exportBackup 函数 ▼▼▼
 async function exportBackup() {
-    try {
-        await showCustomAlert('正在准备数据...', '请稍候，正在打包您的所有信息...');
+    let loadingToast = showLoading('正在准备数据...');
 
-        // 1. 数据准备 (这部分保持不变)
-        const backupData = {
-            version: 1,
-            timestamp: Date.now()
-        };
+    try {
+        // 1. 数据准备
+        const backupData = { version: 1, timestamp: Date.now() };
+        // ... (数据准备的详细代码保持不变，此处省略) ...
         const tablesToExport = [
             db.chats.toArray(), db.worldBooks.toArray(), db.userStickers.toArray(),
             db.apiConfig.get('main'), db.globalSettings.get('main'),
@@ -11867,25 +12071,51 @@ async function exportBackup() {
             'memories', 'worldBookCategories'
         ];
         const results = await Promise.all(tablesToExport);
-        results.forEach((data, index) => {
-            backupData[tableNames[index]] = data;
+        results.forEach((data, index) => { backupData[tableNames[index]] = data; });
+
+
+        // 2. 将数据转为 Blob 文件
+        const fileName = `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`;
+        const blob = new Blob([JSON.stringify(backupData)], { type: 'application/json' });
+        const file = new File([blob], fileName, { type: 'application/json' });
+
+        // 3. 通过CORS代理将文件上传
+        updateLoadingText(loadingToast, '正在上传备份文件...');
+        const formData = new FormData();
+        formData.append('files[]', file);
+
+        // 【【【这就是唯一的、最终的修改！】】】
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/https://uguu.se/upload';
+        
+        // 我们继续使用可靠的 xhrFetch
+        const response = await xhrFetch(proxyUrl, {
+            method: 'POST',
+            body: formData
         });
 
-        // 2. 将数据转换为 JSON 字符串
-        const jsonString = JSON.stringify(backupData, null, 2);
+        if (!response.ok) {
+            throw new Error(`文件上传失败: ${response.statusText}`);
+        }
 
-        // 3. 【【【核心】】】创建包含所有文件内容的 Data URL
-        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+        const result = await response.json();
+        if (!result.files || !result.files[0] || !result.files[0].url) {
+            throw new Error('上传成功，但服务器返回的数据格式不正确。');
+        }
+        const downloadUrl = result.files[0].url;
 
-        // 4. 调用我们新的对话框函数，把链接显示给用户
-        showDownloadLinkModal(dataUrl);
+        hideLoading(loadingToast);
+        
+        // 4. 显示二维码弹窗
+        showQrCodeModal(downloadUrl);
 
     } catch (error) {
+        hideLoading(loadingToast);
         console.error("导出数据时出错:", error);
-        await showCustomAlert('导出失败', `发生了一个错误: ${error.message}`);
+        await showCustomAlert('导出失败', `发生了一个错误: ${error.message}。请检查您的网络连接后重试。`);
     }
 }
 // ▲▲▲ 替换到这里结束 ▲▲▲
+
 // ▼▼▼ 用这个【已包含 memories】的版本,完整替换旧的 importBackup 函数 ▼▼▼
 async function importBackup(file) {
     if (!file) return;
@@ -19875,6 +20105,70 @@ async function renderMemoriesScreen() {
     startAllCountdownTimers();
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 请用这【一整块】全新的代码，替换掉您所有旧的 showLoading 和 hideLoading 函数 ▼▼▼
+
+/**
+ * 显示一个加载提示框。
+ * @param {string} text - 要显示的文本。
+ * @returns {HTMLElement} 返回创建的加载提示框元素，用于后续操作。
+ */
+function showLoading(text = '正在加载...') {
+    // 移除任何可能已存在的加载提示
+    const existingBackdrop = document.querySelector('.loading-backdrop');
+    if (existingBackdrop) {
+        existingBackdrop.remove();
+    }
+
+    // 创建背景
+    const backdrop = document.createElement('div');
+    backdrop.className = 'loading-backdrop';
+
+    // 创建提示框主体
+    const toast = document.createElement('div');
+    toast.className = 'loading-toast';
+    toast.innerHTML = `
+        <div class="loading-spinner"></div>
+        <span class="loading-text">${text}</span>
+    `;
+
+    backdrop.appendChild(toast);
+    document.body.appendChild(backdrop);
+
+    // 【【【核心】】】返回背景元素作为凭证
+    return backdrop;
+}
+
+/**
+ * 更新一个已存在的加载提示框的文本。
+ * @param {HTMLElement} loadingElement - 由 showLoading 返回的元素。
+ * @param {string} newText - 新的文本内容。
+ */
+function updateLoadingText(loadingElement, newText) {
+    if (!loadingElement) return; // 如果元素不存在，直接返回
+    const textSpan = loadingElement.querySelector('.loading-text');
+    if (textSpan) {
+        textSpan.textContent = newText;
+    }
+}
+
+/**
+ * 关闭指定的加载提示框。
+ * @param {HTMLElement} loadingElement - 由 showLoading 返回的元素。
+ */
+function hideLoading(loadingElement) {
+    if (loadingElement && loadingElement.parentNode) {
+        loadingElement.remove();
+    } else {
+        // 作为备用方案，如果凭证丢失，则尝试关闭所有加载提示
+        const anyBackdrop = document.querySelector('.loading-backdrop');
+        if (anyBackdrop) {
+            anyBackdrop.remove();
+        }
+    }
+}
+
+// ▲▲▲ 替换到这里结束 ▲▲▲
 
 /**
  * 创建普通回忆卡片DOM元素
