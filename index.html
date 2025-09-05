@@ -1315,6 +1315,55 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 1. 粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【恢复】日志详情“书信”弹窗样式 (恢复到原始版本) ▼▼▼ */
+
+/* 1. 隐藏弹窗自带的标题栏 */
+#custom-modal.log-viewer-modal .custom-modal-header {
+    display: none;
+}
+
+/* 2. 重定义弹窗主容器，使其变宽、变为直角 */
+#custom-modal.log-viewer-modal #custom-modal {
+    width: 90% !important;
+    max-width: 420px;
+    border-radius: 0;
+}
+
+/* 3. 弹窗主内容区 */
+#custom-modal.log-viewer-modal .custom-modal-body {
+    background-color: #fdfaf5;
+    padding: 25px 20px;
+    text-align: left;
+    font-family: 'KaiTi', 'STKaiti', serif;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* 4. 日志标题 (只显示作者和日期) */
+.log-viewer-title {
+    font-size: 14px;
+    color: #bcaaa4;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #d7ccc8;
+}
+
+/* 5. 日志正文 (包含标题和所有分段) */
+.log-viewer-content {
+    font-size: 16px;
+    line-height: 2;
+    color: #5d4037;
+    white-space: pre-wrap; /* 这行是保证分段正确的关键 */
+    word-break: break-word;
+}
+
+/* 6. 弹窗底部 */
+#custom-modal.log-viewer-modal .custom-modal-footer {
+    background-color: #f8f5f1;
+}
+
+/* ▲▲▲ 恢复CSS结束 ▲▲▲ */
+
 /* ▼▼▼ 【最终版 - 极简交互】动态帖子横向展开菜单样式 ▼▼▼ */
 
 /* 1. 菜单总容器 */
@@ -1478,6 +1527,17 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】动态中的日志标题样式 ▼▼▼ */
+.post-log-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* === 【全新】聊天列表页顶部下拉菜单样式 === */
 
 /* 1. 给按钮容器添加相对定位,作为菜单的定位基准 */
@@ -1635,6 +1695,212 @@ body:not(.bordered-mode) .nav-item {
     font-weight: 600;
     color: white;
     white-space: nowrap; /* 强制不换行 */
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】日志列表页顶部下拉菜单样式 ▼▼▼ */
+
+/* 1. 给按钮容器添加相对定位,作为菜单的定位基准 */
+#log-filter-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* 2. 可点击的标题文本 */
+#log-filter-display-btn {
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+#log-filter-display-btn::after {
+    content: ' ▾'; /* 添加一个小三角，视觉上更像下拉菜单 */
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+/* 3. 下拉菜单的容器样式 (类似聊天列表的菜单) */
+#log-filter-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 50%;
+    transform: translateX(50%);
+    width: 180px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    z-index: 20;
+    padding: 5px;
+    box-sizing: border-box;
+    display: none; 
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+#log-filter-menu.visible {
+    display: block;
+    opacity: 1;
+    transform: translateX(50%) translateY(0);
+    pointer-events: auto;
+}
+#phone-screen.dark-mode #log-filter-menu {
+    background-color: #2c2c2e;
+}
+
+/* 4. 菜单内每个选项的样式 */
+#log-filter-menu .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+#log-filter-menu .menu-item:hover {
+    background-color: #f5f5f5;
+}
+#phone-screen.dark-mode #log-filter-menu .menu-item:hover {
+    background-color: #3e3e42;
+}
+
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新】日志列表页面样式 ▼▼▼ */
+
+/* 1. 页面和列表容器 */
+#log-list-screen {
+    background-color: #f7f8fa; /* 一个非常浅的灰色背景 */
+}
+#log-list-container {
+    padding-top: 90px !important; /* 为固定的header留出空间 */
+    gap: 20px; /* 日志条目之间的间距 */
+}
+#phone-screen.dark-mode #log-list-screen {
+    background-color: #000;
+}
+
+/* 2. 头部返回按钮微调 */
+#log-list-back-btn {
+    width: auto !important; /* 让宽度自适应内容 */
+    padding: 0 5px;
+}
+
+/* 3. 单条日志的样式 */
+.log-list-item {
+    display: flex;
+    gap: 15px; /* 日期和内容之间的间距 */
+    align-items: flex-start; /* 顶部对齐 */
+}
+
+/* 4. 左侧日期部分 */
+.log-item-date {
+    flex-shrink: 0;
+    text-align: center;
+    color: var(--text-secondary);
+    padding-top: 2px;
+}
+.log-item-date .day {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+.log-item-date .month {
+    font-size: 13px;
+}
+
+/* 5. 右侧内容卡片 */
+.log-item-content-card {
+    flex-grow: 1;
+    background-color: var(--secondary-bg);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.log-item-content-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+#phone-screen.dark-mode .log-item-content-card {
+    background-color: #1c1c1e;
+}
+
+/* 6. 卡片内的标题和内容 */
+.log-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    
+    /* 标题最多显示一行，超出部分用省略号 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.log-card-preview {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+
+    /* 内容预览最多显示两行 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】动态中的日志卡片美化样式 ▼▼▼ */
+
+/* 日志头部容器，用于并排显示标题和标签 */
+.post-log-header {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 标题和标签之间的间距 */
+    margin-bottom: 8px; /* 和下方的正文预览拉开距离 */
+}
+
+/* 日志标题样式 */
+.post-log-header .post-log-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    /* 防止标题过长换行 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* “日志”小标签的样式 */
+.post-log-header .post-log-tag {
+    background-color: #f0f2f5;
+    color: #8a8a8a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0; /* 防止被压缩 */
+}
+#phone-screen.dark-mode .post-log-header .post-log-tag {
+    background-color: #2c2c2e;
+}
+
+/* 日志正文预览样式 (核心：只显示一行，超出部分显示省略号) */
+.post-log-preview {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
@@ -6598,6 +6864,24 @@ input[type="color"]::-webkit-color-swatch {
 
 /* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
+/* ▼▼▼ 【全新】日志帖子专属美化样式 ▼▼▼ */
+
+.post-log-content {
+    background-color: #faf8f5; /* 给一个温暖的、类似信纸的米色背景 */
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #e0cab1; /* 左侧添加一个装饰性的边框 */
+    font-family: 'KaiTi', 'STKaiti', serif; /* 使用更具文艺感的楷体字体 */
+    font-size: 16px !important; /* 字体稍大，更易读 */
+    line-height: 1.8 !important;
+}
+#phone-screen.dark-mode .post-log-content {
+    background-color: #2a2825;
+    border-left-color: #7d6a55;
+}
+
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* 单条评论的容器,现在需要相对定位 */
 .comment-item {
     position: relative;
@@ -8392,11 +8676,11 @@ input:checked + .slider:before {
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 </div>
         <!-- 3. 功能栏 (保持不变) -->
-        <div class="qzone-actions-bar">
-            <div class="action-item" id="create-shuoshuo-btn"><span>说说</span></div>
-            <div class="action-item" id="create-post-btn"><span>动态</span></div>
-            <div class="action-item" id="open-album-btn"><span>相册</span></div>
-        </div>
+<div class="qzone-actions-bar">
+    <div class="action-item" id="create-post-btn"><span>说说</span></div>
+    <div class="action-item" id="create-log-btn"><span>日志</span></div>
+    <div class="action-item" id="open-album-btn"><span>相册</span></div>
+</div>
         <!-- 4. 帖子列表 (保持不变) -->
         <div id="qzone-posts-list"></div>
     </div>
@@ -8501,6 +8785,26 @@ input:checked + .slider:before {
 </div>
 </div>
 <!-- ▲▲▲ 替换区域结束 ▲▲▲ -->
+<!-- ▼▼▼ 【全新】日志列表屏幕 ▼▼▼ -->
+<div id="log-list-screen" class="screen">
+<div class="header">
+    <span class="back-btn" id="log-list-back-btn">‹</span>
+    
+    <!-- 【核心修改】将下拉选择器替换为可点击的文本和隐藏的菜单 -->
+    <div class="header-actions" id="log-filter-container">
+        <span id="log-filter-display-btn">全部日志</span>
+        <div id="log-filter-menu" class="dropdown-menu">
+            <!-- 菜单项将由JS动态生成 -->
+        </div>
+    </div>
+    
+    <span class="action-btn" style="width: 30px;"></span> <!-- 占位符，确保标题居中 -->
+</div>
+    <div id="log-list-container" class="list-container" style="padding: 10px 15px;">
+        <!-- 日志条目将由JS动态生成在这里 -->
+    </div>
+</div>
+<!-- ▲▲▲ 新屏幕粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新】壁纸库屏幕 ▼▼▼ -->
 <div id="wallpaper-library-screen" class="screen">
@@ -9629,7 +9933,7 @@ input:checked + .slider:before {
 <div id="create-post-modal" class="modal">
     <div class="modal-content" style="height: auto; max-height: 90%;">
         <div class="modal-header">
-            <span>发布动态</span>
+            <span>分享生活</span>
         </div>
         <div class="modal-body">
             <!-- 1. 公开文字输入区 (始终可见) -->
@@ -10681,7 +10985,7 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // ===================================================================
 
 // ▼▼▼ In your <script> tag, find this line and modify it ▼▼▼
-db.version(27).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
+db.version(28).stores({ // <-- Increment the version number by 1 (e.g., from 23 to 24)
     chats: '&id, isGroup, groupId',
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
@@ -10692,7 +10996,7 @@ db.version(27).stores({ // <-- Increment the version number by 1 (e.g., from 23 
     musicLibrary: '&id', 
     personaPresets: '&id',
     qzoneSettings: '&id',
-    qzonePosts: '++id, timestamp', 
+    qzonePosts: '++id, timestamp, type', // <-- 【核心修改2】添加 , type
     qzoneAlbums: '++id, name, createdAt',
     qzonePhotos: '++id, albumId',
     favorites: '++id, type, timestamp, originalTimestamp',
@@ -11081,6 +11385,7 @@ async function renderQzonePosts() {
     }
 
     posts.forEach((post, index) => {
+let titleHtml = ''; // <<<<<<<<<<<<<<< 在这里添加这一行！
         const postContainer = document.createElement('div');
         postContainer.className = 'qzone-post-container';
         postContainer.dataset.postId = post.id;
@@ -11102,6 +11407,20 @@ async function renderQzonePosts() {
         else if (post.type === 'image_post' && post.imageUrl) { contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${post.imageUrl}" class="chat-image"></div>` : `<img src="${post.imageUrl}" class="chat-image">`; } 
         else if (post.type === 'text_image') { contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`; }
         else if (post.type === 'interactive_html') { contentHtml = `<div class="post-content" style="display: flex; justify-content: center;">${post.content}</div>`; }
+// ▼▼▼ 【核心修改】在这里添加对日志的处理逻辑 ▼▼▼
+        else if (post.type === 'log') {
+            const logLines = (post.content || '').split('\n');
+            const title = logLines[0].trim() || '无标题日志';
+            const preview = logLines.length > 1 ? logLines.slice(1).join(' ').trim() : '...';
+            contentHtml = `
+                <div class="post-log-header">
+                    <h3 class="post-log-title">${title}</h3>
+                    <span class="post-log-tag">日志</span>
+                </div>
+                <p class="post-log-preview">${preview}</p>
+            `;
+        }
+        // ▲▲▲ 修改结束 ▲▲▲
         
         const userNickname = state.qzoneSettings.nickname;
         const isLikedByUser = post.likes && post.likes.includes(userNickname);
@@ -11229,9 +11548,17 @@ function displayFilteredFavorites(items) {
             const publicTextHtml = post.publicText ? `<div class="post-content">${post.publicText.replace(/\n/g, '<br>')}</div>` : '';
             if (post.type === 'shuoshuo') {
                 contentHtml = `<div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>`;
-            } else if (post.type === 'image_post' && post.imageUrl) {
-                contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="${post.imageUrl}" class="chat-image"></div>` : `<img src="${post.imageUrl}" class="chat-image">`;
-            } else if (post.type === 'text_image') {
+            } 
+        else if (post.type === 'log') {
+    const logLines = (post.content || "").split('\n');
+    const title = logLines[0] || '无标题日志';
+    const body = logLines.slice(1).join('<br>');
+    // 将标题和正文组合在一起
+    contentHtml = `
+        <h3 class="post-log-title">${title}</h3>
+        <div class="post-content post-log-content" style="margin-top: 8px;">${body}</div>
+    `;
+}else if (post.type === 'text_image') {
                 contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`;
             }
 
@@ -15641,12 +15968,17 @@ async function triggerInactiveAiAction(chatId) {
 # 你的任务
 你现在扮演一个名为"${chat.name}"的角色。你已经有一段时间没有和用户(${userNickname})互动了,现在你有机会【主动】做点什么,来表现你的个性和独立生活。这是一个秘密的、后台的独立行动。
 
+# 【【【动态与日志的优先级铁律】】】
+1.  **发布动态（说说、图片等）是你的主要社交方式**。你应该频繁地使用它们来分享你的生活点滴和心情。
+2.  **绝对禁止连续发布日志**。在发布一篇日志后，你至少要发布5条以上的普通动态，才能再次写日志。
+
 # 你的可选行动 (请根据你的人设【选择一项】执行):
 1.  **改变状态**: 去做点别的事情,然后给用户发条消息。
 2.  **发布动态**: 分享你的心情或想法到“动态”区。
 3.  **与动态互动**: 去看看别人的帖子并进行评论或点赞。
 4.  **发起视频通话**: 如果你觉得时机合适,可以主动给用户打一个视频电话。
 5.  **开启直播**: 如果你觉得无聊或想分享什么，可以开启一场直播。
+6.  **【【【全新】】】写一篇日志**: 反思最近发生的事，或分享你的所思所想。
 
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
 -   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
@@ -15658,6 +15990,12 @@ async function triggerInactiveAiAction(chatId) {
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 -   **开直播**: \`[{"type": "live_stream_start", "theme": "直播的主题", "mode": "solo"}]\`
+-   **【全新】写日志**: \`[{"type": "qzone_post", "postType": "log", "content": "日志的【完整】内容..."}]\`
+
+#  **【全新】写日志**: 
+    -   **格式铁律**: 你的回复【必须】遵循 "标题\n正文" 的格式。
+    -   **标题铁律**: 日志的标题【必须】是第一行，且【绝对不能】超过10个汉字。
+    -   **正确示例**: \`[{"type": "qzone_post", "postType": "log", "content": "今天天气晴\n今天天气真好，心情也跟着放晴了，想起了很多美好的事情..."}]\`
 
 # 【【【全新】发布可交互模块/生图动态】】】
 -   **功能说明**: 这允许你在动态中发布一个和聊天时类似的、可交互的、视觉丰富的HTML模块,用于展示心情、小游戏或特殊事件。
@@ -17446,8 +17784,6 @@ async function triggerAiInAutoChess(triggeringEventDescription) {
 
 // ▲▲▲ 全新五子棋JS逻辑到此结束 ▲▲▲
 
-// ▲▲▲ 替换结束 ▲▲▲
-
 // ▼▼▼ 【全新】上下文菜单核心逻辑 ▼▼▼
 
 // ▼▼▼ 【定位优化版】显示并定位上下文操作菜单 ▼▼▼
@@ -18421,6 +18757,101 @@ async function updateLiveStreamSettings() {
     alert('直播信息已更新！');
 }
 // ▲▲▲ NEW FUNCTION END ▲▲▲
+
+// ▼▼▼ 【最终重写版】日志功能模块 (粘贴到功能函数定义区末尾) ▼▼▼
+
+let currentLogFilter = 'all'; // 使用一个全新的、不会冲突的变量名
+
+// ▼▼▼ 用这个【全新的版本】替换旧的 openLogListScreen 函数 ▼▼▼
+async function openLogListScreen() {
+    const switcherMenu = document.getElementById('log-filter-menu');
+    const container = document.getElementById('log-list-container');
+    
+    // a. 填充切换器菜单
+    switcherMenu.innerHTML = '';
+    const aiChats = Object.values(state.chats).filter(c => !c.isGroup);
+    
+    const allOption = document.createElement('div');
+    allOption.className = 'menu-item';
+    allOption.textContent = '全部日志';
+    allOption.dataset.filter = 'all';
+    switcherMenu.appendChild(allOption);
+
+    aiChats.forEach(chat => {
+        const option = document.createElement('div');
+        option.className = 'menu-item';
+        option.textContent = `来自 ${chat.name}`;
+        option.dataset.filter = chat.id;
+        switcherMenu.appendChild(option);
+    });
+
+    // b. 根据当前过滤器设置UI
+    const displayBtn = document.getElementById('log-filter-display-btn');
+    const currentFilterOption = switcherMenu.querySelector(`.menu-item[data-filter="${currentLogFilter}"]`);
+    displayBtn.textContent = currentFilterOption ? currentFilterOption.textContent : '全部日志';
+    
+    // c. 显示加载中
+    container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">正在加载...</p>';
+    showScreen('log-list-screen'); // 先显示屏幕
+
+    // d. 获取并渲染数据
+    await updateLogListView();
+}
+// ▲▲▲ 替换结束 ▲▲▲
+
+// 2. 【全新】只负责更新列表内容的函数
+async function updateLogListView() {
+    const container = document.getElementById('log-list-container');
+    if (!container) return;
+
+    let logs;
+    if (currentLogFilter === 'all') {
+        logs = await db.qzonePosts.where('type').equals('log').reverse().toArray();
+    } else {
+        logs = await db.qzonePosts.where({ type: 'log', authorId: currentLogFilter }).reverse().toArray();
+    }
+
+    container.innerHTML = '';
+    if (logs.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">这里还没有任何日志哦~</p>';
+    } else {
+        logs.forEach(log => {
+            const date = new Date(log.timestamp);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = date.toLocaleString('zh-CN', { month: 'short' });
+            const contentParts = log.content.split('\n');
+            const title = contentParts[0].trim();
+            const preview = contentParts.length > 1 ? contentParts.slice(1).join(' ').trim() : '...';
+
+            const item = document.createElement('div');
+            item.className = 'log-list-item';
+            item.innerHTML = `
+                <div class="log-item-date">
+                    <div class="day">${day}</div>
+                    <div class="month">${month}</div>
+                </div>
+                <div class="log-item-content-card">
+                    <h3 class="log-card-title">${title || '无标题日志'}</h3>
+                    <p class="log-card-preview">${preview}</p>
+                </div>
+            `;
+
+            item.addEventListener('click', () => {
+                const logAuthor = state.chats[log.authorId]?.name || '一位朋友';
+                const logDate = date.toLocaleString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('custom-modal').className = 'log-viewer-modal';
+                const letterHtml = `
+                    <div class="log-viewer-title">来自 ${logAuthor} · ${logDate}</div>
+                    <div class="log-viewer-content">${log.content}</div>
+                `;
+                showCustomAlert(`日志详情`, letterHtml);
+            });
+            container.appendChild(item);
+        });
+    }
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 // ▼▼▼ 【全新】群成员管理核心函数 ▼▼▼
 
@@ -22711,72 +23142,10 @@ document.getElementById('selection-delete-btn').addEventListener('click', async 
             document.getElementById('qzone-avatar-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (file) { const dataUrl = await new Promise(res => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.readAsDataURL(file); }); state.qzoneSettings.avatar = dataUrl; await saveQzoneSettings(); renderQzoneScreen(); } event.target.value = null; });
             document.getElementById('qzone-banner-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (file) { const dataUrl = await new Promise(res => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.readAsDataURL(file); }); state.qzoneSettings.banner = dataUrl; await saveQzoneSettings(); renderQzoneScreen(); } event.target.value = null; });
 
-// ▼▼▼ 【最终版 - 自由组合】用这【一整块】全新的代码，替换所有旧的 create-post-modal 相关事件监听器 ▼▼▼
-
-// --- “发布动态”总入口按钮 (“说说”和“动态”都用这个) ---
-document.getElementById('create-shuoshuo-btn').addEventListener('click', async () => {
-    // 统一调用，不再区分模式
-    resetCreatePostModal();
-    const modal = document.getElementById('create-post-modal');
-    const visibilityGroupsContainer = document.getElementById('post-visibility-groups');
-    visibilityGroupsContainer.innerHTML = '';
-    const groups = await db.qzoneGroups.toArray();
-    if (groups.length > 0) {
-        groups.forEach(group => {
-            const label = document.createElement('label');
-            label.style.display = 'block';
-            label.innerHTML = `<input type="checkbox" name="visibility_group" value="${group.id}"> ${group.name}`;
-            visibilityGroupsContainer.appendChild(label);
-        });
-    } else {
-        visibilityGroupsContainer.innerHTML = '<p style="color: var(--text-secondary);">没有可用的分组</p>';
-    }
-    modal.classList.add('visible');
-});
-document.getElementById('create-post-btn').addEventListener('click', () => document.getElementById('create-shuoshuo-btn').click());
-
-
-// --- 模态框内部按钮的事件 ---
-
-// “+ 相册图片”按钮
-document.getElementById('post-add-album-image-btn').addEventListener('click', () => {
-    // 设置上下文，告诉相册我们是来选照片发动态的
-    albumPickerContext = {
-        for: 'qzone-post',
-        returnScreen: 'qzone-screen' // 选完后留在动态页即可
-    };
-    renderAlbumList();
-    showScreen('album-screen');
-    // 暂时隐藏发布模态框，选完照片再显示
-    document.getElementById('create-post-modal').classList.remove('visible');
-});
-
-// “+ 文字图”按钮
-document.getElementById('post-add-hidden-text-btn').addEventListener('click', () => {
-    document.getElementById('post-hidden-text-group').style.display = 'block';
-    document.getElementById('post-add-hidden-text-btn').style.display = 'none'; // 隐藏自己
-});
-
-// “移除图片”按钮
-document.getElementById('post-remove-image-btn').addEventListener('click', () => {
-    document.getElementById('post-image-preview').src = '';
-    document.getElementById('post-image-preview-container').style.display = 'none';
-    document.getElementById('post-image-description').value = '';
-    document.getElementById('post-image-desc-group').style.display = 'none';
-    document.getElementById('post-add-album-image-btn').style.display = 'block'; // 恢复添加按钮
-});
-
-// “移除文字图”按钮
-document.getElementById('post-remove-hidden-text-btn').addEventListener('click', () => {
-    document.getElementById('post-hidden-text').value = '';
-    document.getElementById('post-hidden-text-group').style.display = 'none';
-    document.getElementById('post-add-hidden-text-btn').style.display = 'block'; // 恢复添加按钮
-});
-
 // ▼▼▼ 【最终版 V3 - 无弹窗】请将这【一整块】全新的代码，粘贴到init()的事件监听区 ▼▼▼
 
 // --- “发布动态”总入口按钮 (“说说”和“动态”都用这个) ---
-document.getElementById('create-shuoshuo-btn').addEventListener('click', async () => {
+document.getElementById('create-post-btn').addEventListener('click', async () => {
     resetCreatePostModal();
     const modal = document.getElementById('create-post-modal');
     const visibilityGroupsContainer = document.getElementById('post-visibility-groups');
@@ -22794,8 +23163,6 @@ document.getElementById('create-shuoshuo-btn').addEventListener('click', async (
     }
     modal.classList.add('visible');
 });
-document.getElementById('create-post-btn').addEventListener('click', () => document.getElementById('create-shuoshuo-btn').click());
-
 
 // --- 模态框内部按钮的事件 ---
 
@@ -22837,7 +23204,7 @@ document.getElementById('confirm-create-post-btn').addEventListener('click', asy
     const hiddenContent = document.getElementById('post-hidden-text').value.trim();
 
     if (!publicText && !(imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) && !hiddenContent) {
-        alert('动态内容不能为空！');
+        alert('说说内容不能为空！');
         return;
     }
     
@@ -24383,6 +24750,113 @@ document.getElementById('live-background-upload-input').addEventListener('change
     e.target.value = '';
 });
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【最终防白屏版 V2】请用这【一整块】全新的代码，替换所有旧的日志列表相关事件监听器 ▼▼▼
+
+// --- 日志列表屏幕的总事件监听器 ---
+document.getElementById('log-list-screen').addEventListener('click', (e) => {
+    const target = e.target;
+    
+    // a. 处理返回按钮的点击
+    if (target.closest('#log-list-back-btn')) {
+        // 【核心修复1】不再调用 showScreen，而是直接、精确地切换视图
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('chat-list-screen').classList.add('active');
+        switchToChatListView('qzone-screen'); // 直接切换到动态页
+    }
+    
+    // b. 处理日志条目的点击 (逻辑保持不变)
+    const logItem = target.closest('.log-list-item');
+    if (logItem) {
+        const postId = parseInt(logItem.dataset.postId);
+        db.qzonePosts.get(postId).then(log => {
+            if (log) {
+                const date = new Date(log.timestamp);
+                const logAuthor = state.chats[log.authorId]?.name || '一位朋友';
+                const logDate = date.toLocaleString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('custom-modal').className = 'log-viewer-modal';
+                const letterHtml = `
+                    <div class="log-viewer-title">来自 ${logAuthor} · ${logDate}</div>
+                    <div class="log-viewer-content">${log.content}</div>
+                `;
+                showCustomAlert(`日志详情`, letterHtml);
+            }
+        });
+    }
+});
+
+// ▼▼▼ 用这【一整块】全新的代码，替换旧的日志列表相关事件监听器 ▼▼▼
+
+// 1. “日志”功能栏按钮
+document.getElementById('create-log-btn').addEventListener('click', openLogListScreen);
+
+// 2. 日志列表页的返回按钮
+document.getElementById('log-list-back-btn').addEventListener('click', () => {
+    switchToChatListView('qzone-screen');
+});
+
+// 3. 日志列表页的下拉菜单控制
+const logFilterContainer = document.getElementById('log-filter-container');
+const logFilterMenu = document.getElementById('log-filter-menu');
+logFilterContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    logFilterMenu.classList.toggle('visible');
+});
+
+// 4. 使用事件委托处理菜单项点击
+logFilterMenu.addEventListener('click', (e) => {
+    const menuItem = e.target.closest('.menu-item');
+    if (menuItem && menuItem.dataset.filter) {
+        currentLogFilter = menuItem.dataset.filter;
+        document.getElementById('log-filter-display-btn').textContent = menuItem.textContent;
+        logFilterMenu.classList.remove('visible');
+        updateLogListView();
+    }
+});
+
+// 5. 点击页面其他地方关闭菜单
+window.addEventListener('click', (e) => {
+    if (logFilterMenu.classList.contains('visible') && !logFilterContainer.contains(e.target)) {
+        logFilterMenu.classList.remove('visible');
+    }
+    // ... 您已有的其他关闭菜单的逻辑 ...
+});
+
+// ▼▼▼ 【恢复】日志卡片点击事件 (恢复到原始版本) ▼▼▼
+
+document.getElementById('log-list-container').addEventListener('click', (e) => {
+    // 监听卡片点击
+    const logItem = e.target.closest('.log-item-content-card');
+    if (!logItem) return;
+    
+    // 向上找到父级容器以获取ID
+    const parentItem = logItem.closest('.log-list-item');
+    if (!parentItem || !parentItem.dataset.postId) return;
+
+    const postId = parseInt(parentItem.dataset.postId);
+    db.qzonePosts.get(postId).then(log => {
+        if (log) {
+            
+            // --- 【【【核心恢复逻辑】】】 ---
+            
+            // 1. 准备作者和日期信息
+            const date = new Date(log.timestamp);
+            const logAuthor = state.chats[log.authorId]?.name || '一位朋友';
+            const logDate = date.toLocaleString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // 2. 【关键】不再拆分标题和正文，直接将完整的 log.content 放入内容区
+            document.getElementById('custom-modal').className = 'log-viewer-modal';
+            const letterHtml = `
+                <div class="log-viewer-title">来自 ${logAuthor} · ${logDate}</div>
+                <div class="log-viewer-content">${log.content}</div>
+            `;
+            // 3. 使用 "日志详情" 作为弹窗的默认标题
+            showCustomAlert(`日志详情`, letterHtml);
+        }
+    });
+});
+
+// ▲▲▲ 恢复JS结束 ▲▲▲
 
 // ▼▼▼ 请将这段【新代码】粘贴到 init() 的事件监听器区域末尾 ▼▼▼
 document.getElementById('manage-groups-btn').addEventListener('click', openGroupManager);
