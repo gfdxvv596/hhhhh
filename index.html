@@ -1315,6 +1315,143 @@ body.bordered-mode #status-bar {
 }
 /* ▲▲▲ 1. 粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【最终版 - 极简交互】动态帖子横向展开菜单样式 ▼▼▼ */
+
+/* 1. 菜单总容器 */
+.post-actions-container {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* 2. 隐藏的操作项容器 (核心修改) */
+.post-action-items {
+    display: flex;
+    align-items: center;
+    
+    /* a. 移除背景和边框 */
+    background-color: transparent;
+    padding: 0;
+    
+    /* b. 动画效果：只改变宽度和透明度 */
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: width 0.3s ease-out, opacity 0.2s ease-out;
+    
+    white-space: nowrap;
+}
+
+/* 3. 展开后的样式 */
+.post-actions-container.expanded .post-action-items {
+    width: 72px; /* 宽度正好容纳两个图标按钮 */
+    opacity: 1;
+    margin-right: 8px; /* 与三点按钮拉开间距 */
+}
+
+/* 4. 单个操作项 (图标按钮) */
+.post-action-item {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 50%; /* 图标按钮是圆形的 */
+    transition: background-color 0.2s;
+}
+.post-action-item:hover {
+    background-color: #f0f0f0;
+}
+#phone-screen.dark-mode .post-action-item:hover {
+    background-color: #2c2c2e;
+}
+
+/* 5. 图标样式 (使用伪元素) */
+.post-action-item::before {
+    content: '';
+    width: 20px; /* 稍微放大图标 */
+    height: 20px;
+    background-color: var(--text-secondary); /* 图标颜色改为次要灰色 */
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+#phone-screen.dark-mode .post-action-item::before {
+    background-color: #a0a0a0;
+}
+
+/* a. 为“编辑”按钮指定图标 */
+#edit-post-btn-inline::before {
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>');
+}
+
+/* b. 为“收藏”按钮指定图标 */
+#favorite-post-btn-inline::before {
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>');
+}
+
+/* ▼▼▼ 【全新】收藏按钮的空心/实心切换样式 ▼▼▼ */
+
+/* a. 默认空心图标 (保持不变) */
+#favorite-post-btn-inline::before {
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>');
+}
+
+/* b. 【核心新增】当按钮拥有 .favorited 类时，切换为实心图标 */
+#favorite-post-btn-inline.favorited::before {
+    /* 使用一个实心的五角星SVG */
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>');
+    /* 同时改变图标颜色为醒目的黄色 */
+    background-color: #ffc107 !important;
+}
+
+/* c. 【新增】为分享按钮指定图标 (之前反馈图标里有，但菜单里没有) */
+.action-icon.share {
+    display: none; /* 暂时隐藏分享按钮，因为还没有功能 */
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
+/* 6. 三点按钮的样式 (保持不变) */
+.post-actions-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease-in-out;
+    font-size: 20px;
+    color: var(--text-secondary);
+}
+.post-actions-btn:hover {
+    background-color: #f0f0f0;
+}
+#phone-screen.dark-mode .post-actions-btn:hover {
+    background-color: #2c2c2e;
+}
+
+/* ▼▼▼ 用这【一段】新代码，替换旧的 .post-actions-container.expanded .post-actions-btn ▼▼▼ */
+/* 7. 【核心修改】展开时，隐藏三点按钮 */
+.post-actions-container.expanded .post-actions-btn {
+    opacity: 0;
+    pointer-events: none; /* 让它在视觉上和物理上都消失 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+.post-actions-container.expanded .post-actions-btn::before {
+    content: '...'; /* 确保内容始终是三个点 */
+    /* 移除之前为"+"号设置的样式 */
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▲▲▲ 粘贴到此结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新】为五字棋添加“正在输入”样式 (粘贴到 <style> 末尾) ▼▼▼ */
@@ -4407,23 +4544,6 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
-
-/* “…”按钮的样式 */
-.post-actions-btn {
-    margin-left: auto; /* 关键:让它自动靠到最右边 */
-    padding: 5px 10px;
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-radius: 50%;
-    line-height: 1;
-}
-.post-actions-btn:hover {
-    background-color: #f0f0f0;
-}
 
 /* 动态编辑模态框的样式 (它将复用现有的操作菜单样式) */
 #post-actions-modal .custom-modal-footer button {
@@ -9505,65 +9625,53 @@ input:checked + .slider:before {
 
     <audio id="audio-player" style="display:none;"></audio>
 
-<!-- ▼▼▼ 用下面这段【完整】的模态框代码,替换掉你现有的 id="create-post-modal" 的整个 div ▼▼▼ -->
+<!-- ▼▼▼ 【最终版 - 自由组合】用这【一整块】全新的代码，替换旧的 create-post-modal ▼▼▼ -->
 <div id="create-post-modal" class="modal">
     <div class="modal-content" style="height: auto; max-height: 90%;">
         <div class="modal-header">
             <span>发布动态</span>
         </div>
         <div class="modal-body">
-            <!-- 公开文字输入区 -->
+            <!-- 1. 公开文字输入区 (始终可见) -->
             <div class="form-group">
-                <textarea id="post-public-text" rows="3" placeholder="分享新鲜事...(非必填的公开文字)"></textarea>
+                <textarea id="post-public-text" rows="4" placeholder="分享新鲜事..."></textarea>
             </div>
 
-            <!-- === 模式切换开关 (新增) === -->
-            <div class="post-mode-switcher">
-                <button id="switch-to-image-mode" class="mode-btn active">上传图片</button>
-                <button id="switch-to-text-image-mode" class="mode-btn">使用文字图</button>
+            <!-- 2. 图片预览区 (默认隐藏，选择图片后显示) -->
+            <div id="post-image-preview-container" class="post-image-preview-container" style="display: none; margin-bottom: 10px;">
+                <img id="post-image-preview" src="" alt="图片预览">
+                <button id="post-remove-image-btn">×</button>
+            </div>
+            <!-- 图片描述输入框 (选择图片后显示) -->
+            <div id="post-image-desc-group" class="form-group" style="display: none;">
+                <label>图片描述 (给AI看，可选)</label>
+                <input type="text" id="post-image-description" placeholder="简单描述图片内容,帮助AI理解">
             </div>
 
-<!-- ▼▼▼ 【修正后】的可见范围设置 ▼▼▼ -->
-<div class="form-group">
-    <label>可见范围</label>
-    <div id="post-visibility-options" style="display: flex; gap: 15px; margin-bottom: 10px;">
-        <label><input type="radio" name="visibility" value="public" checked> 公开</label>
+            <!-- 3. 文字图输入区 (默认隐藏，点击添加后显示) -->
+            <div id="post-hidden-text-group" class="form-group" style="display: none;">
+                 <label>文字图描述 (点击占位图后可见)</label>
+                <textarea id="post-hidden-text" rows="3" placeholder="在这里写下希望被看到的内容..."></textarea>
+                <button id="post-remove-hidden-text-btn" class="form-button-secondary" style="width: auto; padding: 4px 10px; font-size: 12px; margin-top: 5px; float: right;">移除文字图</button>
+            </div>
+            
+            <!-- 4. 添加内容的按钮 -->
+            <div class="post-add-content-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="post-add-album-image-btn" class="form-button-secondary" style="flex: 1; margin-top: 0;">+ 相册图片</button>
+                <button id="post-add-hidden-text-btn" class="form-button-secondary" style="flex: 1; margin-top: 0;">+ 文字图</button>
+            </div>
 
-        <label><input type="radio" name="visibility" value="include"> 指定分组可见</label>
-    </div>
-    <div id="post-visibility-groups" style="display: none; max-height: 120px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 8px;">
-        <!-- 分组多选框将由JS动态生成 -->
-    </div>
-</div>
-<!-- ▲▲▲ 修正结束 ▲▲▲ -->
-
-            <!-- === 图片模式区域 === -->
-            <div id="image-mode-content" class="post-mode-content active">
-                <div class="form-group">
-<div id="post-image-preview-container" class="post-image-preview-container">
-                        <img id="post-image-preview" src="" alt="图片预览">
-                        <button id="post-remove-image-btn">×</button>
-                    </div>
-                    <div class="post-image-upload-options">
-                        <button id="post-upload-local-btn" class="form-button-secondary">本地上传</button>
-                        <button id="post-use-url-btn" class="form-button-secondary">网络URL</button>
-                        <input type="file" id="post-local-image-input" accept="image/*" hidden>
-                    </div>
+            <!-- 5. 可见范围设置 (保持不变) -->
+            <div class="form-group" style="margin-top: 20px;">
+                <label>可见范围</label>
+                <div id="post-visibility-options" style="display: flex; gap: 15px; margin-bottom: 10px;">
+                    <label><input type="radio" name="visibility" value="public" checked> 公开</label>
+                    <label><input type="radio" name="visibility" value="include"> 指定分组可见</label>
                 </div>
-                <div id="post-image-desc-group" class="form-group" style="display: none;">
-                    <label>图片描述 (必填,给AI看)</label>
-                    <input type="text" id="post-image-description" placeholder="简单描述图片内容,帮助AI理解">
+                <div id="post-visibility-groups" style="display: none; max-height: 120px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+                    <!-- 分组多选框将由JS动态生成 -->
                 </div>
             </div>
-
-            <!-- === 文字图模式区域 (新增) === -->
-            <div id="text-image-mode-content" class="post-mode-content">
-                <div class="form-group">
-                    <label>文字图 (给AI理解用的描述,点击图片后可见)</label>
-                    <textarea id="post-hidden-text" rows="4" placeholder="在这里写下图片描述..."></textarea>
-                </div>
-            </div>
-
         </div>
         <div class="modal-footer">
             <button class="cancel" id="cancel-create-post-btn">取消</button>
@@ -11021,22 +11129,29 @@ async function renderQzonePosts() {
             commentsHtml += '</div>';
         }
 
-        // 【【【核心修复区】】】
+        // ▼▼▼ 【最终版 - 带收藏状态判断】请用这【一整块】全新的代码，替换旧的HTML拼接及后续逻辑 ▼▼▼
+        // 【最终HTML拼接】
         postEl.innerHTML = `
             <div class="post-header">
                 <img src="${authorAvatar}" class="post-avatar">
                 <div class="post-info">
                     <span class="post-nickname">${authorNickname}</span>
                 </div>
-                <div class="post-actions-btn">…</div>
+                <div class="post-actions-container">
+                    <div class="post-actions-btn">…</div>
+                    <div class="post-action-items">
+                        <div class="post-action-item" id="edit-post-btn-inline"></div>
+                        <!-- 【核心修改】根据isFavoritedByUser变量，动态添加'favorited' class -->
+                        <div class="post-action-item ${isFavoritedByUser ? 'favorited' : ''}" id="favorite-post-btn-inline"></div>
+                    </div>
+                </div>
             </div>
             <div class="post-main-content">${contentHtml}</div>
             <div class="post-meta-bar">
                 <span class="post-timestamp">${formatPostTimestamp(post.timestamp)}</span>
                 <div class="post-feedback-icons">
-                    <span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></span>
-                    <span class="action-icon favorite ${isFavoritedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M21.17 12.83l-6.23 6.23a2.79 2.79 0 0 1-3.94 0l-6.23-6.23a5.58 5.58 0 0 1 0-7.9l7.73-7.74a.49.49 0 0 1 .7 0l7.73 7.74a5.58 5.58 0 0 1 0 7.9z"></path></svg></span>
-                    <span class="action-icon share"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
+                     <span class="action-icon like ${isLikedByUser ? 'active' : ''}"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></span>
+                     <span class="action-icon share"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
                 </div>
             </div>
             ${likesHtml}
@@ -11046,7 +11161,6 @@ async function renderQzonePosts() {
                     <img src="${commentAvatar}" class="comment-avatar">
                     <input type="text" class="comment-input" placeholder="说点什么吧...">
                 </div>
-                <!-- ★★★ 把发送按钮的HTML结构加回来！ ★★★ -->
                 <button class="comment-send-btn">发送</button>
             </div>
         `;
@@ -11241,17 +11355,28 @@ function displayFilteredFavorites(items) {
         }
 
         // ▲▲▲ 粘贴结束 ▲▲▲
+// ▼▼▼ 【最终版 - 自由组合】用这【一整块】全新的代码，替换旧的 resetCreatePostModal 函数 ▼▼▼
+function resetCreatePostModal() {
+    const modal = document.getElementById('create-post-modal');
+    modal.querySelector('#post-public-text').value = '';
+    
+    // 清空图片相关
+    const imgPreview = modal.querySelector('#post-image-preview');
+    imgPreview.src = '';
+    imgPreview.dataset.sourceType = ''; // 清除来源标记
+    modal.querySelector('#post-image-preview-container').style.display = 'none';
+    modal.querySelector('#post-image-description').value = '';
+    modal.querySelector('#post-image-desc-group').style.display = 'none';
 
-        function resetCreatePostModal() {
-            document.getElementById('post-public-text').value = '';
-            document.getElementById('post-image-preview').src = '';
-            document.getElementById('post-image-description').value = '';
-            document.getElementById('post-image-preview-container').classList.remove('visible');
-            document.getElementById('post-image-desc-group').style.display = 'none';
-            document.getElementById('post-local-image-input').value = '';
-            document.getElementById('post-hidden-text').value = '';
-            document.getElementById('switch-to-image-mode').click();
-        }
+    // 清空文字图相关
+    modal.querySelector('#post-hidden-text').value = '';
+    modal.querySelector('#post-hidden-text-group').style.display = 'none';
+
+    // 恢复添加按钮
+    modal.querySelector('#post-add-album-image-btn').style.display = 'block';
+    modal.querySelector('#post-add-hidden-text-btn').style.display = 'block';
+}
+// ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 用这个【已包含 memories】的版本,完整替换旧的 exportBackup 函数 ▼▼▼
 async function exportBackup() {
@@ -22586,24 +22711,13 @@ document.getElementById('selection-delete-btn').addEventListener('click', async 
             document.getElementById('qzone-avatar-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (file) { const dataUrl = await new Promise(res => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.readAsDataURL(file); }); state.qzoneSettings.avatar = dataUrl; await saveQzoneSettings(); renderQzoneScreen(); } event.target.value = null; });
             document.getElementById('qzone-banner-input').addEventListener('change', async (event) => { const file = event.target.files[0]; if (file) { const dataUrl = await new Promise(res => { const reader = new FileReader(); reader.onload = () => res(reader.result); reader.readAsDataURL(file); }); state.qzoneSettings.banner = dataUrl; await saveQzoneSettings(); renderQzoneScreen(); } event.target.value = null; });
 
-// ▼▼▼ 【修正后】的“说说”按钮事件 ▼▼▼
+// ▼▼▼ 【最终版 - 自由组合】用这【一整块】全新的代码，替换所有旧的 create-post-modal 相关事件监听器 ▼▼▼
+
+// --- “发布动态”总入口按钮 (“说说”和“动态”都用这个) ---
 document.getElementById('create-shuoshuo-btn').addEventListener('click', async () => {
-    // 1. 重置并获取模态框
+    // 统一调用，不再区分模式
     resetCreatePostModal();
     const modal = document.getElementById('create-post-modal');
-    
-    // 2. 设置为“说说”模式
-    modal.dataset.mode = 'shuoshuo';
-    
-    // 3. 隐藏与图片/文字图相关的部分
-    modal.querySelector('.post-mode-switcher').style.display = 'none';
-    modal.querySelector('#image-mode-content').style.display = 'none';
-    modal.querySelector('#text-image-mode-content').style.display = 'none';
-    
-    // 4. 修改主输入框的提示语,使其更符合“说说”的场景
-    modal.querySelector('#post-public-text').placeholder = '分享新鲜事...';
-    
-    // 5. 准备并显示模态框
     const visibilityGroupsContainer = document.getElementById('post-visibility-groups');
     visibilityGroupsContainer.innerHTML = '';
     const groups = await db.qzoneGroups.toArray();
@@ -22619,29 +22733,52 @@ document.getElementById('create-shuoshuo-btn').addEventListener('click', async (
     }
     modal.classList.add('visible');
 });
+document.getElementById('create-post-btn').addEventListener('click', () => document.getElementById('create-shuoshuo-btn').click());
 
-// ▼▼▼ 用下面这段全新的代码进行替换 ▼▼▼
-document.getElementById('create-post-btn').addEventListener('click', async () => {
-    // 1. 重置并获取模态框
+
+// --- 模态框内部按钮的事件 ---
+
+// “+ 相册图片”按钮
+document.getElementById('post-add-album-image-btn').addEventListener('click', () => {
+    // 设置上下文，告诉相册我们是来选照片发动态的
+    albumPickerContext = {
+        for: 'qzone-post',
+        returnScreen: 'qzone-screen' // 选完后留在动态页即可
+    };
+    renderAlbumList();
+    showScreen('album-screen');
+    // 暂时隐藏发布模态框，选完照片再显示
+    document.getElementById('create-post-modal').classList.remove('visible');
+});
+
+// “+ 文字图”按钮
+document.getElementById('post-add-hidden-text-btn').addEventListener('click', () => {
+    document.getElementById('post-hidden-text-group').style.display = 'block';
+    document.getElementById('post-add-hidden-text-btn').style.display = 'none'; // 隐藏自己
+});
+
+// “移除图片”按钮
+document.getElementById('post-remove-image-btn').addEventListener('click', () => {
+    document.getElementById('post-image-preview').src = '';
+    document.getElementById('post-image-preview-container').style.display = 'none';
+    document.getElementById('post-image-description').value = '';
+    document.getElementById('post-image-desc-group').style.display = 'none';
+    document.getElementById('post-add-album-image-btn').style.display = 'block'; // 恢复添加按钮
+});
+
+// “移除文字图”按钮
+document.getElementById('post-remove-hidden-text-btn').addEventListener('click', () => {
+    document.getElementById('post-hidden-text').value = '';
+    document.getElementById('post-hidden-text-group').style.display = 'none';
+    document.getElementById('post-add-hidden-text-btn').style.display = 'block'; // 恢复添加按钮
+});
+
+// ▼▼▼ 【最终版 V3 - 无弹窗】请将这【一整块】全新的代码，粘贴到init()的事件监听区 ▼▼▼
+
+// --- “发布动态”总入口按钮 (“说说”和“动态”都用这个) ---
+document.getElementById('create-shuoshuo-btn').addEventListener('click', async () => {
     resetCreatePostModal();
     const modal = document.getElementById('create-post-modal');
-    
-    // 2. 设置为“复杂动态”模式
-    modal.dataset.mode = 'complex';
-    
-    // 3. 【核心修复】强制重置所有相关UI元素的显示状态
-    modal.querySelector('.post-mode-switcher').style.display = 'flex';
-    modal.querySelector('#image-mode-content').style.display = 'block'; // 强制显示图片区
-    modal.querySelector('#text-image-mode-content').style.display = 'block'; // 强制显示文字图区
-    
-    // 4. 激活“上传图片”模式,同时确保其他模式被取消激活
-    modal.querySelector('#image-mode-content').classList.add('active');
-    modal.querySelector('#text-image-mode-content').classList.remove('active');
-    
-    // 5. 恢复主输入框的默认提示语
-    modal.querySelector('#post-public-text').placeholder = '分享新鲜事...(非必填的公开文字)';
-
-    // 6. 准备并显示模态框(这部分逻辑不变)
     const visibilityGroupsContainer = document.getElementById('post-visibility-groups');
     visibilityGroupsContainer.innerHTML = '';
     const groups = await db.qzoneGroups.toArray();
@@ -22656,8 +22793,116 @@ document.getElementById('create-post-btn').addEventListener('click', async () =>
         visibilityGroupsContainer.innerHTML = '<p style="color: var(--text-secondary);">没有可用的分组</p>';
     }
     modal.classList.add('visible');
+});
+document.getElementById('create-post-btn').addEventListener('click', () => document.getElementById('create-shuoshuo-btn').click());
+
+
+// --- 模态框内部按钮的事件 ---
+
+// “+ 相册图片”按钮
+document.getElementById('post-add-album-image-btn').addEventListener('click', () => {
+    albumPickerContext = { for: 'qzone-post', returnScreen: 'qzone-screen' };
+    renderAlbumList();
+    showScreen('album-screen');
+    document.getElementById('create-post-modal').classList.remove('visible');
+});
+
+// “+ 文字图”按钮
+document.getElementById('post-add-hidden-text-btn').addEventListener('click', () => {
+    document.getElementById('post-hidden-text-group').style.display = 'block';
+    document.getElementById('post-add-hidden-text-btn').style.display = 'none';
+});
+
+// “移除图片”按钮
+document.getElementById('post-remove-image-btn').addEventListener('click', () => {
+    document.getElementById('post-image-preview').src = '';
+    document.getElementById('post-image-preview-container').style.display = 'none';
+    document.getElementById('post-image-description').value = '';
+    document.getElementById('post-image-desc-group').style.display = 'none';
+    document.getElementById('post-add-album-image-btn').style.display = 'block';
+});
+
+// “移除文字图”按钮
+document.getElementById('post-remove-hidden-text-btn').addEventListener('click', () => {
+    document.getElementById('post-hidden-text').value = '';
+    document.getElementById('post-hidden-text-group').style.display = 'none';
+    document.getElementById('post-add-hidden-text-btn').style.display = 'block';
+});
+
+// “发布”按钮 (已移除成功弹窗)
+document.getElementById('confirm-create-post-btn').addEventListener('click', async () => {
+    const publicText = document.getElementById('post-public-text').value.trim();
+    const imageUrl = document.getElementById('post-image-preview').src;
+    const imageDescription = document.getElementById('post-image-description').value.trim();
+    const hiddenContent = document.getElementById('post-hidden-text').value.trim();
+
+    if (!publicText && !(imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) && !hiddenContent) {
+        alert('动态内容不能为空！');
+        return;
+    }
+    
+    const basePostData = {
+        timestamp: Date.now(),
+        authorId: 'user',
+        visibleGroupIds: Array.from(document.querySelectorAll('input[name="visibility_group"]:checked')).map(cb => parseInt(cb.value))
+    };
+
+    let newPost = { ...basePostData };
+    
+    if (imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) {
+        newPost.type = 'image_post';
+        newPost.publicText = publicText;
+        newPost.imageUrl = imageUrl;
+        newPost.imageDescription = imageDescription;
+    } else if (hiddenContent) {
+        newPost.type = 'text_image';
+        newPost.publicText = publicText;
+        newPost.hiddenContent = hiddenContent;
+    } else {
+        newPost.type = 'shuoshuo';
+        newPost.content = publicText;
+    }
+
+    const newPostId = await db.qzonePosts.add(newPost);
+    await renderQzonePosts();
+    document.getElementById('create-post-modal').classList.remove('visible');
+    
+    // 【核心修改】移除了 alert('动态发布成功!');
+
+    (async () => {
+        try {
+            let postSummary = newPost.content || newPost.publicText || newPost.imageDescription || newPost.hiddenContent || "(无文字内容)";
+            postSummary = postSummary.substring(0, 50) + (postSummary.length > 50 ? '...' : '');
+            const chatsToUpdate = [];
+            for (const chatId in state.chats) {
+                const chat = state.chats[chatId];
+                if (chat.isGroup) continue;
+                let shouldNotify = false;
+                const postVisibleGroups = newPost.visibleGroupIds;
+                if (!postVisibleGroups || postVisibleGroups.length === 0) { shouldNotify = true; } 
+                else if (chat.groupId && postVisibleGroups.includes(chat.groupId)) { shouldNotify = true; }
+                if (shouldNotify) {
+                    const historyMessage = { role: 'user', content: `[系统提示:用户刚刚发布了一条动态(ID: ${newPostId}),内容摘要是:“${postSummary}”。你现在可以对这条动态进行评论了。]`, timestamp: Date.now() + Math.random(), isHidden: true };
+                    chat.history.push(historyMessage);
+                    chatsToUpdate.push(chat);
+                }
+            }
+            if (chatsToUpdate.length > 0) {
+                await db.chats.bulkPut(chatsToUpdate);
+                console.log(`已成功向 ${chatsToUpdate.length} 个AI发送了新动态通知。`);
+            }
+        } catch (error) {
+            console.error("后台通知AI新动态时发生错误:", error);
+        }
+    })();
+});
+
+// “取消”按钮
+document.getElementById('cancel-create-post-btn').addEventListener('click', () => {
+    document.getElementById('create-post-modal').classList.remove('visible');
 });
 // ▲▲▲ 替换结束 ▲▲▲
+
 
             document.getElementById('open-album-btn').addEventListener('click', async () => { await renderAlbumList(); showScreen('album-screen'); });
             document.getElementById('album-back-btn').addEventListener('click', () => { showScreen('chat-list-screen'); switchToChatListView('qzone-screen'); });
@@ -22705,16 +22950,43 @@ document.getElementById('album-photo-input').addEventListener('change', async (e
 
 // --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
 
-// ▼▼▼ 【最终版】相册照片点击事件（整合了发送到聊天、设置直播背景和放大查看）▼▼▼
+// ▼▼▼ 【最终防白屏版 V3 - 简化流程】请用这【一整块】全新的代码，替换旧的 photos-grid-page 点击事件监听器 ▼▼▼
 document.getElementById('photos-grid-page').addEventListener('click', async (e) => {
     const photoThumb = e.target.closest('.photo-thumb');
     
-    // --- 逻辑分支1: 如果我们是从直播间来选背景的 ---
+    // --- 逻辑分支1: 如果我们是从发布动态来选照片的 ---
+    if (albumPickerContext.for === 'qzone-post' && photoThumb) {
+        const photoUrl = photoThumb.src;
+        const modal = document.getElementById('create-post-modal');
+
+        // a. 将图片URL设置到预览区
+        modal.querySelector('#post-image-preview').src = photoUrl;
+        modal.querySelector('#post-image-preview-container').style.display = 'flex';
+        modal.querySelector('#post-image-desc-group').style.display = 'block';
+        modal.querySelector('#post-add-album-image-btn').style.display = 'none';
+
+        // 【【【核心修复：切断循环】】】
+        // b. 不再调用 showScreen，而是直接切换 .active 类
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('chat-list-screen').classList.add('active');
+        document.getElementById('qzone-screen').classList.add('active'); // 确保动态视图是激活的
+        
+        // c. 重新显示发布框
+        modal.classList.add('visible');
+        
+        // d. 重置上下文
+        albumPickerContext = { for: null, returnScreen: null };
+        
+        return;
+    }
+
+    // --- 其他所有逻辑分支保持不变 ---
+    // (为了完整性，我已将所有其他逻辑完整地复制过来)
+
     if (albumPickerContext.for === 'live-background' && photoThumb) {
         const photoUrl = photoThumb.src;
         liveStreamState.backgroundUrl = photoUrl;
         document.getElementById('live-stream-screen').style.backgroundImage = `url(${photoUrl})`;
-
         const streamerChatId = liveStreamState.streamerId;
         if (streamerChatId && streamerChatId !== 'user' && state.chats[streamerChatId]) {
             const streamerChat = state.chats[streamerChatId];
@@ -22722,55 +22994,33 @@ document.getElementById('photos-grid-page').addEventListener('click', async (e) 
             streamerChat.settings.offlineVideoBackground = photoUrl;
             await db.chats.put(streamerChat);
         }
-
         showScreen(albumPickerContext.returnScreen);
         albumPickerContext = { for: null, returnScreen: null };
         alert('直播背景已更换！');
         return;
     }
 
-    // --- 【【【全新逻辑分支2】】】: 如果我们是从聊天界面来选照片发送的 ---
     if (albumPickerContext.for === 'chat-photo' && photoThumb) {
         const photoUrl = photoThumb.src;
         const chatId = albumPickerContext.chatId;
         const chat = state.chats[chatId];
         if (!chat) return;
-
-        // a. 创建一个图片消息对象
-        const msg = {
-            role: 'user',
-            content: [{ type: 'image_url', image_url: { url: photoUrl } }],
-            timestamp: Date.now()
-        };
-
-        // b. 将消息保存到数据库
+        const msg = { role: 'user', content: [{ type: 'image_url', image_url: { url: photoUrl } }], timestamp: Date.now() };
         chat.history.push(msg);
         await db.chats.put(chat);
-        
-        // c. 跳转回聊天界面
         showScreen(albumPickerContext.returnScreen);
-        
-        // d. 在聊天界面上渲染出刚刚发送的图片
         appendMessage(msg, chat);
-        
-        // e. 刷新聊天列表
         renderChatList();
-        
-        // f. 重置上下文，完成本次操作
         albumPickerContext = { for: null, returnScreen: null, chatId: null };
-        
-        return; // 结束，不执行后续逻辑
+        return;
     }
-
-    // --- 默认逻辑分支: 删除照片 或 放大查看 ---
+    
     const deleteBtn = e.target.closest('.photo-delete-btn');
-
     if (deleteBtn) {
         e.stopPropagation();
         const photoId = parseInt(deleteBtn.dataset.photoId);
         const confirmed = await showCustomConfirm(
-            '删除照片',
-            '确定要删除这张照片吗？此操作不可恢复。',
+            '删除照片', '确定要删除这张照片吗？此操作不可恢复。',
             { confirmButtonClass: 'btn-danger' }
         );
 
@@ -22781,22 +23031,24 @@ document.getElementById('photos-grid-page').addEventListener('click', async (e) 
             await db.qzonePhotos.delete(photoId);
 
             const album = await db.qzoneAlbums.get(state.activeAlbumId);
-            const photoCount = (album.photoCount || 1) - 1;
-            const updateData = { photoCount };
-            
-            if (album.coverUrl === deletedPhoto.url) {
-                const nextPhoto = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).first();
-                updateData.coverUrl = nextPhoto ? nextPhoto.url : 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png';
+            if (album) {
+                const photoCount = (album.photoCount || 1) - 1;
+                const updateData = { photoCount };
+                
+                if (album.coverUrl === deletedPhoto.url) {
+                    const nextPhoto = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).first();
+                    updateData.coverUrl = nextPhoto ? nextPhoto.url : 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png';
+                }
+                
+                await db.qzoneAlbums.update(state.activeAlbumId, updateData);
             }
             
-            await db.qzoneAlbums.update(state.activeAlbumId, updateData);
             await renderAlbumPhotosScreen();
             await renderAlbumList();
             alert('照片已删除。');
         }
     } 
     else if (photoThumb) {
-        // 如果没有任何上下文，就执行默认的放大查看操作
         openPhotoViewer(photoThumb.src);
     }
 });
@@ -22825,126 +23077,6 @@ document.addEventListener('keydown', (e) => {
 document.getElementById('create-album-btn-page').addEventListener('click', async () => { const albumName = await showCustomPrompt("创建新相册", "请输入相册名称"); if (albumName && albumName.trim()) { const newAlbum = { name: albumName.trim(), coverUrl: 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png', photoCount: 0, createdAt: Date.now() }; await db.qzoneAlbums.add(newAlbum); await renderAlbumList(); alert(`相册 "${albumName}" 创建成功!`); } else if (albumName !== null) { alert("相册名称不能为空!"); } });
 
             document.getElementById('cancel-create-post-btn').addEventListener('click', () => document.getElementById('create-post-modal').classList.remove('visible'));
-            document.getElementById('post-upload-local-btn').addEventListener('click', () => document.getElementById('post-local-image-input').click());
-            document.getElementById('post-local-image-input').addEventListener('change', (event) => { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { document.getElementById('post-image-preview').src = e.target.result; document.getElementById('post-image-preview-container').classList.add('visible'); document.getElementById('post-image-desc-group').style.display = 'block'; }; reader.readAsDataURL(file); } });
-            document.getElementById('post-use-url-btn').addEventListener('click', async () => { const url = await showCustomPrompt("输入图片URL", "请输入网络图片的链接", "", "url"); if (url) { document.getElementById('post-image-preview').src = url; document.getElementById('post-image-preview-container').classList.add('visible'); document.getElementById('post-image-desc-group').style.display = 'block'; } });
-            document.getElementById('post-remove-image-btn').addEventListener('click', () => resetCreatePostModal());
-            const imageModeBtn = document.getElementById('switch-to-image-mode');
-            const textImageModeBtn = document.getElementById('switch-to-text-image-mode');
-            const imageModeContent = document.getElementById('image-mode-content');
-            const textImageModeContent = document.getElementById('text-image-mode-content');
-            imageModeBtn.addEventListener('click', () => { imageModeBtn.classList.add('active'); textImageModeBtn.classList.remove('active'); imageModeContent.classList.add('active'); textImageModeContent.classList.remove('active'); });
-            textImageModeBtn.addEventListener('click', () => { textImageModeBtn.classList.add('active'); imageModeBtn.classList.remove('active'); textImageModeContent.classList.add('active'); imageModeContent.classList.remove('active'); });
-
-// ▼▼▼ 【最终修正版】的“发布”按钮事件,已修复权限漏洞 ▼▼▼
-document.getElementById('confirm-create-post-btn').addEventListener('click', async () => {
-    const modal = document.getElementById('create-post-modal');
-    const mode = modal.dataset.mode;
-    
-    // --- 1. 获取通用的可见性设置 ---
-    const visibilityMode = document.querySelector('input[name="visibility"]:checked').value;
-    let visibleGroupIds = null;
-    
-    if (visibilityMode === 'include') {
-        visibleGroupIds = Array.from(document.querySelectorAll('input[name="visibility_group"]:checked')).map(cb => parseInt(cb.value));
-    }
-
-    let newPost = {};
-    const basePostData = {
-        timestamp: Date.now(),
-        authorId: 'user',
-        // 【重要】在这里就把权限信息存好
-        visibleGroupIds: visibleGroupIds,
-    };
-
-    // --- 2. 根据模式构建不同的 post 对象 ---
-    if (mode === 'shuoshuo') {
-        const content = document.getElementById('post-public-text').value.trim();
-        if (!content) {
-            alert('说说内容不能为空哦!');
-            return;
-        }
-        newPost = {
-            ...basePostData,
-            type: 'shuoshuo',
-            content: content,
-        };
-
-    } else { // 处理 'complex' 模式 (图片/文字图)
-        const publicText = document.getElementById('post-public-text').value.trim();
-        const isImageModeActive = document.getElementById('image-mode-content').classList.contains('active');
-if (isImageModeActive) {
-            const imageUrl = document.getElementById('post-image-preview').src;
-            const imageDescription = document.getElementById('post-image-description').value.trim();
-            if (!imageUrl || !(imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) {
-                alert('请先添加一张图片再发布动态哦!');
-                return;
-            }
-            if (!imageDescription) {
-                alert('请为你的图片添加一个简单的描述(必填,给AI看的)!');
-                return;
-            }
-            newPost = {
-                ...basePostData,
-                type: 'image_post',
-                publicText: publicText,
-                imageUrl: imageUrl,
-                imageDescription: imageDescription,
-            };
-        } else { // 文字图模式
-            const hiddenText = document.getElementById('post-hidden-text').value.trim();
-            if (!hiddenText) {
-                alert('请输入文字图描述!');
-                return;
-            }
-            newPost = {
-                ...basePostData,
-                type: 'text_image',
-                publicText: publicText,
-                hiddenContent: hiddenText,
-            };
-        }
-    }
-    // --- 3. 保存到数据库 ---
-    const newPostId = await db.qzonePosts.add(newPost);
-    let postSummary = newPost.content || newPost.publicText || newPost.imageDescription || newPost.hiddenContent || "(无文字内容)";
-    postSummary = postSummary.substring(0, 50) + (postSummary.length > 50 ? '...' : '');
-
-    // --- 4. 【核心修正】带有权限检查的通知循环 ---
-    for (const chatId in state.chats) {
-        const chat = state.chats[chatId];
-        if (chat.isGroup) continue; // 跳过群聊
-
-        let shouldNotify = false;
-        const postVisibleGroups = newPost.visibleGroupIds;
-
-        // 判断条件1:如果动态是公开的 (没有设置任何可见分组)
-        if (!postVisibleGroups || postVisibleGroups.length === 0) {
-            shouldNotify = true;
-        } 
-        // 判断条件2:如果动态设置了部分可见,并且当前角色在可见分组内
-        else if (chat.groupId && postVisibleGroups.includes(chat.groupId)) {
-            shouldNotify = true;
-        }
-
-        // 只有满足条件的角色才会被通知
-        if (shouldNotify) {
-            const historyMessage = {
-                role: 'user',
-                content: `[系统提示:用户刚刚发布了一条动态(ID: ${newPostId}),内容摘要是:“${postSummary}”。你现在可以对这条动态进行评论了。]`,
-                timestamp: Date.now(),
-                isHidden: true
-            };
-            chat.history.push(historyMessage);
-            await db.chats.put(chat);
-        }
-    }
-    // --- 修正结束 ---
-
-    await renderQzonePosts();
-    modal.classList.remove('visible');
-    alert('动态发布成功!');
-});
 
 // ... 在 init() 函数的事件监听器区域 ...
 
@@ -23040,14 +23172,14 @@ document.addEventListener('touchmove', handleSwipeMove, { passive: false });
 document.addEventListener('touchend', handleSwipeEnd);
 
 
-// ▼▼▼ 【最终原子化修复版 - 完整代码】请用这【一整块】全新的代码，替换旧的 postsList 点击事件监听器 ▼▼▼
+// ▼▼▼ 【最终版 V2 - 横向展开菜单 - 完整代码】请用这【一整块】全新的代码，替换旧的 postsList 点击事件监听器 ▼▼▼
 
 postsList.addEventListener('click', async (e) => {
     // --- 滑动和编辑模式的判断逻辑 ---
     if (!swipeState.isClick && Math.abs(swipeState.currentX - swipeState.startX) < 10) {
         swipeState.isClick = true;
     }
-    if (!swipeState.isClick) return; // 如果确定是滑动，则不执行点击逻辑
+    if (!swipeState.isClick) return;
 
     const target = e.target;
     const postContainer = target.closest('.qzone-post-container');
@@ -23058,19 +23190,75 @@ postsList.addEventListener('click', async (e) => {
     // --- 分支1: 如果当前是编辑模式 ---
     if (isQzoneEditMode) {
         togglePostSelection(postId);
-        return; // 在编辑模式下，只处理选择逻辑，直接返回
+        return;
     }
     
     // --- 如果不是编辑模式，阻止事件冒泡到上层 ---
     e.stopPropagation();
 
-    // --- 【全新功能：点击评论进行回复】 ---
+    // --- 【【【核心JS修改区】】】 ---
+    
+    // a. 处理三点按钮的点击 (展开/收起)
+    const actionsBtn = target.closest('.post-actions-btn');
+    if (actionsBtn) {
+        e.stopPropagation();
+        const container = actionsBtn.closest('.post-actions-container');
+        // 先关闭所有其他已展开的菜单
+        document.querySelectorAll('.post-actions-container.expanded').forEach(other => {
+            if (other !== container) other.classList.remove('expanded');
+        });
+        // 切换当前点击的菜单
+        container.classList.toggle('expanded');
+        return;
+    }
+
+    // b. 处理展开菜单项的点击
+    const actionItem = target.closest('.post-action-item');
+    if (actionItem) {
+        e.stopPropagation();
+        const container = actionItem.closest('.post-actions-container');
+        
+        if (actionItem.id === 'edit-post-btn-inline') {
+            activePostId = postId; // 设置当前操作的ID
+            openPostEditor(); // 调用旧的编辑函数
+        } 
+// ▼▼▼ 在 postsList 的点击事件中，用这段新代码替换旧的 'favorite-post-btn-inline' 逻辑 ▼▼▼
+        else if (actionItem.id === 'favorite-post-btn-inline') {
+            // 【【【全新：收藏/取消收藏逻辑】】】
+            const postToSave = await db.qzonePosts.get(postId);
+            if (postToSave) {
+                const existing = await db.favorites.where({ type: 'qzone_post', 'content.id': postId }).first();
+                
+                if (existing) {
+                    // 如果已收藏，则执行取消收藏
+                    await db.favorites.delete(existing.id);
+                    await showCustomAlert('提示', '已取消收藏。');
+                } else {
+                    // 如果未收藏，则执行收藏
+                    await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() });
+                    await showCustomAlert('收藏成功', '动态已成功添加到你的收藏夹！');
+                }
+                
+                // 无论操作是收藏还是取消，都刷新列表以更新图标状态
+                await renderQzonePosts();
+            }
+        }     
+        container.classList.remove('expanded'); // 点击后自动收起
+        return;
+    }
+
+    // --- 分支3: 其他所有正常模式下的点击逻辑 ---
+    const sendCommentBtn = target.closest('.comment-send-btn');
+    const commentDeleteBtn = target.closest('.comment-delete-btn');
+    const deleteActionBtn = target.closest('.qzone-post-delete-action');
+    const hiddenTextImage = target.closest('img[data-hidden-text]');
+    const feedbackIcon = target.closest('.action-icon');
     const commentItem = target.closest('.comment-item');
-    // 确保点击的不是评论上的删除按钮
-    if (commentItem && !target.closest('.comment-delete-btn')) {
+    
+    // c. 点击评论进行回复
+    if (commentItem && !commentDeleteBtn) {
         const commenterNameEl = commentItem.querySelector('.commenter-name');
         const commentInput = postContainer.querySelector('.comment-input');
-
         if (commenterNameEl && commentInput) {
             const commenterName = commenterNameEl.textContent.replace(':', '').trim();
             const replyText = `@${commenterName} `;
@@ -23078,16 +23266,8 @@ postsList.addEventListener('click', async (e) => {
             commentInput.focus();
             commentInput.setSelectionRange(replyText.length, replyText.length);
         }
-        return; // 处理完点击回复后，结束本次事件处理
+        return;
     }
-
-    // --- 分支2: 如果当前是正常模式 (执行所有其他点击逻辑) ---
-    const sendCommentBtn = target.closest('.comment-send-btn');
-    const commentDeleteBtn = target.closest('.comment-delete-btn');
-    const postActionsBtn = target.closest('.post-actions-btn');
-    const deleteActionBtn = target.closest('.qzone-post-delete-action');
-    const hiddenTextImage = target.closest('img[data-hidden-text]');
-    const feedbackIcon = target.closest('.action-icon');
 
     // 【行为1】点击发送评论按钮
     if (sendCommentBtn) {
@@ -23149,7 +23329,7 @@ postsList.addEventListener('click', async (e) => {
         await renderQzonePosts();
         return; // 结束
     } 
-    // 【行为2】点击滑动后出现的删除按钮
+    // e. 点击滑动删除按钮
     else if (deleteActionBtn) {
         const confirmed = await showCustomConfirm('删除动态', '确定要永久删除这条动态吗？', { confirmButtonClass: 'btn-danger' });
         if (confirmed) {
@@ -23172,7 +23352,7 @@ postsList.addEventListener('click', async (e) => {
             }, 300);
         }
     } 
-    // 【行为3】点击评论旁的删除按钮
+    // f. 点击评论删除按钮
     else if (commentDeleteBtn) {
         const commentIndex = parseInt(commentDeleteBtn.dataset.commentIndex);
         const post = await db.qzonePosts.get(postId);
@@ -23186,42 +23366,24 @@ postsList.addEventListener('click', async (e) => {
             alert('评论已删除。');
         }
     } 
-    // 【行为4】点击帖子右上角的三点菜单
-    else if (postActionsBtn) {
-        showPostActions(postId);
-    } 
-    // 【行为5】点击文字图
+    // g. 点击文字图
     else if (hiddenTextImage) {
         showCustomAlert("图片内容", hiddenTextImage.dataset.hiddenText.replace(/<br>/g, '\n'));
     } 
-    // 【行为6】点击点赞或收藏
+    // h. 点击点赞/分享图标
     else if (feedbackIcon) {
         if (feedbackIcon.classList.contains('like')) {
             const post = await db.qzonePosts.get(postId);
             if (!post.likes) post.likes = [];
             const userNickname = state.qzoneSettings.nickname;
             const userLikeIndex = post.likes.indexOf(userNickname);
-            if (userLikeIndex > -1) { 
-                post.likes.splice(userLikeIndex, 1); 
-            } else { 
-                post.likes.push(userNickname); 
-                feedbackIcon.classList.add('animate-like'); 
-                feedbackIcon.addEventListener('animationend', () => feedbackIcon.classList.remove('animate-like'), { once: true }); 
-            }
+            if (userLikeIndex > -1) { post.likes.splice(userLikeIndex, 1); } 
+            else { post.likes.push(userNickname); feedbackIcon.classList.add('animate-like'); feedbackIcon.addEventListener('animationend', () => feedbackIcon.classList.remove('animate-like'), { once: true }); }
             await db.qzonePosts.update(postId, { likes: post.likes });
         }
-        if (feedbackIcon.classList.contains('favorite')) {
-            const existingFavorite = await db.favorites.where({ type: 'qzone_post', 'content.id': postId }).first();
-            if (existingFavorite) { 
-                await db.favorites.delete(existingFavorite.id); 
-                await showCustomAlert('提示', '已取消收藏'); 
-            } else { 
-                const postToSave = await db.qzonePosts.get(postId); 
-                if (postToSave) { 
-                    await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() }); 
-                    await showCustomAlert('提示', '收藏成功!'); 
-                } 
-            }
+        // 注意：收藏图标的逻辑已移除，由新的横向展开菜单处理
+        if (feedbackIcon.classList.contains('share')) {
+            alert("分享功能待开发...");
         }
         await renderQzonePosts();
     }
@@ -24160,6 +24322,32 @@ document.getElementById('live-stream-screen').addEventListener('click', (e) => {
     }
 });
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【最终版 - 移动端回车修复】请用这【一整块】全新的代码，替换所有旧的评论回车监听器 ▼▼▼
+
+// --- 为整个动态列表添加键盘事件监听 (使用事件委托) ---
+postsList.addEventListener('keydown', (e) => {
+    // 检查事件是否发生在评论输入框，并且按下的是Enter键
+    // 使用 e.key === 'Enter' 作为主要判断，因为它更现代
+    if (e.target.matches('.comment-input') && e.key === 'Enter' && !e.shiftKey) {
+        
+        // 1. 阻止默认行为 (最关键的一步)
+        //    它会阻止软键盘的回车键执行换行或跳转。
+        e.preventDefault(); 
+        
+        // 2. 找到该输入框对应的发送按钮
+        const postContainer = e.target.closest('.qzone-post-container');
+        if (postContainer) {
+            const sendBtn = postContainer.querySelector('.comment-send-btn');
+            if (sendBtn) {
+                // 3. 模拟一次点击来发送评论
+                sendBtn.click();
+            }
+        }
+    }
+});
+
+// ▲▲▲ 替换结束 ▲▲▲
 // ▼▼▼ 请用这段【修正后】的代码，完整替换旧的 live-background-upload-input 事件监听器 ▼▼▼
 document.getElementById('live-background-upload-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -24295,6 +24483,36 @@ document.getElementById('add-existing-contact-btn').addEventListener('click', as
 
 document.getElementById('create-new-member-btn').addEventListener('click', createNewMemberInGroup);
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】点击页面空白处，收起所有展开的动态菜单 ▼▼▼
+window.addEventListener('click', (e) => {
+    // 检查页面上所有已展开的菜单
+    document.querySelectorAll('.post-actions-container.expanded').forEach(expandedContainer => {
+        // 如果本次点击的区域不在这个已展开的菜单内部
+        if (!expandedContainer.contains(e.target)) {
+            // 就把它收起来
+            expandedContainer.classList.remove('expanded');
+        }
+    });
+
+    // --- (这里是您之前已有的、用于关闭其他下拉菜单的逻辑，我们把它整合到一起) ---
+    const qzoneDropdown = document.getElementById('qzone-actions-dropdown');
+    const qzoneMenuBtn = document.getElementById('qzone-actions-menu-btn');
+    if (qzoneDropdown && qzoneMenuBtn) {
+        if (qzoneDropdown.classList.contains('visible') && !qzoneDropdown.contains(e.target) && !qzoneMenuBtn.contains(e.target)) {
+            qzoneDropdown.classList.remove('visible');
+        }
+    }
+    
+    const addChatMenu = document.getElementById('add-chat-menu');
+    const addChatBtn = document.getElementById('add-chat-btn');
+    if(addChatMenu && addChatBtn) {
+        if (addChatMenu.classList.contains('visible') && !addChatMenu.contains(e.target) && !addChatBtn.contains(e.target)) {
+            addChatMenu.classList.remove('visible');
+        }
+    }
+});
+// ▲▲▲ 新增/整合结束 ▲▲▲
 
 // ▼▼▼ 【全新】视频通话功能事件监听器 ▼▼▼
 
