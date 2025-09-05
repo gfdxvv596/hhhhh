@@ -11711,68 +11711,75 @@ function resetCreatePostModal() {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 用这个【已包含 memories】的版本,完整替换旧的 exportBackup 函数 ▼▼▼
-// ▼▼▼ 请用这【一整块】全新的代码，完整替换掉您文件中旧的 exportBackup 函数 ▼▼▼
+// ▼▼▼ 请用这【一整块】全新的、智能的导出函数，完整替换旧的 exportBackup ▼▼▼
 async function exportBackup() {
     try {
-        // --- 这部分数据准备的代码完全保持不变，非常完美 ---
+        // --- 数据准备部分保持不变 ---
         const backupData = {
             version: 1, 
             timestamp: Date.now()
         };
-
         const [
             chats, worldBooks, userStickers, apiConfig, globalSettings,
             personaPresets, musicLibrary, qzoneSettings, qzonePosts,
             qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-            memories,
-            worldBookCategories
+            memories, worldBookCategories
         ] = await Promise.all([
-            db.chats.toArray(),
-            db.worldBooks.toArray(),
-            db.userStickers.toArray(),
-            db.apiConfig.get('main'),
-            db.globalSettings.get('main'),
-            db.personaPresets.toArray(),
-            db.musicLibrary.get('main'),
-            db.qzoneSettings.get('main'),
-            db.qzonePosts.toArray(),
-            db.qzoneAlbums.toArray(),
-            db.qzonePhotos.toArray(),
-            db.favorites.toArray(),
-            db.qzoneGroups.toArray(),
-            db.memories.toArray(),
-            db.worldBookCategories.toArray()
+            db.chats.toArray(), db.worldBooks.toArray(), db.userStickers.toArray(),
+            db.apiConfig.get('main'), db.globalSettings.get('main'),
+            db.personaPresets.toArray(), db.musicLibrary.get('main'),
+            db.qzoneSettings.get('main'), db.qzonePosts.toArray(),
+            db.qzoneAlbums.toArray(), db.qzonePhotos.toArray(),
+            db.favorites.toArray(), db.qzoneGroups.toArray(),
+            db.memories.toArray(), db.worldBookCategories.toArray()
         ]);
-
         Object.assign(backupData, {
             chats, worldBooks, userStickers, apiConfig, globalSettings,
             personaPresets, musicLibrary, qzoneSettings, qzonePosts,
             qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-            memories,
-            worldBookCategories
+            memories, worldBookCategories
         });
-        
-        // --- 【【【核心修改部分：替换下载逻辑】】】 ---
 
-        // 1. 将最终的数据对象转换为JSON字符串
-        const jsonString = JSON.stringify(backupData, null, 2);
-        
-        // 2. 创建一个 Data URL。这种URL直接包含了文件的所有内容，而不是一个地址。
-        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+        // --- 【【【核心修改：智能下载逻辑】】】 ---
 
-        // 3. 使用 window.open 请求外部浏览器打开这个 Data URL。
-        //    外部浏览器会识别出这是一个文件，并自动触发下载。
-        const newWindow = window.open(dataUrl, '_blank');
-        
-        // 4. 检查弹出窗口是否被阻止，并给用户提示
-        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-            await showCustomAlert('导出失败', '无法自动打开浏览器。请检查您的APP或浏览器设置是否阻止了弹出窗口。');
-            return; // 如果失败，则停止执行
+        // 1. 定义一个简单的函数来检测是否为移动设备或可能的封包APP环境
+        const isMobileOrApp = () => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        // 2. 根据环境执行不同的下载策略
+        if (isMobileOrApp()) {
+            // 【策略A：封包APP/手机方案】使用 Data URL + window.open
+            // 这种方式可以成功调用外部浏览器进行下载
+            
+            await showCustomAlert('正在准备数据...', '即将调用外部浏览器进行下载，请在新打开的页面中保存文件。');
+
+            const jsonString = JSON.stringify(backupData, null, 2);
+            const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+            
+            const newWindow = window.open(dataUrl, '_blank');
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                await showCustomAlert('导出失败', '无法自动打开浏览器。请检查您的APP或浏览器设置是否阻止了弹出窗口。');
+            }
+
+        } else {
+            // 【策略B：桌面浏览器方案】使用 Blob + 模拟点击下载链接
+            // 这是桌面浏览器的标准做法，可以指定文件名并直接触发下载，体验最好
+            
+            const blob = new Blob(
+                [JSON.stringify(backupData, null, 2)], 
+                { type: 'application/json' }
+            );
+            const url = URL.createObjectURL(blob);
+            const link = Object.assign(document.createElement('a'), {
+                href: url,
+                download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json` // 指定了文件名！
+            });
+            document.body.appendChild(link); // 兼容 Firefox
+            link.click();
+            URL.revokeObjectURL(url);
+            link.remove();
+            
+            await showCustomAlert('导出成功', '备份文件已开始下载！');
         }
-        
-        // 5. 成功调用后，给用户一个清晰的提示
-        await showCustomAlert('正在调用浏览器', '数据已准备好，即将通过您的默认浏览器进行下载。请在新打开的页面中保存文件。');
 
     } catch (error) {
         console.error("导出数据时出错:", error);
