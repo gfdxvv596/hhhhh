@@ -3091,6 +3091,88 @@ input[type="color"]::-webkit-color-swatch {
 
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】导出链接对话框样式 ▼▼▼ */
+.export-link-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.export-link-modal {
+    background-color: var(--bg-color);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.export-link-modal h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.export-link-modal p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.export-link-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 12px;
+    word-break: break-all;
+    resize: none;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+.export-link-modal .modal-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.export-link-modal .copy-button {
+    background-color: #007aff;
+    color: white;
+    margin-bottom: 10px;
+}
+.export-link-modal .copy-button:hover {
+    background-color: #0056b3;
+}
+
+.export-link-modal .close-button {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+.export-link-modal .close-button:hover {
+    background-color: var(--hover-color);
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 【最终修复】用这【一整块】代码，替换所有旧的棋盘和规则图标样式 ▼▼▼ */
 
 /* --- 1. 游戏规则弹窗内的图标样式 --- */
@@ -11711,20 +11793,65 @@ function resetCreatePostModal() {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 请用这【一整块】全新的、智能的导出函数，完整替换旧的 exportBackup ▼▼▼
+// ▼▼▼ 【全新】请将这个函数完整地添加到 exportBackup 函数之前 ▼▼▼
+function showDownloadLinkModal(url) {
+    // 创建背景遮罩
+    const backdrop = document.createElement('div');
+    backdrop.className = 'export-link-backdrop';
+
+    // 创建对话框主体
+    const modal = document.createElement('div');
+    modal.className = 'export-link-modal';
+
+    modal.innerHTML = `
+        <h3>导出链接已生成</h3>
+        <p>请复制下面的完整链接，然后在您的手机浏览器中打开它，即可下载备份文件。</p>
+        <textarea class="export-link-textarea" readonly></textarea>
+        <button class="modal-button copy-button">一键复制</button>
+        <button class="modal-button close-button">关闭</button>
+    `;
+    
+    // 填充链接内容
+    modal.querySelector('.export-link-textarea').value = url;
+
+    // "一键复制" 按钮的逻辑
+    const copyButton = modal.querySelector('.copy-button');
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(url).then(() => {
+            copyButton.textContent = '已复制到剪贴板！';
+            copyButton.style.backgroundColor = '#4caf50'; // 绿色表示成功
+            setTimeout(() => {
+                copyButton.textContent = '一键复制';
+                copyButton.style.backgroundColor = '#007aff';
+            }, 2000);
+        }).catch(err => {
+            copyButton.textContent = '复制失败';
+            console.error('复制失败: ', err);
+        });
+    });
+
+    // "关闭" 按钮的逻辑
+    const closeButton = modal.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(backdrop);
+    });
+
+    backdrop.appendChild(modal);
+    document.body.appendChild(backdrop);
+}
+// ▲▲▲ 新JS函数粘贴结束 ▲▲▲
+
+// ▼▼▼ 请用这【一整块】全新的代码，完整替换掉您文件中旧的 exportBackup 函数 ▼▼▼
 async function exportBackup() {
     try {
-        // --- 数据准备部分保持不变 ---
+        await showCustomAlert('正在准备数据...', '请稍候，正在打包您的所有信息...');
+
+        // 1. 数据准备 (这部分保持不变)
         const backupData = {
-            version: 1, 
+            version: 1,
             timestamp: Date.now()
         };
-        const [
-            chats, worldBooks, userStickers, apiConfig, globalSettings,
-            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-            qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-            memories, worldBookCategories
-        ] = await Promise.all([
+        const tablesToExport = [
             db.chats.toArray(), db.worldBooks.toArray(), db.userStickers.toArray(),
             db.apiConfig.get('main'), db.globalSettings.get('main'),
             db.personaPresets.toArray(), db.musicLibrary.get('main'),
@@ -11732,54 +11859,26 @@ async function exportBackup() {
             db.qzoneAlbums.toArray(), db.qzonePhotos.toArray(),
             db.favorites.toArray(), db.qzoneGroups.toArray(),
             db.memories.toArray(), db.worldBookCategories.toArray()
-        ]);
-        Object.assign(backupData, {
-            chats, worldBooks, userStickers, apiConfig, globalSettings,
-            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-            qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
-            memories, worldBookCategories
+        ];
+        const tableNames = [
+            'chats', 'worldBooks', 'userStickers', 'apiConfig', 'globalSettings',
+            'personaPresets', 'musicLibrary', 'qzoneSettings', 'qzonePosts',
+            'qzoneAlbums', 'qzonePhotos', 'favorites', 'qzoneGroups',
+            'memories', 'worldBookCategories'
+        ];
+        const results = await Promise.all(tablesToExport);
+        results.forEach((data, index) => {
+            backupData[tableNames[index]] = data;
         });
 
-        // --- 【【【核心修改：智能下载逻辑】】】 ---
+        // 2. 将数据转换为 JSON 字符串
+        const jsonString = JSON.stringify(backupData, null, 2);
 
-        // 1. 定义一个简单的函数来检测是否为移动设备或可能的封包APP环境
-        const isMobileOrApp = () => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        // 3. 【【【核心】】】创建包含所有文件内容的 Data URL
+        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
 
-        // 2. 根据环境执行不同的下载策略
-        if (isMobileOrApp()) {
-            // 【策略A：封包APP/手机方案】使用 Data URL + window.open
-            // 这种方式可以成功调用外部浏览器进行下载
-            
-            await showCustomAlert('正在准备数据...', '即将调用外部浏览器进行下载，请在新打开的页面中保存文件。');
-
-            const jsonString = JSON.stringify(backupData, null, 2);
-            const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
-            
-            const newWindow = window.open(dataUrl, '_blank');
-            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                await showCustomAlert('导出失败', '无法自动打开浏览器。请检查您的APP或浏览器设置是否阻止了弹出窗口。');
-            }
-
-        } else {
-            // 【策略B：桌面浏览器方案】使用 Blob + 模拟点击下载链接
-            // 这是桌面浏览器的标准做法，可以指定文件名并直接触发下载，体验最好
-            
-            const blob = new Blob(
-                [JSON.stringify(backupData, null, 2)], 
-                { type: 'application/json' }
-            );
-            const url = URL.createObjectURL(blob);
-            const link = Object.assign(document.createElement('a'), {
-                href: url,
-                download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json` // 指定了文件名！
-            });
-            document.body.appendChild(link); // 兼容 Firefox
-            link.click();
-            URL.revokeObjectURL(url);
-            link.remove();
-            
-            await showCustomAlert('导出成功', '备份文件已开始下载！');
-        }
+        // 4. 调用我们新的对话框函数，把链接显示给用户
+        showDownloadLinkModal(dataUrl);
 
     } catch (error) {
         console.error("导出数据时出错:", error);
