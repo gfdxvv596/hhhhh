@@ -11712,8 +11712,10 @@ function resetCreatePostModal() {
 // ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 用这个【已包含 memories】的版本,完整替换旧的 exportBackup 函数 ▼▼▼
+// ▼▼▼ 请用这【一整块】全新的代码，完整替换掉您文件中旧的 exportBackup 函数 ▼▼▼
 async function exportBackup() {
     try {
+        // --- 这部分数据准备的代码完全保持不变，非常完美 ---
         const backupData = {
             version: 1, 
             timestamp: Date.now()
@@ -11724,7 +11726,7 @@ async function exportBackup() {
             personaPresets, musicLibrary, qzoneSettings, qzonePosts,
             qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
             memories,
-            worldBookCategories // <-- 【核心修改1】在这里添加新变量
+            worldBookCategories
         ] = await Promise.all([
             db.chats.toArray(),
             db.worldBooks.toArray(),
@@ -11739,8 +11741,8 @@ async function exportBackup() {
             db.qzonePhotos.toArray(),
             db.favorites.toArray(),
             db.qzoneGroups.toArray(),
-                        db.memories.toArray(),
-            db.worldBookCategories.toArray() // <-- 【核心修改2】在这里添加对新表的读取
+            db.memories.toArray(),
+            db.worldBookCategories.toArray()
         ]);
 
         Object.assign(backupData, {
@@ -11748,29 +11750,36 @@ async function exportBackup() {
             personaPresets, musicLibrary, qzoneSettings, qzonePosts,
             qzoneAlbums, qzonePhotos, favorites, qzoneGroups,
             memories,
-            worldBookCategories // <-- 【核心修改3】将新数据添加到备份对象中
+            worldBookCategories
         });
         
-        const blob = new Blob(
-            [JSON.stringify(backupData, null, 2)], 
-            { type: 'application/json' }
-        );
-        const url = URL.createObjectURL(blob);
-        const link = Object.assign(document.createElement('a'), {
-            href: url,
-            download: `EPhone-Full-Backup-${new Date().toISOString().split('T')[0]}.json`
-        });
-        link.click();
-        URL.revokeObjectURL(url);
+        // --- 【【【核心修改部分：替换下载逻辑】】】 ---
+
+        // 1. 将最终的数据对象转换为JSON字符串
+        const jsonString = JSON.stringify(backupData, null, 2);
         
-        await showCustomAlert('导出成功', '已成功导出所有数据!');
+        // 2. 创建一个 Data URL。这种URL直接包含了文件的所有内容，而不是一个地址。
+        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+
+        // 3. 使用 window.open 请求外部浏览器打开这个 Data URL。
+        //    外部浏览器会识别出这是一个文件，并自动触发下载。
+        const newWindow = window.open(dataUrl, '_blank');
+        
+        // 4. 检查弹出窗口是否被阻止，并给用户提示
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+            await showCustomAlert('导出失败', '无法自动打开浏览器。请检查您的APP或浏览器设置是否阻止了弹出窗口。');
+            return; // 如果失败，则停止执行
+        }
+        
+        // 5. 成功调用后，给用户一个清晰的提示
+        await showCustomAlert('正在调用浏览器', '数据已准备好，即将通过您的默认浏览器进行下载。请在新打开的页面中保存文件。');
 
     } catch (error) {
         console.error("导出数据时出错:", error);
         await showCustomAlert('导出失败', `发生了一个错误: ${error.message}`);
     }
 }
-
+// ▲▲▲ 替换到这里结束 ▲▲▲
 // ▼▼▼ 用这个【已包含 memories】的版本,完整替换旧的 importBackup 函数 ▼▼▼
 async function importBackup(file) {
     if (!file) return;
